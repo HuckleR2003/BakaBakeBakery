@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="hud" class="hud">
+        <ui:VisualElement class="top-row">
+            <ui:VisualElement class="metric-card">
+                <ui:Label text="COINS" class="metric-label" />
+                <ui:Label name="coin-value" text="0" class="metric-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="milestone-card">
+                <ui:Label text="NEXT MILESTONE" class="metric-label" />
+                <ui:Label text="Manager  &#183;  0 / 10 loaves" class="milestone-value" />
+            </ui:VisualElement>
+            <ui:Button name="ledger-button" text="BAKERY LEDGER" class="ledger-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="upgrade-ledger" class="ledger ledger--closed">
+            <ui:VisualElement class="ledger-tabs">
+                <ui:Label text="RECIPES" class="ledger-tab ledger-tab--active" />
+                <ui:Label text="STAFF" class="ledger-tab" />
+                <ui:Label text="BAKERY" class="ledger-tab" />
+            </ui:VisualElement>
+            <ui:Label text="A SMALL BEGINNING" class="ledger-heading" />
+            <ui:Label text="Bake ten loaves by hand. The neighbourhood is already beginning to notice." class="ledger-copy" />
+            <ui:VisualElement class="ledger-divider" />
+            <ui:Label text="SECOND OVEN" class="upgrade-name" />
+            <ui:Label text="Unlocks after 30 bread sales" class="upgrade-detail" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="recipe-dock">
+            <ui:Label text="TODAY'S RECIPES" class="dock-kicker" />
+            <ui:VisualElement class="recipe-row">
+                <ui:Button name="recipe-bread" text="B&#10;COUNTRY BREAD&#10;4.0 s  &#183;  6 coins" class="recipe-card recipe-card--selected" />
+                <ui:Button name="recipe-kaiser" text="K&#10;KAISER ROLLS&#10;30 bread sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-croissant" text="C&#10;BUTTER CROISSANT&#10;45 total sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-swirl" text="S&#10;CINNAMON SWIRL&#10;Bakery level 2" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-finezja" text="F&#10;FINEZJA&#10;100 total sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-monocle" text="M&#10;CINNAMON MONOCLE&#10;125 total sales" class="recipe-card recipe-card--locked" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,228 @@
+:root {
+    --flour: rgb(244, 229, 198);
+    --paper: rgb(250, 239, 216);
+    --crust: rgb(200, 117, 61);
+    --cocoa: rgb(56, 40, 36);
+    --sage: rgb(113, 129, 107);
+    --cherry: rgb(168, 77, 70);
+    --glow: rgb(255, 180, 93);
+}
+
+.hud {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    color: var(--cocoa);
+}
+
+.top-row {
+    position: absolute;
+    top: 24px;
+    left: 28px;
+    right: 28px;
+    height: 74px;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.metric-card,
+.milestone-card {
+    background-color: rgba(244, 229, 198, 0.96);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 4px;
+    border-left-color: rgba(56, 40, 36, 0.42);
+    border-right-color: rgba(56, 40, 36, 0.42);
+    border-top-color: rgba(56, 40, 36, 0.42);
+    border-bottom-color: rgba(56, 40, 36, 0.64);
+    border-radius: 9px;
+    padding: 9px 15px;
+    margin-right: 12px;
+}
+
+.metric-card {
+    width: 126px;
+}
+
+.milestone-card {
+    width: 250px;
+}
+
+.metric-label,
+.dock-kicker {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(56, 40, 36, 0.72);
+    -unity-font-style: bold;
+}
+
+.metric-value {
+    font-size: 27px;
+    -unity-font-style: bold;
+    color: var(--cocoa);
+    margin-top: -2px;
+}
+
+.milestone-value {
+    margin-top: 7px;
+    font-size: 15px;
+    -unity-font-style: bold;
+}
+
+.ledger-button {
+    margin-left: auto;
+    height: 46px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: rgb(56, 40, 36);
+    color: var(--flour);
+    border-width: 0;
+    border-radius: 8px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.ledger-button:hover {
+    background-color: rgb(75, 53, 47);
+}
+
+.ledger {
+    position: absolute;
+    top: 86px;
+    right: 28px;
+    width: 330px;
+    min-height: 265px;
+    padding: 22px;
+    background-color: rgba(250, 239, 216, 0.98);
+    border-left-width: 7px;
+    border-left-color: var(--cherry);
+    border-right-width: 2px;
+    border-right-color: rgba(56, 40, 36, 0.5);
+    border-top-width: 2px;
+    border-top-color: rgba(56, 40, 36, 0.5);
+    border-bottom-width: 5px;
+    border-bottom-color: rgba(56, 40, 36, 0.7);
+    border-radius: 8px;
+}
+
+.ledger--closed {
+    display: none;
+}
+
+.ledger-tabs {
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.ledger-tab {
+    margin-right: 8px;
+    padding: 6px 8px;
+    color: rgba(56, 40, 36, 0.56);
+    font-size: 10px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.ledger-tab--active {
+    color: var(--cocoa);
+    background-color: rgba(200, 117, 61, 0.18);
+    border-radius: 5px;
+}
+
+.ledger-heading {
+    font-size: 20px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.ledger-copy {
+    white-space: normal;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.ledger-divider {
+    height: 1px;
+    margin-top: 18px;
+    margin-bottom: 16px;
+    background-color: rgba(56, 40, 36, 0.24);
+}
+
+.upgrade-name {
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.upgrade-detail {
+    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(56, 40, 36, 0.64);
+}
+
+.recipe-dock {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    width: 1180px;
+    margin-left: -590px;
+    padding: 12px 18px 16px 18px;
+    background-color: rgba(56, 40, 36, 0.94);
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    border-bottom-width: 6px;
+    border-bottom-color: rgb(34, 25, 23);
+}
+
+.dock-kicker {
+    color: rgba(244, 229, 198, 0.7);
+    margin-left: 7px;
+    margin-bottom: 8px;
+}
+
+.recipe-row {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.recipe-card {
+    width: 178px;
+    height: 104px;
+    padding: 10px;
+    background-color: var(--paper);
+    color: var(--cocoa);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 4px;
+    border-color: rgba(200, 117, 61, 0.55);
+    border-bottom-color: rgb(140, 78, 45);
+    border-radius: 7px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+}
+
+.recipe-card:hover {
+    background-color: rgb(255, 246, 226);
+}
+
+.recipe-card--selected {
+    translate: 0 -7px;
+    border-top-width: 4px;
+    border-left-color: var(--glow);
+    border-right-color: var(--glow);
+    border-top-color: var(--glow);
+    background-color: rgb(255, 244, 217);
+}
+
+.recipe-card--locked {
+    opacity: 0.62;
+    background-color: rgb(205, 198, 178);
+    border-color: rgba(56, 40, 36, 0.4);
+}

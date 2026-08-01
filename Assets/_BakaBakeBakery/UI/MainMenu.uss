@@ -1,0 +1,492 @@
+:root {
+    --flour: rgb(244, 229, 198);
+    --paper: rgb(250, 239, 216);
+    --crust: rgb(200, 117, 61);
+    --cocoa: rgb(56, 40, 36);
+    --deep-cocoa: rgb(35, 27, 27);
+    --sage: rgb(113, 129, 107);
+    --cherry: rgb(168, 77, 70);
+    --evening: rgb(67, 86, 101);
+    --glow: rgb(255, 180, 93);
+}
+
+.menu-root {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    background-color: var(--evening);
+    color: var(--flour);
+}
+
+.menu-sun {
+    position: absolute;
+    width: 720px;
+    height: 720px;
+    right: -150px;
+    top: -220px;
+    background-color: rgba(255, 180, 93, 0.22);
+    border-radius: 50%;
+    border-width: 2px;
+    border-color: rgba(244, 229, 198, 0.13);
+}
+
+.menu-ground {
+    position: absolute;
+    height: 290px;
+    right: -3%;
+    bottom: -145px;
+    left: -3%;
+    background-color: var(--deep-cocoa);
+    rotate: -3deg;
+}
+
+.menu-layout {
+    position: absolute;
+    width: 1500px;
+    height: 760px;
+    left: 50%;
+    top: 50%;
+    margin-left: -750px;
+    margin-top: -405px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menu-copy-column {
+    width: 690px;
+}
+
+.menu-eyebrow,
+.card-kicker {
+    font-size: 13px;
+    letter-spacing: 5px;
+    color: rgba(244, 229, 198, 0.72);
+    -unity-font-style: bold;
+}
+
+.title-lockup {
+    margin-top: 22px;
+}
+
+.title-line {
+    height: 116px;
+    margin-top: -20px;
+    font-size: 112px;
+    letter-spacing: -2px;
+    color: var(--paper);
+    -unity-font-style: bold;
+}
+
+.title-line--small {
+    font-size: 58px;
+    height: 80px;
+    letter-spacing: 14px;
+    color: rgba(244, 229, 198, 0.72);
+}
+
+.title-line--warm {
+    color: var(--glow);
+}
+
+.menu-subtitle {
+    width: 560px;
+    margin-top: 20px;
+    font-size: 21px;
+    color: rgba(244, 229, 198, 0.78);
+    white-space: normal;
+}
+
+.menu-actions {
+    width: 350px;
+    margin-top: 44px;
+}
+
+.menu-button {
+    height: 54px;
+    margin-bottom: 12px;
+    padding-left: 22px;
+    padding-right: 22px;
+    background-color: rgba(35, 27, 27, 0.88);
+    color: var(--flour);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 4px;
+    border-color: rgba(244, 229, 198, 0.28);
+    border-bottom-color: rgba(20, 16, 17, 0.8);
+    border-radius: 8px;
+    font-size: 16px;
+    letter-spacing: 3px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+}
+
+.menu-button:hover,
+.menu-button:focus {
+    background-color: var(--paper);
+    color: var(--cocoa);
+    border-color: var(--glow);
+}
+
+.menu-button--primary {
+    background-color: var(--cherry);
+    border-color: rgba(244, 229, 198, 0.52);
+}
+
+.menu-button--quiet {
+    width: 180px;
+    background-color: rgba(35, 27, 27, 0.44);
+}
+
+.bakery-card {
+    width: 600px;
+    height: 620px;
+    padding: 24px;
+    background-color: var(--paper);
+    border-left-width: 7px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    border-bottom-width: 9px;
+    border-left-color: var(--cherry);
+    border-right-color: rgba(56, 40, 36, 0.54);
+    border-top-color: rgba(56, 40, 36, 0.54);
+    border-bottom-color: var(--cocoa);
+    border-radius: 14px;
+    color: var(--cocoa);
+    rotate: 2deg;
+}
+
+.bakery-card-header {
+    height: 52px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.bakery-card .card-kicker {
+    color: rgba(56, 40, 36, 0.64);
+}
+
+.card-number {
+    margin-left: auto;
+    font-size: 25px;
+    color: var(--cherry);
+    -unity-font-style: bold;
+}
+
+.awning-row {
+    height: 54px;
+    flex-direction: row;
+    overflow: hidden;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.awning-stripe {
+    flex-grow: 1;
+    background-color: var(--cherry);
+}
+
+.awning-stripe--cream {
+    background-color: var(--flour);
+}
+
+.window-scene {
+    position: relative;
+    height: 414px;
+    background-color: var(--sage);
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-bottom-width: 12px;
+    border-color: var(--cocoa);
+    overflow: hidden;
+}
+
+.shelf {
+    position: absolute;
+    height: 18px;
+    right: 30px;
+    left: 30px;
+    background-color: var(--cocoa);
+    flex-direction: row;
+    align-items: flex-end;
+    padding-left: 22px;
+}
+
+.shelf--top {
+    top: 126px;
+}
+
+.shelf--bottom {
+    top: 258px;
+}
+
+.bread-shape {
+    width: 86px;
+    height: 54px;
+    margin-right: 28px;
+    margin-bottom: 15px;
+    background-color: var(--crust);
+    border-radius: 50%;
+    border-bottom-width: 6px;
+    border-bottom-color: rgb(145, 78, 44);
+}
+
+.bread-shape--roll {
+    width: 60px;
+    height: 48px;
+}
+
+.bread-shape--swirl {
+    width: 54px;
+    height: 54px;
+    background-color: var(--flour);
+    border-width: 10px;
+    border-color: var(--crust);
+}
+
+.bread-shape--finezja {
+    width: 96px;
+    height: 44px;
+    background-color: var(--paper);
+    border-top-width: 18px;
+    border-top-color: var(--cherry);
+}
+
+.bread-shape--monocle {
+    width: 62px;
+    height: 62px;
+    background-color: var(--crust);
+    border-width: 11px;
+    border-color: var(--cocoa);
+}
+
+.oven-block {
+    position: absolute;
+    width: 122px;
+    height: 150px;
+    right: 34px;
+    bottom: 0;
+    background-color: var(--deep-cocoa);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.oven-window {
+    position: absolute;
+    width: 84px;
+    height: 72px;
+    left: 19px;
+    top: 28px;
+    background-color: var(--glow);
+    border-width: 8px;
+    border-color: var(--cocoa);
+    border-radius: 8px;
+}
+
+.card-caption {
+    margin-top: 18px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(56, 40, 36, 0.72);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.studio-signature {
+    position: absolute;
+    left: 34px;
+    bottom: 28px;
+    padding-left: 15px;
+    border-left-width: 3px;
+    border-left-color: var(--glow);
+}
+
+.signature-studio {
+    font-size: 21px;
+    color: var(--paper);
+    -unity-font-style: bold;
+}
+
+.signature-author {
+    margin-top: 3px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: rgba(244, 229, 198, 0.78);
+}
+
+.settings-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(25, 20, 22, 0.88);
+}
+
+.settings-panel--closed {
+    display: none;
+}
+
+.settings-sheet {
+    width: 880px;
+    min-height: 730px;
+    padding: 38px;
+    background-color: var(--paper);
+    color: var(--cocoa);
+    border-left-width: 8px;
+    border-left-color: var(--cherry);
+    border-right-width: 3px;
+    border-right-color: var(--cocoa);
+    border-top-width: 3px;
+    border-top-color: var(--cocoa);
+    border-bottom-width: 8px;
+    border-bottom-color: var(--cocoa);
+    border-radius: 12px;
+}
+
+.settings-heading-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.settings-heading {
+    font-size: 37px;
+    letter-spacing: 3px;
+    -unity-font-style: bold;
+}
+
+.settings-subheading {
+    margin-top: 5px;
+    font-size: 17px;
+    color: rgba(56, 40, 36, 0.72);
+}
+
+.close-settings-button {
+    width: 120px;
+    height: 44px;
+    margin-left: auto;
+    background-color: var(--cocoa);
+    color: var(--flour);
+    border-width: 0;
+    border-radius: 7px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+}
+
+.close-settings-button:hover,
+.close-settings-button:focus {
+    background-color: var(--cherry);
+}
+
+.settings-divider {
+    height: 2px;
+    margin-top: 26px;
+    margin-bottom: 12px;
+    background-color: rgba(56, 40, 36, 0.18);
+}
+
+.setting-row {
+    min-height: 112px;
+    flex-direction: row;
+    align-items: center;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(56, 40, 36, 0.16);
+}
+
+.setting-copy {
+    width: 420px;
+}
+
+.setting-name {
+    font-size: 16px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+}
+
+.setting-description {
+    margin-top: 6px;
+    font-size: 15px;
+    color: rgba(56, 40, 36, 0.72);
+    white-space: normal;
+}
+
+.volume-slider {
+    width: 260px;
+}
+
+.volume-slider .unity-base-slider__tracker {
+    height: 8px;
+    background-color: rgba(56, 40, 36, 0.2);
+    border-radius: 5px;
+}
+
+.volume-slider .unity-base-slider__dragger {
+    width: 20px;
+    height: 20px;
+    background-color: var(--cherry);
+    border-width: 3px;
+    border-color: var(--cocoa);
+    border-radius: 50%;
+}
+
+.setting-value {
+    width: 62px;
+    margin-left: 10px;
+    font-size: 17px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+.setting-toggle {
+    margin-left: auto;
+    min-width: 62px;
+    min-height: 38px;
+}
+
+.setting-toggle .unity-toggle__input {
+    width: 54px;
+    height: 30px;
+    background-color: rgba(56, 40, 36, 0.18);
+    border-width: 2px;
+    border-color: rgba(56, 40, 36, 0.58);
+    border-radius: 15px;
+}
+
+.setting-toggle:checked .unity-toggle__input {
+    background-color: var(--sage);
+    border-color: var(--cocoa);
+}
+
+.about-card {
+    margin-top: 18px;
+    padding: 18px 22px;
+    background-color: var(--cocoa);
+    border-left-width: 5px;
+    border-left-color: var(--glow);
+    border-radius: 8px;
+}
+
+.about-studio {
+    font-size: 24px;
+    color: var(--paper);
+    -unity-font-style: bold;
+}
+
+.about-author {
+    margin-top: 3px;
+    font-size: 18px;
+    color: var(--flour);
+}
+
+.about-discipline {
+    margin-top: 8px;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: rgba(244, 229, 198, 0.58);
+}

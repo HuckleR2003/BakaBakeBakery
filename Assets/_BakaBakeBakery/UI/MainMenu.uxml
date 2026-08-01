@@ -1,0 +1,98 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="main-menu" class="menu-root">
+        <ui:VisualElement class="menu-sun" />
+        <ui:VisualElement class="menu-ground" />
+        <ui:VisualElement class="menu-layout">
+            <ui:VisualElement class="menu-copy-column">
+                <ui:Label text="HCK LABS PRESENTS" class="menu-eyebrow" />
+                <ui:VisualElement class="title-lockup">
+                    <ui:Label text="BAKA" class="title-line title-line--small" />
+                    <ui:Label text="BAKE" class="title-line title-line--warm" />
+                    <ui:Label text="BAKERY" class="title-line" />
+                </ui:VisualElement>
+                <ui:Label text="A tiny bakery with a very big morning ahead." class="menu-subtitle" />
+                <ui:VisualElement class="menu-actions">
+                    <ui:Button name="start-button" text="START BAKING" class="menu-button menu-button--primary" />
+                    <ui:Button name="settings-button" text="SETTINGS" class="menu-button" />
+                    <ui:Button name="quit-button" text="QUIT" class="menu-button menu-button--quiet" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="bakery-card">
+                <ui:VisualElement class="bakery-card-header">
+                    <ui:Label text="TODAY'S WINDOW" class="card-kicker" />
+                    <ui:Label text="01" class="card-number" />
+                </ui:VisualElement>
+                <ui:VisualElement class="awning-row">
+                    <ui:VisualElement class="awning-stripe awning-stripe--cream" />
+                    <ui:VisualElement class="awning-stripe" />
+                    <ui:VisualElement class="awning-stripe awning-stripe--cream" />
+                    <ui:VisualElement class="awning-stripe" />
+                    <ui:VisualElement class="awning-stripe awning-stripe--cream" />
+                    <ui:VisualElement class="awning-stripe" />
+                </ui:VisualElement>
+                <ui:VisualElement class="window-scene">
+                    <ui:VisualElement class="shelf shelf--top">
+                        <ui:VisualElement class="bread-shape bread-shape--loaf" />
+                        <ui:VisualElement class="bread-shape bread-shape--roll" />
+                        <ui:VisualElement class="bread-shape bread-shape--swirl" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="shelf shelf--bottom">
+                        <ui:VisualElement class="bread-shape bread-shape--finezja" />
+                        <ui:VisualElement class="bread-shape bread-shape--monocle" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="oven-block">
+                        <ui:VisualElement class="oven-window" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label text="OPENING SOON  ·  ONE LOAF AT A TIME" class="card-caption" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="studio-signature">
+            <ui:Label text="HCK Labs" class="signature-studio" />
+            <ui:Label text="Marcin 'HCK' Firmuga" class="signature-author" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-panel" class="settings-panel settings-panel--closed">
+            <ui:VisualElement class="settings-sheet">
+                <ui:VisualElement class="settings-heading-row">
+                    <ui:VisualElement>
+                        <ui:Label text="SETTINGS" class="settings-heading" />
+                        <ui:Label text="A comfortable shift is a better shift." class="settings-subheading" />
+                    </ui:VisualElement>
+                    <ui:Button name="close-settings-button" text="BACK" class="close-settings-button" />
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-divider" />
+                <ui:VisualElement class="setting-row">
+                    <ui:VisualElement class="setting-copy">
+                        <ui:Label text="MASTER VOLUME" class="setting-name" />
+                        <ui:Label text="All music and bakery sounds." class="setting-description" />
+                    </ui:VisualElement>
+                    <ui:Slider name="volume-slider" low-value="0" high-value="100" show-input-field="false" class="volume-slider" />
+                    <ui:Label name="volume-value" text="80%" class="setting-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="setting-row">
+                    <ui:VisualElement class="setting-copy">
+                        <ui:Label text="FULLSCREEN" class="setting-name" />
+                        <ui:Label text="Use a borderless full-screen window." class="setting-description" />
+                    </ui:VisualElement>
+                    <ui:Toggle name="fullscreen-toggle" class="setting-toggle" />
+                </ui:VisualElement>
+                <ui:VisualElement class="setting-row">
+                    <ui:VisualElement class="setting-copy">
+                        <ui:Label text="REDUCE MOTION" class="setting-name" />
+                        <ui:Label text="Disables camera sway and simplifies the studio intro." class="setting-description" />
+                    </ui:VisualElement>
+                    <ui:Toggle name="reduce-motion-toggle" class="setting-toggle" />
+                </ui:VisualElement>
+                <ui:VisualElement class="settings-divider" />
+                <ui:VisualElement class="about-card">
+                    <ui:Label text="HCK Labs" class="about-studio" />
+                    <ui:Label text="Marcin 'HCK' Firmuga" class="about-author" />
+                    <ui:Label text="SOFTWARE &amp; GAMES" class="about-discipline" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
