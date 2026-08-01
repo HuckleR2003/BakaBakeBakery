@@ -78,6 +78,35 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(day.DailyItemsSold, Is.Zero);
         }
 
+        /// <summary>
+        /// The exact shape a stuck player reported: day one, standing in the morning with a single
+        /// sale behind them, an empty pantry and six coins. Resuming this must reach the market.
+        /// </summary>
+        [Test]
+        public void AStalledFirstMorningCanStillReachTheMarket()
+        {
+            var stuck = BakeryProgressStore.Sanitize(new BakeryProgressData
+            {
+                coins = 6,
+                countryBreadSold = 1,
+                totalItemsSold = 1,
+                warmth = 1,
+                bakeryLevel = 1,
+                dayNumber = 1,
+                dayPhase = (int)BakeryDayPhase.MorningPreparation,
+                tutorialStep = 1
+            });
+
+            var day = new BakeryDayCycle(stuck);
+
+            Assert.That(day.Phase, Is.EqualTo(BakeryDayPhase.MorningPreparation));
+            Assert.That(day.BeginMarketTrip(out var cost), Is.True, "A resumed morning must not be a dead end.");
+            Assert.That(cost, Is.LessThanOrEqualTo(stuck.coins));
+            day.Tick(BakeryDayCycle.MarketTripSeconds);
+            Assert.That(day.Phase, Is.EqualTo(BakeryDayPhase.ReadyToOpen));
+            Assert.That(day.StartDay(), Is.True);
+        }
+
         [Test]
         public void DailySalesSurviveSaveAndResume()
         {
