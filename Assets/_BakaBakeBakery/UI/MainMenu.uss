@@ -142,6 +142,36 @@
     background-color: rgba(35, 27, 27, 0.44);
 }
 
+.menu-button--danger {
+    height: 46px;
+    margin-bottom: 4px;
+    background-color: rgba(35, 27, 27, 0.6);
+    border-color: rgba(180, 69, 79, 0.55);
+    font-size: 14px;
+}
+
+.menu-button--danger:hover,
+.menu-button--danger:focus {
+    background-color: var(--cherry);
+    color: var(--flour);
+    border-color: rgba(244, 229, 198, 0.62);
+}
+
+.menu-button--arming {
+    background-color: var(--cherry);
+    color: var(--flour);
+    border-color: var(--glow);
+}
+
+.menu-note {
+    margin-bottom: 12px;
+    padding-left: 4px;
+    color: rgba(244, 229, 198, 0.55);
+    font-size: 11px;
+    letter-spacing: 1px;
+    white-space: normal;
+}
+
 .bakery-card {
     width: 600px;
     height: 620px;

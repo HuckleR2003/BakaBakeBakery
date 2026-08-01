@@ -35,6 +35,13 @@ namespace BakaBakeBakery.Gameplay
             }
         }
 
+        /// <summary>Forgets the saved bakery so the next shift starts from the first morning.</summary>
+        public static void Clear()
+        {
+            PlayerPrefs.DeleteKey(ProgressKey);
+            PlayerPrefs.Save();
+        }
+
         public static void Save(BakeryProgressData progress)
         {
             var safeProgress = Sanitize(progress);

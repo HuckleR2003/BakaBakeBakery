@@ -32,6 +32,8 @@ namespace BakaBakeBakery.Tests.EditMode
             var root = Clone("MainMenu.uxml");
 
             Assert.That(root.Q<Button>("start-button"), Is.Not.Null);
+            Assert.That(root.Q<Button>("new-game-button"), Is.Not.Null, "A saved bakery must be escapable from the menu.");
+            Assert.That(root.Q<Label>("new-game-note"), Is.Not.Null);
             Assert.That(root.Q<Button>("settings-button"), Is.Not.Null);
             Assert.That(root.Q<Button>("quit-button"), Is.Not.Null);
             Assert.That(root.Q<Toggle>("fullscreen-toggle"), Is.Not.Null);

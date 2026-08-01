@@ -13,6 +13,8 @@
                 <ui:Label text="A tiny bakery with a very big morning ahead." class="menu-subtitle" />
                 <ui:VisualElement class="menu-actions">
                     <ui:Button name="start-button" text="START BAKING" class="menu-button menu-button--primary" />
+                    <ui:Button name="new-game-button" text="NEW BAKERY" class="menu-button menu-button--danger" />
+                    <ui:Label name="new-game-note" text="This clears the saved bakery." class="menu-note" />
                     <ui:Button name="settings-button" text="SETTINGS" class="menu-button" />
                     <ui:Button name="quit-button" text="QUIT" class="menu-button menu-button--quiet" />
                 </ui:VisualElement>

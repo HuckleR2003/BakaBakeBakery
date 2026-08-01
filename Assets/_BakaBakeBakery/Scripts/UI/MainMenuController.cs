@@ -11,11 +11,17 @@ namespace BakaBakeBakery.UI
     {
         [SerializeField] private StyleSheet styleSheet;
 
+        private const float ConfirmWindowSeconds = 4f;
+
         private Button startButton;
+        private Button newGameButton;
         private Button settingsButton;
         private Button quitButton;
         private Button closeSettingsButton;
+        private Label newGameNote;
         private VisualElement settingsPanel;
+        private IVisualElementScheduledItem disarmSchedule;
+        private bool newGameArmed;
         private Toggle fullscreenToggle;
         private Toggle reduceMotionToggle;
         private Slider volumeSlider;
@@ -31,6 +37,8 @@ namespace BakaBakeBakery.UI
             }
 
             startButton = root.Q<Button>("start-button");
+            newGameButton = root.Q<Button>("new-game-button");
+            newGameNote = root.Q<Label>("new-game-note");
             settingsButton = root.Q<Button>("settings-button");
             quitButton = root.Q<Button>("quit-button");
             closeSettingsButton = root.Q<Button>("close-settings-button");
@@ -48,7 +56,12 @@ namespace BakaBakeBakery.UI
             }
 
             startButton.clicked += StartGame;
-            startButton.text = BakeryProgressStore.HasProgress ? "CONTINUE BAKING" : "START BAKING";
+            if (newGameButton != null)
+            {
+                newGameButton.clicked += OnNewGameClicked;
+            }
+
+            RefreshSaveState();
             settingsButton.clicked += OpenSettings;
             quitButton.clicked += QuitGame;
             if (closeSettingsButton != null)
@@ -76,6 +89,7 @@ namespace BakaBakeBakery.UI
             }
 
             settingsPanel.AddToClassList("settings-panel--closed");
+            newGameArmed = false;
             smokeTimer = 0f;
             startButton.schedule.Execute(startButton.Focus).StartingIn(120);
         }
@@ -96,6 +110,14 @@ namespace BakaBakeBakery.UI
             {
                 quitButton.clicked -= QuitGame;
             }
+
+            if (newGameButton != null)
+            {
+                newGameButton.clicked -= OnNewGameClicked;
+            }
+
+            disarmSchedule?.Pause();
+            disarmSchedule = null;
 
             if (closeSettingsButton != null)
             {
@@ -132,6 +154,74 @@ namespace BakaBakeBakery.UI
         private static void StartGame()
         {
             SceneFlow.TryLoad(SceneFlow.MainBakeryScene);
+        }
+
+        /// <summary>
+        /// Erasing a bakery is not undoable, so the first click only arms the button and the second
+        /// one inside a short window actually clears the save.
+        /// </summary>
+        private void OnNewGameClicked()
+        {
+            if (!newGameArmed)
+            {
+                ArmNewGame();
+                return;
+            }
+
+            newGameArmed = false;
+            disarmSchedule?.Pause();
+            BakeryProgressStore.Clear();
+            RefreshSaveState();
+            StartGame();
+        }
+
+        private void ArmNewGame()
+        {
+            if (!BakeryProgressStore.HasProgress)
+            {
+                StartGame();
+                return;
+            }
+
+            newGameArmed = true;
+            newGameButton.text = "ERASE AND START OVER?";
+            newGameButton.AddToClassList("menu-button--arming");
+            SetNote("Click again to lose the saved bakery for good.");
+            disarmSchedule?.Pause();
+            disarmSchedule = newGameButton.schedule
+                .Execute(DisarmNewGame)
+                .StartingIn(Mathf.RoundToInt(ConfirmWindowSeconds * 1000f));
+        }
+
+        private void DisarmNewGame()
+        {
+            newGameArmed = false;
+            RefreshSaveState();
+        }
+
+        private void RefreshSaveState()
+        {
+            var hasProgress = BakeryProgressStore.HasProgress;
+            startButton.text = hasProgress ? "CONTINUE BAKING" : "START BAKING";
+            if (newGameButton == null)
+            {
+                return;
+            }
+
+            newGameButton.RemoveFromClassList("menu-button--arming");
+            newGameButton.text = hasProgress ? "NEW BAKERY" : "NEW BAKERY  ·  READY";
+            newGameButton.SetEnabled(true);
+            SetNote(hasProgress
+                ? "Starts the first morning again and clears the saved bakery."
+                : "Nothing is saved yet, so this is the same as starting.");
+        }
+
+        private void SetNote(string text)
+        {
+            if (newGameNote != null)
+            {
+                newGameNote.text = text;
+            }
         }
 
         private void OpenSettings()
