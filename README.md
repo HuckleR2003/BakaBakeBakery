@@ -24,6 +24,11 @@ The current build includes:
 - a taller food-truck interior with a story shelf, pantry jars, recipe board, hanging utensils, pendant lights, and more readable workstation spacing;
 - a park path running into the diorama, sideways benches, swaying trees, looping walkers, post-purchase snacks, a distant road with traffic, lit house windows and chimney smoke;
 - a three-second illustrated road to market, food-truck bicycle, bakery delivery car, flour motes, oven steam, and a closing service shutter;
+- a free morning market every day, so an empty cash tin can never end a run;
+- an articulated grip: knuckle-pivoted fingers and thumbs that close around the dough, the tray and the finished bake;
+- a graded diorama with tone mapping, oven bloom, vignette and SMAA, warm key and cool rim lighting, and street lamps that take over once the shutter is down;
+- drifting clouds, gliding birds, falling leaves, bunting, a neighbour's laundry line, and a cat on the far bench;
+- a widened camera lean that starts near the middle of the screen and reaches almost three times further than the original framing;
 - the animated black HCK Labs ident, Main Menu, comfort settings, and responsive bakery HUD.
 
 ## Project setup
@@ -44,7 +49,7 @@ Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/Studi
 - Open Craft, then drag two to four pantry ingredients into the equation. Clicking an ingredient is an accessible shortcut to the next empty slot.
 - Press `B` to open the Bakery Book and buy available upgrades.
 - Press `Escape` to close the open Bakery Book or Settings panel.
-- Move the pointer toward the screen edges for the restrained diorama camera lean.
+- Move the pointer away from the centre of the screen to lean the diorama camera; the further out, the wider the view.
 
 ## Direction
 

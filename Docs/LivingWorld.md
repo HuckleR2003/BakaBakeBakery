@@ -23,6 +23,20 @@ The bakery world must tell the truth about the simulation. A prop may not appear
 - Reaching, loading, watching the oven, carrying, and placing use different body tilts and arm gestures.
 - Mrs. Rose and the neighbour have distinct entrances and exits. A customer already leaving temporarily owns the service space, preventing character overlap.
 - Idle motion is deliberately small: breathing, the hanging service bell, oven light, and chimney steam support the work instead of competing with it.
+- Hands are a rig, not a prop. Three knuckle-pivoted fingers and a thumb per hand open while reaching, close around whatever is being carried, and release as the load reaches the oven or the counter. The carried tray keeps the tilt the hands are actually holding and sags slightly while walking.
+
+## The district around the work
+
+The street is allowed a life the player never manages. None of it touches the simulation, and all of it is driven by name from `BakeryAmbientDistrict`:
+
+- clouds drifting across the backdrop and birds gliding over the park with a flapping silhouette;
+- leaves falling and tumbling around the park trees;
+- bunting over the truck and laundry on a neighbour's line, both moving on their own breeze;
+- a cat that has claimed the far bench, tail swinging;
+- street lamps that carry light with a faint flicker, dim while the shutter is up and brightening once the shift closes;
+- the key light cooling toward morning and warming into the closing summary, with the counter spot dropping while the bakery rests.
+
+Every one of these respects the comfort setting: reduced motion scales them down instead of switching them off.
 
 ## Visual honesty checks
 
