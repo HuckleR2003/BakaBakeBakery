@@ -73,7 +73,12 @@ namespace BakaBakeBakery.Gameplay
             RecipeId.CinnamonMonocle,
             RecipeId.ChocolateMuffin,
             RecipeId.JamTurnover,
-            RecipeId.ChocolatePillow
+            RecipeId.ChocolatePillow,
+            RecipeId.PastelDeNata,
+            RecipeId.RaspberryMacaron,
+            RecipeId.HoneyBaklava,
+            RecipeId.ChocolateCannoli,
+            RecipeId.FudgeBrownie
         };
 
         public bool IsReady { get; private set; }
@@ -331,14 +336,9 @@ namespace BakaBakeBakery.Gameplay
                 return false;
             }
 
-            var tutorialBasket = dayCycle.DayNumber == 1 && loop.TotalItemsSold == 0;
-            if (!dayCycle.BeginMarketTrip(loop.Coins >= BakeryDayCycle.MorningBasketCost, tutorialBasket, out var cost))
+            if (!dayCycle.BeginMarketTrip(out var cost))
             {
-                hud?.ShowToast(
-                    "MORNING MARKET",
-                    loop.Coins < BakeryDayCycle.MorningBasketCost && !tutorialBasket
-                        ? $"The market basket needs {BakeryDayCycle.MorningBasketCost} coins."
-                        : "The bicycle is already on its way.");
+                hud?.ShowToast("MORNING MARKET", "The bicycle is already on its way.");
                 return false;
             }
 
@@ -458,8 +458,8 @@ namespace BakaBakeBakery.Gameplay
 
             try
             {
-                var progress = BuildSmokeProbe.IsSmokeTest || BuildSmokeProbe.IsVisualCapture
-                    ? new BakeryProgressData()
+                var progress = BuildSmokeProbe.IsAutomatedRun
+                    ? BakeryProgressStore.CreateNewGame()
                     : BakeryProgressStore.Load();
                 createdLoop = new BakeryLoop(specs, progress);
                 dayCycle = new BakeryDayCycle(progress);
@@ -618,7 +618,7 @@ namespace BakaBakeBakery.Gameplay
 
         private void TickSave(float deltaTime)
         {
-            if (!saveDirty || BuildSmokeProbe.IsSmokeTest || BuildSmokeProbe.IsVisualCapture)
+            if (!saveDirty || BuildSmokeProbe.IsAutomatedRun)
             {
                 return;
             }
@@ -632,7 +632,7 @@ namespace BakaBakeBakery.Gameplay
 
         private void SaveIfNeeded()
         {
-            if (!saveDirty || loop == null || BuildSmokeProbe.IsSmokeTest || BuildSmokeProbe.IsVisualCapture)
+            if (!saveDirty || loop == null || BuildSmokeProbe.IsAutomatedRun)
             {
                 return;
             }

@@ -239,7 +239,8 @@ namespace BakaBakeBakery.UI
                 tutorialDaySummary.style.display = showSummary ? DisplayStyle.Flex : DisplayStyle.None;
                 if (showSummary)
                 {
-                    tutorialDaySummary.text = $"MARKET -{day.DailyCosts}  ·  SALES {day.DailyItemsSold} / +{day.DailyRevenue}  ·  PROFIT {day.DailyProfit:+#;-#;0}";
+                    var marketLine = day.DailyCosts > 0 ? $"MARKET -{day.DailyCosts}" : "MARKET · A GIFT";
+                    tutorialDaySummary.text = $"{marketLine}  ·  SALES {day.DailyItemsSold} / +{day.DailyRevenue}  ·  PROFIT {day.DailyProfit:+#;-#;0}";
                 }
             }
 
@@ -554,14 +555,55 @@ namespace BakaBakeBakery.UI
                 current = snapshot.TotalItemsSold;
                 target = BakeryLoop.BakeryUpgradeSales;
             }
-            else
+            else if (TryFindNextSalesMilestone(snapshot, out var pending, out var pendingTarget))
             {
                 SetText(milestoneTitle, "THE STREET KNOWS OUR NAME");
-                SetText(milestoneValue, "New recipes arrive with every warm morning");
+                SetText(milestoneValue, $"{pending.DisplayName} · {snapshot.TotalItemsSold} / {pendingTarget} sales");
+                current = snapshot.TotalItemsSold;
+                target = pendingTarget;
+            }
+            else
+            {
+                SetText(milestoneTitle, "A BAKERY THAT RUNS ITSELF");
+                SetText(milestoneValue, $"{snapshot.TotalItemsSold} warm parcels have left this counter");
                 current = target = 1;
             }
 
             SetWidth(milestoneProgressFill, target <= 0 ? 1f : (float)current / target);
+        }
+
+        private bool TryFindNextSalesMilestone(
+            BakerySnapshot snapshot,
+            out BakeryRecipeSpec recipe,
+            out int target)
+        {
+            recipe = default;
+            target = 0;
+            if (game == null)
+            {
+                return false;
+            }
+
+            foreach (var recipeId in game.RecipeDisplayOrder)
+            {
+                if (game.IsRecipeUnlocked(recipeId))
+                {
+                    continue;
+                }
+
+                var candidate = game.GetRecipe(recipeId);
+                if (candidate.UnlockAtSales <= snapshot.TotalItemsSold
+                    || candidate.RequiredBakeryLevel > snapshot.BakeryLevel)
+                {
+                    continue;
+                }
+
+                recipe = candidate;
+                target = candidate.UnlockAtSales;
+                return true;
+            }
+
+            return false;
         }
 
         private void RenderWarmth(BakerySnapshot snapshot)

@@ -78,7 +78,7 @@ namespace BakaBakeBakery.Gameplay
                 BakeryTutorialStep.VisitMarket => new BakeryTutorialBeat(
                     step,
                     "Najpierw pełny koszyk",
-                    "Mąka kupiona w panice zawsze kosztuje więcej nerwów niż monet. Bierzemy rower, jedziemy na targ i wracamy z zapasem na całą zmianę. Pierwszy koszyk stawiam ja.",
+                    "Mąka kupiona w panice zawsze kosztuje więcej nerwów niż monet. Bierzemy rower, jedziemy na targ i wracamy z zapasem na całą zmianę. Poranny koszyk zawsze stawia sąsiedztwo — na targ wjeżdżasz za darmo, nawet z pustą kasetką.",
                     "Kliknij drewnianą tabliczkę i jedź na poranny targ.",
                     "Jedziemy na targ",
                     "Daj mi chwilkę",

@@ -10,11 +10,17 @@ namespace BakaBakeBakery.Gameplay
 
         public static bool HasProgress => PlayerPrefs.HasKey(ProgressKey);
 
+        /// <summary>A fresh bakery: the opening float in the cash tin, nothing else.</summary>
+        public static BakeryProgressData CreateNewGame()
+        {
+            return Sanitize(new BakeryProgressData { coins = BakeryProgressData.NewGameCoins });
+        }
+
         public static BakeryProgressData Load()
         {
             if (!PlayerPrefs.HasKey(ProgressKey))
             {
-                return Sanitize(null);
+                return CreateNewGame();
             }
 
             try
@@ -45,7 +51,7 @@ namespace BakaBakeBakery.Gameplay
             safe.totalItemsSold = Math.Clamp(safe.totalItemsSold, safe.countryBreadSold, 100000000);
             safe.warmth = Math.Clamp(safe.warmth, 0, BakeryLoop.WarmthGoal - 1);
             safe.bakeryLevel = Math.Clamp(safe.bakeryLevel, 1, 2);
-            safe.discoveryMask = Math.Clamp(safe.discoveryMask, 0, 0b111);
+            safe.discoveryMask = Math.Clamp(safe.discoveryMask, 0, BakeryLoop.AllDiscoveriesMask);
             safe.dayNumber = Math.Clamp(safe.dayNumber, 1, 9999);
             safe.dayPhase = Enum.IsDefined(typeof(BakeryDayPhase), safe.dayPhase)
                 ? safe.dayPhase

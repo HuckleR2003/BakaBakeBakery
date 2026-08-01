@@ -222,6 +222,44 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(loop.CounterStock, Is.Zero);
         }
 
+        [Test]
+        public void ANewBakeryOpensWithTheStartingFloat()
+        {
+            var progress = BakeryProgressStore.CreateNewGame();
+
+            Assert.That(BakeryProgressData.NewGameCoins, Is.EqualTo(10));
+            Assert.That(progress.coins, Is.EqualTo(BakeryProgressData.NewGameCoins));
+            Assert.That(CreateLoop(progress).Coins, Is.EqualTo(BakeryProgressData.NewGameCoins));
+        }
+
+        [Test]
+        public void EveryTestKitchenDiscoverySurvivesASavedBook()
+        {
+            var discoveries = new[]
+            {
+                RecipeId.ChocolateMuffin,
+                RecipeId.JamTurnover,
+                RecipeId.ChocolatePillow,
+                RecipeId.PastelDeNata,
+                RecipeId.RaspberryMacaron,
+                RecipeId.HoneyBaklava,
+                RecipeId.ChocolateCannoli,
+                RecipeId.FudgeBrownie
+            };
+            var loop = CreateLoop();
+            foreach (var recipeId in discoveries)
+            {
+                Assert.That(loop.UnlockCraftedRecipe(recipeId), Is.True, $"{recipeId} could not be discovered.");
+            }
+
+            var restored = CreateLoop(BakeryProgressStore.Sanitize(loop.ExportProgress()));
+
+            foreach (var recipeId in discoveries)
+            {
+                Assert.That(restored.IsRecipeUnlocked(recipeId), Is.True, $"{recipeId} was lost by the save.");
+            }
+        }
+
         private static BakeryLoop CreateLoop(BakeryProgressData progress = null)
         {
             return new BakeryLoop(new List<BakeryRecipeSpec>
@@ -234,7 +272,12 @@ namespace BakaBakeBakery.Tests.EditMode
                 new(RecipeId.CinnamonMonocle, "Cinnamon Monocle", 10f, 3, 9, 125, 2),
                 new(RecipeId.ChocolateMuffin, "Chocolate Muffin", 10f, 3, 8, 0, 1),
                 new(RecipeId.JamTurnover, "Village Jam Turnover", 9f, 2, 10, 0, 1),
-                new(RecipeId.ChocolatePillow, "Chocolate Pillow", 11f, 2, 12, 0, 1)
+                new(RecipeId.ChocolatePillow, "Chocolate Pillow", 11f, 2, 12, 0, 1),
+                new(RecipeId.PastelDeNata, "Pastel de Nata", 12f, 3, 11, 0, 1),
+                new(RecipeId.RaspberryMacaron, "Raspberry Macaron", 10f, 4, 9, 0, 1),
+                new(RecipeId.HoneyBaklava, "Honey Baklava", 13f, 3, 13, 0, 1),
+                new(RecipeId.ChocolateCannoli, "Chocolate Cannoli", 12f, 2, 14, 0, 1),
+                new(RecipeId.FudgeBrownie, "Fudge Brownie", 11f, 4, 10, 0, 1)
             }, progress);
         }
     }

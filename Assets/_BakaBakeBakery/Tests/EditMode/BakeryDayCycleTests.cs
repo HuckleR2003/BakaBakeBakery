@@ -10,7 +10,7 @@ namespace BakaBakeBakery.Tests.EditMode
         {
             var day = new BakeryDayCycle(new BakeryProgressData());
 
-            Assert.That(day.BeginMarketTrip(false, true, out var cost), Is.True);
+            Assert.That(day.BeginMarketTrip(out var cost), Is.True);
             Assert.That(cost, Is.Zero);
             Assert.That(day.Phase, Is.EqualTo(BakeryDayPhase.TravellingToMarket));
             day.Tick(2.9f);
@@ -26,21 +26,47 @@ namespace BakaBakeBakery.Tests.EditMode
         {
             var day = new BakeryDayCycle(new BakeryProgressData());
 
-            Assert.That(day.BeginMarketTrip(true, false, out var cost), Is.True);
+            Assert.That(day.BeginMarketTrip(out var cost), Is.True);
             Assert.That(cost, Is.EqualTo(BakeryDayCycle.MorningBasketCost));
             day.Tick(BakeryDayCycle.MarketTripSeconds);
             day.StartDay();
             Assert.That(day.DailyProfit, Is.EqualTo(-BakeryDayCycle.MorningBasketCost));
             day.RecordRevenue(24);
-            Assert.That(day.DailyProfit, Is.EqualTo(6));
+            Assert.That(day.DailyProfit, Is.EqualTo(24 - BakeryDayCycle.MorningBasketCost));
             Assert.That(day.DailyItemsSold, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MarketIsReachableWithAnEmptyCashTin()
+        {
+            var day = new BakeryDayCycle(new BakeryProgressData { coins = 0 });
+
+            Assert.That(BakeryDayCycle.MorningBasketCost, Is.Zero, "Entering the market must never be a paywall.");
+            Assert.That(day.BeginMarketTrip(out var cost), Is.True);
+            Assert.That(cost, Is.Zero);
+            Assert.That(day.Phase, Is.EqualTo(BakeryDayPhase.TravellingToMarket));
+        }
+
+        [Test]
+        public void EveryMorningAfterTheFirstIsAlsoFree()
+        {
+            var day = new BakeryDayCycle(new BakeryProgressData());
+            day.BeginMarketTrip(out _);
+            day.Tick(BakeryDayCycle.MarketTripSeconds);
+            day.StartDay();
+            day.EndDayEarly();
+            day.BeginNextMorning();
+
+            Assert.That(day.DayNumber, Is.EqualTo(2));
+            Assert.That(day.BeginMarketTrip(out var cost), Is.True);
+            Assert.That(cost, Is.Zero);
         }
 
         [Test]
         public void EarlyCloseCreatesSummaryAndNextMorning()
         {
             var day = new BakeryDayCycle(new BakeryProgressData());
-            day.BeginMarketTrip(false, true, out _);
+            day.BeginMarketTrip(out _);
             day.Tick(BakeryDayCycle.MarketTripSeconds);
             day.StartDay();
 
@@ -56,7 +82,7 @@ namespace BakaBakeBakery.Tests.EditMode
         public void DailySalesSurviveSaveAndResume()
         {
             var day = new BakeryDayCycle(new BakeryProgressData());
-            day.BeginMarketTrip(false, true, out _);
+            day.BeginMarketTrip(out _);
             day.Tick(BakeryDayCycle.MarketTripSeconds);
             day.StartDay();
             day.RecordRevenue(12);

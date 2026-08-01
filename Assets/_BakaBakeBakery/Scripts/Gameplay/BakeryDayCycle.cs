@@ -15,7 +15,12 @@ namespace BakaBakeBakery.Gameplay
     {
         public const float MarketTripSeconds = 3f;
         public const float DayDurationSeconds = 300f;
-        public const int MorningBasketCost = 18;
+
+        /// <summary>
+        /// The morning basket is a gift from the neighbourhood, not a toll. Entering the market must
+        /// never depend on the cash tin, so an empty purse can never end the run.
+        /// </summary>
+        public const int MorningBasketCost = 0;
 
         public BakeryDayCycle(BakeryProgressData progress)
         {
@@ -43,10 +48,10 @@ namespace BakaBakeBakery.Gameplay
             ? 1f - RemainingSeconds / MarketTripSeconds
             : Phase > BakeryDayPhase.TravellingToMarket ? 1f : 0f;
 
-        public bool BeginMarketTrip(bool canAfford, bool tutorialBasket, out int cost)
+        public bool BeginMarketTrip(out int cost)
         {
-            cost = tutorialBasket ? 0 : MorningBasketCost;
-            if (Phase != BakeryDayPhase.MorningPreparation || (!tutorialBasket && !canAfford))
+            cost = MorningBasketCost;
+            if (Phase != BakeryDayPhase.MorningPreparation)
             {
                 return false;
             }

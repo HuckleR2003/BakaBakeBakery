@@ -126,6 +126,9 @@ namespace BakaBakeBakery.Gameplay
     {
         public const int CurrentVersion = 3;
 
+        /// <summary>Coins a brand new bakery opens with. Saved games keep their own balance.</summary>
+        public const int NewGameCoins = 10;
+
         public int version = CurrentVersion;
         public int coins;
         public int countryBreadSold;
@@ -158,6 +161,9 @@ namespace BakaBakeBakery.Gameplay
         public const int BakeryUpgradeCost = 200;
         public const int WarmthGoal = 12;
         public const float GoldenMinuteDuration = 18f;
+
+        /// <summary>Every test-kitchen discovery bit, so a saved book never loses a recipe.</summary>
+        public static readonly int AllDiscoveriesMask = BuildAllDiscoveriesMask();
 
         private const float FetchDuration = 2.4f;
         private const float LoadDuration = 2.15f;
@@ -590,6 +596,17 @@ namespace BakaBakeBakery.Gameplay
             }
 
             return totalItemsSold >= recipe.UnlockAtSales && bakeryLevel >= recipe.RequiredBakeryLevel;
+        }
+
+        private static int BuildAllDiscoveriesMask()
+        {
+            var mask = 0;
+            foreach (RecipeId recipeId in Enum.GetValues(typeof(RecipeId)))
+            {
+                mask |= DiscoveryBit(recipeId);
+            }
+
+            return mask;
         }
 
         private static int DiscoveryBit(RecipeId recipeId)
