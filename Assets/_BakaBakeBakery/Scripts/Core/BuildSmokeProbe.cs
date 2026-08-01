@@ -12,6 +12,8 @@ namespace BakaBakeBakery.Core
     {
         private const string SmokeArgument = "-bakaSmokeTest";
         private const string CaptureArgument = "-bakaCaptureRoot";
+        private const string SoakArgument = "-bakaSoakMinutes";
+        private const float SoakStallToleranceSeconds = 75f;
 
         public static bool IsSmokeTest { get; } = Array.Exists(
             Environment.GetCommandLineArgs(),
@@ -19,13 +21,36 @@ namespace BakaBakeBakery.Core
 
         public static bool IsVisualCapture => !string.IsNullOrWhiteSpace(CaptureRoot);
 
+        /// <summary>Minutes of unattended real-time play requested for a long stability run.</summary>
+        public static float SoakMinutes { get; } = ParseMinutes(GetArgumentValue(SoakArgument));
+
+        public static bool IsSoakTest => SoakMinutes > 0f;
+
+        /// <summary>Any automated run that must never touch the player's own saved bakery.</summary>
+        public static bool IsAutomatedRun => IsSmokeTest || IsVisualCapture || IsSoakTest;
+
         private static string CaptureRoot { get; } = GetArgumentValue(CaptureArgument);
 
         private IEnumerator Start()
         {
-            if (IsVisualCapture || IsSmokeTest)
+            if (IsAutomatedRun)
             {
                 Application.runInBackground = true;
+            }
+
+            if (IsSoakTest)
+            {
+                yield return null;
+                if (SceneManager.GetActiveScene().name == SceneFlow.MainBakeryScene)
+                {
+                    yield return SoakBakeryLoop();
+                }
+                else
+                {
+                    SceneFlow.TryLoad(SceneFlow.MainBakeryScene);
+                }
+
+                yield break;
             }
 
             if (IsSmokeTest)
@@ -134,6 +159,124 @@ namespace BakaBakeBakery.Core
                 yield return new WaitForSecondsRealtime(0.2f);
                 Application.Quit(game.CurrentSnapshot.TotalItemsSold >= 1 ? 0 : 1);
             }
+        }
+
+        /// <summary>
+        /// Plays the shipped build unattended for the requested number of minutes: morning market,
+        /// opening the shutter, baking, selling, closing and starting the next day. It fails loudly
+        /// on a production stall, an overflowing counter or a negative balance.
+        /// </summary>
+        private static IEnumerator SoakBakeryLoop()
+        {
+            var game = default(BakeryGameController);
+            var ready = Time.realtimeSinceStartup + 8f;
+            while (Time.realtimeSinceStartup < ready)
+            {
+                game = FindAnyObjectByType<BakeryGameController>();
+                if (game != null && game.IsReady)
+                {
+                    break;
+                }
+
+                yield return null;
+            }
+
+            if (game == null || !game.IsReady)
+            {
+                Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SOAK_FAILED controller did not become ready.");
+                Application.Quit(1);
+                yield break;
+            }
+
+            var startedAt = Time.realtimeSinceStartup;
+            var deadline = startedAt + SoakMinutes * 60f;
+            var lastSaleAt = startedAt;
+            var lastHeartbeatAt = startedAt;
+            var soldBefore = game.CurrentSnapshot.TotalItemsSold;
+            var marketTrips = 0;
+
+            while (Time.realtimeSinceStartup < deadline)
+            {
+                var day = game.DayCycle;
+                switch (day.Phase)
+                {
+                    case BakeryDayPhase.MorningPreparation:
+                        if (game.GoToMarket())
+                        {
+                            marketTrips++;
+                        }
+
+                        break;
+                    case BakeryDayPhase.ReadyToOpen:
+                        game.StartDay();
+                        break;
+                    case BakeryDayPhase.Open:
+                        game.RequestBakerAction();
+                        break;
+                    case BakeryDayPhase.DaySummary:
+                        game.BeginNextMorning();
+                        break;
+                }
+
+                var snapshot = game.CurrentSnapshot;
+                if (snapshot.TotalItemsSold > soldBefore)
+                {
+                    soldBefore = snapshot.TotalItemsSold;
+                    lastSaleAt = Time.realtimeSinceStartup;
+                }
+
+                if (snapshot.CounterStock > snapshot.CounterCapacity)
+                {
+                    Debug.LogError($"[Baka Bake Bakery] GAMEPLAY_SOAK_FAILED counter held {snapshot.CounterStock} of {snapshot.CounterCapacity}.");
+                    Application.Quit(1);
+                    yield break;
+                }
+
+                if (snapshot.Coins < 0)
+                {
+                    Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SOAK_FAILED the cash tin went negative.");
+                    Application.Quit(1);
+                    yield break;
+                }
+
+                if (day.Phase == BakeryDayPhase.Open
+                    && Time.realtimeSinceStartup - lastSaleAt > SoakStallToleranceSeconds)
+                {
+                    Debug.LogError($"[Baka Bake Bakery] GAMEPLAY_SOAK_FAILED no sale for {SoakStallToleranceSeconds:0}s while open in day {day.DayNumber}, phase {snapshot.Phase}.");
+                    Application.Quit(1);
+                    yield break;
+                }
+
+                if (Time.realtimeSinceStartup - lastHeartbeatAt >= 60f)
+                {
+                    lastHeartbeatAt = Time.realtimeSinceStartup;
+                    Debug.Log($"[Baka Bake Bakery] GAMEPLAY_SOAK_HEARTBEAT {(Time.realtimeSinceStartup - startedAt) / 60f:0.0} min · day {day.DayNumber} · {day.Phase} · sold {snapshot.TotalItemsSold} · coins {snapshot.Coins} · level {snapshot.BakeryLevel}.");
+                }
+
+                yield return null;
+            }
+
+            var final = game.CurrentSnapshot;
+            if (final.TotalItemsSold <= 0 || marketTrips <= 0)
+            {
+                Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SOAK_FAILED the session never produced a sale or a market run.");
+                Application.Quit(1);
+                yield break;
+            }
+
+            Debug.Log($"[Baka Bake Bakery] GAMEPLAY_SOAK_READY {SoakMinutes:0.0} min · day {game.DayCycle.DayNumber} · {marketTrips} market runs · sold {final.TotalItemsSold} · coins {final.Coins} · bakery level {final.BakeryLevel} · second oven {final.SecondOvenPurchased}.");
+            Application.Quit(0);
+        }
+
+        private static float ParseMinutes(string value)
+        {
+            return float.TryParse(
+                value,
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out var minutes) && minutes > 0f
+                ? Math.Min(minutes, 240f)
+                : 0f;
         }
 
         private static IEnumerator ExerciseBakeryLoop()
