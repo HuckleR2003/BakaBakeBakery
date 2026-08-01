@@ -20,22 +20,21 @@ Numbers below are balance targets, not code constants. They will live in recipe 
 | Condition | Reward | Presentation |
 |---|---|---|
 | First interaction | Manual action prompt | Small world-space paper label |
-| 10 Country Breads produced | Manager | Stamped manager card and visible arrival |
+| 10 Country Breads sold | Manager | Stamped manager card and automatic work rhythm |
 | 30 Country Breads sold | Kaiser Roll + oven slot | Recipe reveal and covered oven bay opens |
 | 45 total sales | Butter Croissant | Golden recipe card and customer request preview |
-| 60 total sales | Wooden bakery purchase | Building card with before/after silhouette |
+| 55 total sales | Wooden bakery purchase | Building card with before/after silhouette |
 | 75 total sales in bakery level 2 | Cinnamon Swirl + finishing bench | New station is installed in-world |
 | 100 total sales in bakery level 2 | Finezja | Vanilla and strawberry cream piping appears at the bench |
 | 125 total sales in bakery level 2 | Cinnamon Monocle | A new laminated tray and cinnamon-dusting motion appear |
 
 ## Manual bread tutorial
 
-The first ten breads require four successful commands:
+The first ten breads require three successful commands:
 
 1. Fetch dough from the refrigerator.
 2. Load the oven.
-3. Collect the baked loaf after the timer completes.
-4. Place the loaf on the counter.
+3. Lift the finished bake and place it on the counter.
 
 Clicks made while the baker is moving are ignored with a small visual acknowledgement. The prompt always identifies the next valid action.
 
@@ -62,12 +61,12 @@ This keeps manual and automatic production behaviourally identical.
 ## Economy targets
 
 - Second oven target price: 120 coins.
-- Wooden bakery target price: 220 coins.
+- Wooden bakery target price: 200 coins.
 - Finishing bench is included with the Cinnamon Swirl milestone in the slice.
 - No ingredient costs during the first session.
 - No customer penalty before the manager unlock.
 
-The first balance pass should make the second oven affordable close to its unlock and the wooden bakery affordable shortly after 60 sales without mandatory waiting.
+The first balance pass makes the second oven affordable close to its unlock and the wooden bakery affordable shortly after 55 sales without mandatory waiting.
 
 ## Data requirements
 

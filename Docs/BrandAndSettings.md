@@ -8,7 +8,7 @@ The game uses a three-level signature rather than repeating one oversized logo e
 2. **Software & Games** — studio discipline, used only as a restrained descriptor.
 3. **Marcin 'HCK' Firmuga** — creator credit, visible in the Main Menu signature and Settings panel.
 
-The animated ident deliberately does not borrow Unity branding or a stock laboratory mark. Its test vial, white serum, break pattern, and sour-cherry diagonal wipe are built from native UI geometry and remain resolution-independent.
+The animated ident deliberately does not borrow Unity branding or a stock laboratory mark. Its test vial, white serum, break pattern, and sour-cherry diagonal wipe are built from native UI geometry and remain resolution-independent. A near-black laboratory field, restrained grid, scan line, experiment labels, and soft cherry reaction glow give the mark its own quiet technical atmosphere.
 
 ## Startup sequence
 
@@ -16,9 +16,9 @@ The animated ident deliberately does not borrow Unity branding or a stock labora
 |---:|---|
 | 0.18–0.88 s | The two-line-height laboratory vial reveals from left to right. |
 | 0.68–1.48 s | `HCK Labs` and `Software & Games` reveal toward the right. |
-| 1.48–3.48 s | The complete signature holds for two seconds. |
-| 3.48–4.25 s | The vial breaks; fragments scatter and white serum spills. |
-| 4.25–5.05 s | A sour-cherry backslash wipe crosses into the Main Menu. |
+| 1.48–3.58 s | The complete signature holds for just over two seconds. |
+| 3.58–4.42 s | The vial breaks; twelve fragments scatter, a reaction ring expands, and white serum spills. |
+| 4.42–5.28 s | A sour-cherry backslash edge pulls a cream wipe into the Main Menu. |
 
 Any key or primary click advances to the wipe. With Reduce Motion enabled, the explosion is replaced by a simple fade. A hard failsafe attempts to leave the intro after eight seconds.
 

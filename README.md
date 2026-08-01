@@ -6,17 +6,16 @@ Start with a food truck, bake the first loaves by hand, train a manager, expand 
 
 ## Current status
 
-The project is in its **Visual Foundation** phase. The current build includes the HCK Labs studio ident, Main Menu, persistent comfort settings, six recipe definitions, camera language, interface grammar, and a representative food-truck scene.
+The project now contains a **playable vertical slice**. The first ten Country Bread sales are made through a deliberate three-step rhythm: fetch the dough, load the oven, and move the finished loaf to the counter. Mila then takes over the same safe command loop as manager.
 
-The first playable slice will contain:
+The current build includes:
 
-- a four-action manual bread tutorial;
-- automated production after the tenth loaf;
-- customers, counter inventory, and visible sales;
+- customers, a two-person queue, visible counter inventory, sales, and local progress;
 - Country Bread, Kaiser Rolls, Butter Croissants, Cinnamon Swirls, Finezja, and Cinnamon Monocles;
-- a second oven and a finishing station;
-- the food-truck-to-bakery transformation;
-- local save data and capped offline progress.
+- manager, second-oven, and wooden-bakery milestones;
+- a neighbourhood Warmth meter and temporary double-income Golden Minutes;
+- conversational bubbles for Jules, Mrs. Rose, and a returning neighbour;
+- the animated black HCK Labs ident, Main Menu, comfort settings, and responsive bakery HUD.
 
 ## Project setup
 
@@ -27,6 +26,14 @@ The first playable slice will contain:
 - Secondary target: WebGL
 
 Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/StudioIntro.unity`, and press Play. The shipping flow is `StudioIntro -> MainMenu -> MainBakery`.
+
+## Controls
+
+- Click Jules in the truck or press `Space` to perform the highlighted bakery action.
+- Press `1`–`6` or click a recipe card to select an unlocked product.
+- Press `B` to open the Bakery Book and buy available upgrades.
+- Press `Escape` to close the open Bakery Book or Settings panel.
+- Move the pointer toward the screen edges for the restrained diorama camera lean.
 
 ## Direction
 

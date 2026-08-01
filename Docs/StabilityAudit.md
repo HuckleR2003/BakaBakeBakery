@@ -1,47 +1,47 @@
 # Stability Audit
 
-This audit covers the pre-gameplay Visual Foundation build. It does not claim that the future production scheduler, customer queue, economy, or save migration is tested before those systems exist.
+This audit covers the playable food-truck vertical slice, including the production state machine, customers, milestones, local progress, runtime interface, scene flow, and Windows player journey.
 
-## Guardrails now in the project
+## Runtime guardrails
 
-- Scene changes go through one guarded asynchronous loader; repeated clicks cannot enqueue duplicate loads.
-- The shipping scene order is explicit: `StudioIntro`, `MainMenu`, `MainBakery`.
-- The intro uses unscaled time, accepts skip input, respects Reduce Motion, and has an eight-second escape path.
-- Missing intro UI falls back to Main Menu instead of holding the player on a blank screen.
-- Settings values are clamped, namespaced, persisted, and applied before the first scene.
-- Missing mouse input or invalid screen dimensions centre the camera instead of throwing.
-- Camera smoothing clamps invalid serialized timing values.
-- Oven glow clamps amplitude and frequency, preventing negative or invalid light behaviour.
-- Locked recipe cards ignore selection input.
-- Escape closes open Settings and Bakery Ledger overlays.
-- Recipe catalog lookup safely handles a missing list and null recipe entries.
-- A command-line smoke journey visits all three shipping scenes and exits only after `MainBakery` is ready.
+- Every loaf follows one explicit state machine. Input is accepted only while waiting for dough, oven loading, or counter placement; click spam during movement and baking is rejected.
+- The manager calls the same action interface as the player. It cannot skip a station, overfill the counter, or start a batch that will not fit.
+- Counter stock keeps one recipe identity until sold out, so selecting another card cannot relabel existing products.
+- Customer arrivals are capped at two. Sales require both stock and a waiting customer, and each sale consumes exactly one of each.
+- Invalid, infinite, negative, or abnormally large frame deltas are ignored or capped before they reach production timers.
+- Save values are versioned, clamped, and validated. Missing, malformed, unavailable, or locked recipe selections safely fall back to Country Bread.
+- Progress is saved after meaningful events and when leaving the scene. Smoke-test runs never contaminate the player's save.
+- Scene changes go through one guarded asynchronous loader, so repeated clicks cannot enqueue duplicate loads.
+- The intro uses unscaled time, accepts skip input, respects Reduce Motion, and has a hard escape path if an expected UI element is missing.
+- Missing mouse, touch, camera, station, product, or UI references fail softly and leave a diagnostic rather than trapping the production loop.
+- World clicks are raycast from the active camera and are discarded when an interactive UI control is under the pointer.
+- Escape closes open Settings and Bakery Book overlays before any broader navigation is considered.
 
-## Test matrix
+## Verified boundaries
 
 | Area | Verification |
 |---|---|
-| Recipe data | Unique IDs, non-null assets, positive duration and revenue, six products. |
-| Camera | Dead zone, no downward tilt, symmetric edges, top-corner response. |
-| Settings | Volume clamping, Reduce Motion persistence contract, stable scene names. |
-| UI contracts | Required buttons, toggles, animated elements, and six recipe cards exist. |
-| Build configuration | Studio intro is build index 0; all shipping scenes are enabled. |
-| Player journey | Headless smoke run logs Intro, Main Menu, and Main Bakery readiness. |
-
-Final test counts and build results are recorded after each verified build rather than predicted in this document.
+| Manual production | Three deliberate actions, busy-state spam rejection, bake completion, counter placement, and first sale. |
+| Manager | Unlock at ten Country Bread sales, automatic use of the same loop, and counter-capacity compliance. |
+| Progression | Kaiser threshold, exact second-oven price, exact wooden-bakery threshold and price, repeat-purchase rejection. |
+| Recipes | Six unique products; locked selection fallback; no switching while fresh stock remains. |
+| Persistence | Corrupt-value sanitisation and round-trip restoration of valid purchases and selected recipe. |
+| Timing | NaN, infinity, negative values, and oversized frame stalls cannot corrupt state. |
+| Input | Mouse/touch world hit, Space action, number-key recipe selection, B ledger, Escape close. |
+| UI contracts | Required controls, twelve intro fragments, scan/shockwave elements, bubbles, warmth, upgrades, and six cards exist. |
+| Player journey | Studio ident, Main Menu, Main Bakery, and the first complete loaf-and-sale path run in the built player. |
 
 ## Latest verified run — 2026-08-01
 
-- EditMode tests: **15 passed, 0 failed, 0 skipped**.
+- EditMode tests: **23 passed, 0 failed, 0 skipped**.
 - Windows x86_64 player: **Build Finished, Result: Success**.
-- Runtime smoke journey: `StudioIntro`, `MainMenu`, and `MainBakery` each reported ready in order.
-- Player log: no exceptions, missing references, failed scene loads, or assertion errors.
-- Visual captures reviewed at `1280 x 720`: complete ident, broken-vial beat, Main Menu, and Settings panel.
-- Source hygiene: no generated `Assets/Resources` test artifacts remained after the build.
+- Runtime gameplay smoke: `GAMEPLAY_SMOKE_READY first manual loaf completed and sold.`
+- Player log: no exceptions, failed scene loads, compiler warnings, or unsupported UI selectors.
+- Runtime captures reviewed at `1600 × 900`: full ident, vial break, diagonal wipe, Main Menu, Settings, idle food truck, baker movement, oven phase, conversation bubble, and first sale.
 
-## Known boundaries before the next slice
+## Remaining production boundaries
 
-- The actual click-to-bake state machine is the next milestone and therefore cannot yet deadlock.
-- Save versioning and offline progression are not implemented; they must receive migration and clock-tamper tests when introduced.
-- Customer reservation and counter capacity rules are design contracts only until the gameplay scheduler exists.
-- Visual Foundation props are deterministic graybox geometry, not final optimized meshes; a later performance budget will measure draw calls, batches, and memory on target hardware.
+- The second oven currently expresses parallel capacity as a visible installed oven, 40% faster baking rhythm, and a larger counter. A true multi-oven scheduler is reserved for the next production-system pass.
+- Saves resume at a safe station boundary rather than halfway through an animation or bake. This intentionally favours recoverability over sub-second continuity.
+- Offline earnings are not enabled yet; clock migration and tamper handling must ship with that feature, not before it.
+- Current characters and props are authored procedural low-poly geometry. Mesh optimisation, animation clips, audio, and target-hardware performance budgets remain later production work.
