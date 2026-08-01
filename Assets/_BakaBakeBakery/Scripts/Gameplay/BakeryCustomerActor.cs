@@ -17,6 +17,9 @@ namespace BakaBakeBakery.Gameplay
         [SerializeField] private Transform rightLeg;
         [SerializeField] private Transform leftArm;
         [SerializeField] private Transform rightArm;
+        [SerializeField] private Transform pickupArm;
+        [SerializeField] private Transform pickupHand;
+        [SerializeField] private Transform counterPickupStation;
         [SerializeField] private GameObject purchaseParcel;
 
         private Quaternion leftLegBase;
@@ -32,10 +35,15 @@ namespace BakaBakeBakery.Gameplay
         private bool leaving;
         private DepartureStage departureStage;
         private Vector3 parcelBasePosition;
+        private Vector3 pickupHandBasePosition;
+        private float collectionRemaining;
+
+        private const float CollectionDuration = 1.18f;
 
         private enum DepartureStage
         {
             None,
+            Collecting,
             HeadingToPark,
             Eating,
             Exiting
@@ -44,7 +52,7 @@ namespace BakaBakeBakery.Gameplay
         public int QueueIndex => queueIndex;
         public bool IsLeaving => leaving;
         public bool BlocksService => leaving
-            && departureStage == DepartureStage.HeadingToPark
+            && (departureStage == DepartureStage.Collecting || departureStage == DepartureStage.HeadingToPark)
             && serviceStation != null
             && Vector3.SqrMagnitude(transform.localPosition - serviceStation.localPosition) < 2.25f;
 
@@ -63,6 +71,7 @@ namespace BakaBakeBakery.Gameplay
             leftArmBase = leftArm != null ? leftArm.localRotation : Quaternion.identity;
             rightArmBase = rightArm != null ? rightArm.localRotation : Quaternion.identity;
             parcelBasePosition = purchaseParcel != null ? purchaseParcel.transform.localPosition : Vector3.zero;
+            pickupHandBasePosition = pickupHand != null ? pickupHand.localPosition : Vector3.zero;
             SetParcel(false);
             if (visualRoot != null)
             {
@@ -104,14 +113,15 @@ namespace BakaBakeBakery.Gameplay
 
             queueIndex = -1;
             leaving = true;
-            leavePause = 0.38f;
-            departureStage = postPurchaseStation != null
-                ? DepartureStage.HeadingToPark
-                : DepartureStage.Exiting;
-            targetPosition = postPurchaseStation != null
-                ? postPurchaseStation.localPosition
-                : exitStation.localPosition;
+            leavePause = 0f;
+            collectionRemaining = CollectionDuration;
+            departureStage = DepartureStage.Collecting;
+            targetPosition = serviceStation.localPosition;
             SetParcel(true);
+            if (purchaseParcel != null && counterPickupStation != null)
+            {
+                purchaseParcel.transform.position = counterPickupStation.position;
+            }
         }
 
         public void Render(float deltaTime)
@@ -125,6 +135,12 @@ namespace BakaBakeBakery.Gameplay
             if (leavePause > 0f)
             {
                 leavePause = Mathf.Max(0f, leavePause - deltaTime);
+            }
+
+            if (departureStage == DepartureStage.Collecting)
+            {
+                RenderCollection(deltaTime);
+                return;
             }
 
             if (departureStage == DepartureStage.Eating)
@@ -200,11 +216,64 @@ namespace BakaBakeBakery.Gameplay
                     leaving = false;
                     departureStage = DepartureStage.None;
                     SetParcel(false);
+                    if (pickupHand != null) pickupHand.localPosition = pickupHandBasePosition;
                     visualRoot.gameObject.SetActive(false);
                     transform.localPosition = entranceStation.localPosition;
                     targetPosition = transform.localPosition;
                 }
             }
+        }
+
+        private void RenderCollection(float deltaTime)
+        {
+            collectionRemaining = Mathf.Max(0f, collectionRemaining - deltaTime);
+            var progress = 1f - collectionRemaining / CollectionDuration;
+            var reach = progress < 0.48f
+                ? Mathf.SmoothStep(0f, 1f, progress / 0.48f)
+                : Mathf.SmoothStep(1f, 0f, (progress - 0.48f) / 0.52f);
+
+            if (pickupHand != null && counterPickupStation != null && visualRoot != null)
+            {
+                var pickupLocal = visualRoot.InverseTransformPoint(counterPickupStation.position);
+                pickupHand.localPosition = Vector3.Lerp(pickupHandBasePosition, pickupLocal, reach);
+            }
+
+            ApplySwing(leftArm, leftArmBase, -10f);
+            ApplySwing(rightArm, rightArmBase, -10f);
+            if (pickupArm != null)
+            {
+                var baseRotation = pickupArm == leftArm ? leftArmBase : rightArmBase;
+                ApplySwing(pickupArm, baseRotation, -18f - reach * 62f);
+            }
+
+            if (purchaseParcel != null && counterPickupStation != null)
+            {
+                if (progress < 0.48f)
+                {
+                    purchaseParcel.transform.position = counterPickupStation.position;
+                }
+                else if (pickupHand != null)
+                {
+                    purchaseParcel.transform.position = pickupHand.position;
+                }
+            }
+
+            visualRoot.localPosition = visualBasePosition + Vector3.up * (Mathf.Sin(Time.unscaledTime * 2f) * 0.01f);
+            if (collectionRemaining > 0f)
+            {
+                return;
+            }
+
+            if (purchaseParcel != null)
+            {
+                purchaseParcel.transform.SetParent(visualRoot, true);
+                purchaseParcel.transform.localPosition = parcelBasePosition;
+            }
+
+            if (pickupHand != null) pickupHand.localPosition = pickupHandBasePosition;
+            departureStage = postPurchaseStation != null ? DepartureStage.HeadingToPark : DepartureStage.Exiting;
+            targetPosition = postPurchaseStation != null ? postPurchaseStation.localPosition : exitStation.localPosition;
+            leavePause = 0.12f;
         }
 
         private void SetParcel(bool visible)

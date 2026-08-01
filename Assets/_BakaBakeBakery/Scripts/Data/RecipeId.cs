@@ -10,6 +10,11 @@ namespace BakaBakeBakery.Data
         CinnamonMonocle = 5,
         ChocolateMuffin = 6,
         JamTurnover = 7,
-        ChocolatePillow = 8
+        ChocolatePillow = 8,
+        PastelDeNata = 9,
+        RaspberryMacaron = 10,
+        HoneyBaklava = 11,
+        ChocolateCannoli = 12,
+        FudgeBrownie = 13
     }
 }

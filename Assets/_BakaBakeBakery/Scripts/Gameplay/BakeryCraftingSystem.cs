@@ -37,7 +37,12 @@ namespace BakaBakeBakery.Gameplay
         {
             new(RecipeId.ChocolateMuffin, "Chocolate Muffin", IngredientId.Flour, IngredientId.Milk, IngredientId.Chocolate),
             new(RecipeId.JamTurnover, "Village Jam Turnover", IngredientId.PuffPastry, IngredientId.Jam),
-            new(RecipeId.ChocolatePillow, "Chocolate Pillow", IngredientId.PuffPastry, IngredientId.Milk, IngredientId.Chocolate)
+            new(RecipeId.ChocolatePillow, "Chocolate Pillow", IngredientId.PuffPastry, IngredientId.Milk, IngredientId.Chocolate),
+            new(RecipeId.PastelDeNata, "Pastel de Nata", IngredientId.PuffPastry, IngredientId.Milk, IngredientId.Milk),
+            new(RecipeId.RaspberryMacaron, "Raspberry Macaron", IngredientId.Flour, IngredientId.Milk, IngredientId.Jam, IngredientId.Jam),
+            new(RecipeId.HoneyBaklava, "Honey Baklava", IngredientId.PuffPastry, IngredientId.Flour, IngredientId.Jam),
+            new(RecipeId.ChocolateCannoli, "Chocolate Cannoli", IngredientId.Flour, IngredientId.Milk, IngredientId.Chocolate, IngredientId.Chocolate),
+            new(RecipeId.FudgeBrownie, "Fudge Brownie", IngredientId.Flour, IngredientId.Chocolate, IngredientId.Chocolate)
         };
 
         private readonly int[] stock = new int[Enum.GetValues(typeof(IngredientId)).Length];

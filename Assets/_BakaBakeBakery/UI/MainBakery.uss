@@ -301,6 +301,19 @@
     translate: 0 -5px;
 }
 
+.speech-portrait {
+    position: absolute;
+    left: -26px;
+    top: -28px;
+    width: 52px;
+    height: 52px;
+    background-color: rgb(211, 188, 153);
+    -unity-background-scale-mode: scale-and-crop;
+    border-width: 3px;
+    border-color: rgba(255, 180, 93, 0.92);
+    border-radius: 99px;
+}
+
 .speech-bubble--baker {
     left: 39%;
     top: 34%;
@@ -402,6 +415,7 @@
     border-width: 3px;
     border-color: rgba(255, 180, 93, 0.72);
     border-radius: 99px;
+    -unity-background-scale-mode: scale-and-crop;
 }
 
 .mila-face {
@@ -853,6 +867,19 @@
 
 .map-village { left: 14px; }
 .map-town { right: 8px; top: 22px; }
+
+.map-seller-portrait {
+    position: absolute;
+    right: -16px;
+    top: -17px;
+    width: 42px;
+    height: 42px;
+    background-color: var(--flour);
+    -unity-background-scale-mode: scale-and-crop;
+    border-width: 2px;
+    border-color: var(--glow);
+    border-radius: 99px;
+}
 
 .map-house {
     width: 55px;
@@ -1467,6 +1494,80 @@
     height: 13px;
     rotate: 0deg;
     background-color: var(--cocoa);
+}
+
+.product-icon--pasteldenata {
+    width: 39px;
+    height: 33px;
+    background-color: var(--glow);
+    border-width: 5px;
+    border-color: var(--crust);
+    border-radius: 99px 99px 36% 36%;
+}
+
+.product-icon--pasteldenata .product-icon-detail {
+    top: 5px;
+    width: 5px;
+    height: 5px;
+    background-color: var(--cocoa);
+    border-radius: 99px;
+    rotate: 0deg;
+}
+
+.product-icon--raspberrymacaron {
+    width: 46px;
+    height: 27px;
+    background-color: rgb(202, 91, 104);
+    border-bottom-width: 7px;
+    border-bottom-color: var(--paper);
+    border-radius: 99px;
+}
+
+.product-icon--raspberrymacaron .product-icon-detail { display: none; }
+
+.product-icon--honeybaklava {
+    width: 45px;
+    height: 30px;
+    background-color: rgb(213, 142, 60);
+    border-radius: 5px;
+}
+
+.product-icon--honeybaklava .product-icon-detail {
+    top: 8px;
+    height: 3px;
+    width: 34px;
+    left: 6px;
+    rotate: 0deg;
+    background-color: var(--glow);
+}
+
+.product-icon--chocolatecannoli {
+    width: 52px;
+    height: 24px;
+    background-color: var(--crust);
+    border-left-width: 8px;
+    border-right-width: 8px;
+    border-color: var(--cocoa);
+    border-radius: 99px;
+}
+
+.product-icon--chocolatecannoli .product-icon-detail { display: none; }
+
+.product-icon--fudgebrownie {
+    width: 40px;
+    height: 32px;
+    background-color: rgb(78, 45, 35);
+    border-bottom-color: rgb(39, 25, 23);
+    border-radius: 5px;
+}
+
+.product-icon--fudgebrownie .product-icon-detail {
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    background-color: var(--glow);
+    border-radius: 99px;
+    rotate: 0deg;
 }
 
 .craft-heading {

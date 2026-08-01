@@ -90,6 +90,7 @@ namespace BakaBakeBakery.UI
             }
 
             QueryElements();
+            ApplyPortraits();
             RegisterCallbacks();
         }
 
@@ -368,7 +369,7 @@ namespace BakaBakeBakery.UI
 
             recipeSlotButtons.Clear();
             craftSlotButtons.Clear();
-            for (var index = 0; index < 9; index++)
+            for (var index = 0; index < Enum.GetValues(typeof(RecipeId)).Length; index++)
             {
                 var button = root.Q<Button>($"recipe-slot-{index}");
                 if (button != null)
@@ -392,6 +393,26 @@ namespace BakaBakeBakery.UI
             AddIngredientCard("ingredient-pastry", IngredientId.PuffPastry);
             AddIngredientCard("ingredient-jam", IngredientId.Jam);
             AddIngredientCard("ingredient-chocolate", IngredientId.Chocolate);
+        }
+
+        private void ApplyPortraits()
+        {
+            ApplyPortrait("baker-portrait", "Portraits/main");
+            ApplyPortrait("grandmother-portrait", "Portraits/grandma");
+            ApplyPortrait("neighbour-portrait", "Portraits/neighbour_young");
+            ApplyPortrait("friend-portrait", "Portraits/mila");
+            ApplyPortrait("tutorial-portrait", "Portraits/mila");
+            ApplyPortrait("shop-seller-portrait", "Portraits/shop_seller");
+        }
+
+        private void ApplyPortrait(string elementName, string resourcePath)
+        {
+            var element = root?.Q<VisualElement>(elementName);
+            var texture = Resources.Load<Texture2D>(resourcePath);
+            if (element != null && texture != null)
+            {
+                element.style.backgroundImage = new StyleBackground(texture);
+            }
         }
 
         private void RegisterCallbacks()

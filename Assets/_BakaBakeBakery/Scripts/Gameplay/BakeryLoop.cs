@@ -599,6 +599,11 @@ namespace BakaBakeBakery.Gameplay
                 RecipeId.ChocolateMuffin => 1 << 0,
                 RecipeId.JamTurnover => 1 << 1,
                 RecipeId.ChocolatePillow => 1 << 2,
+                RecipeId.PastelDeNata => 1 << 3,
+                RecipeId.RaspberryMacaron => 1 << 4,
+                RecipeId.HoneyBaklava => 1 << 5,
+                RecipeId.ChocolateCannoli => 1 << 6,
+                RecipeId.FudgeBrownie => 1 << 7,
                 _ => 0
             };
         }
