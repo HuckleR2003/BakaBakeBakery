@@ -53,6 +53,26 @@ namespace BakaBakeBakery.Editor
             public Material White;
         }
 
+        private sealed class WorldReferences
+        {
+            public GameObject LockedOvenBay;
+            public GameObject SecondOven;
+            public GameObject CabinUpgrade;
+            public GameObject GoldenMinuteLight;
+            public GameObject CountryBread;
+            public GameObject KaiserRolls;
+            public GameObject Croissant;
+            public GameObject CinnamonSwirl;
+            public GameObject Finezja;
+            public GameObject CinnamonMonocle;
+        }
+
+        private sealed class CharacterReferences
+        {
+            public BakeryWorkerView Worker;
+            public Collider BakerHitTarget;
+        }
+
         [MenuItem("Baka Bake Bakery/Rebuild Visual Foundation")]
         public static void BuildAll()
         {
@@ -334,7 +354,7 @@ namespace BakaBakeBakery.Editor
 
             var root = new GameObject("StudioIntro");
             root.AddComponent<BuildSmokeProbe>();
-            BuildFlatCamera(root.transform, "Studio Intro Camera", Hex("191416"));
+            BuildFlatCamera(root.transform, "Studio Intro Camera", Hex("030305"));
             BuildUiDocument<StudioIntroController>(
                 "HCK Labs Studio Intro",
                 StudioIntroUxmlPath,
@@ -365,7 +385,7 @@ namespace BakaBakeBakery.Editor
         {
             PlayerSettings.companyName = "HCK Labs";
             PlayerSettings.productName = "Baka Bake Bakery";
-            PlayerSettings.bundleVersion = "0.2.0";
+            PlayerSettings.bundleVersion = "0.3.0";
             PlayerSettings.defaultScreenWidth = 1600;
             PlayerSettings.defaultScreenHeight = 900;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
@@ -412,11 +432,13 @@ namespace BakaBakeBakery.Editor
             root.AddComponent<BuildSmokeProbe>();
             BuildPlatform(root.transform, materials);
             BuildBackdrop(root.transform, materials);
-            BuildFoodTruck(root.transform, materials);
+            var world = BuildFoodTruck(root.transform, materials);
             BuildStreetDetails(root.transform, materials);
-            BuildCharacters(root.transform, materials);
+            var characters = BuildCharacters(root.transform, materials);
             BuildLighting(root.transform, materials);
-            return BuildCamera(root.transform);
+            var camera = BuildCamera(root.transform);
+            BuildGameplayController(root, camera, world, characters);
+            return camera;
         }
 
         private static void BuildPlatform(Transform parent, Materials materials)
@@ -466,8 +488,9 @@ namespace BakaBakeBakery.Editor
             CreatePrimitive(PrimitiveType.Cube, "Cornice", facade, new Vector3(0f, scale.y * 0.5f, -0.05f), new Vector3(scale.x + 0.25f, 0.18f, scale.z + 0.12f), wall);
         }
 
-        private static void BuildFoodTruck(Transform parent, Materials materials)
+        private static WorldReferences BuildFoodTruck(Transform parent, Materials materials)
         {
+            var references = new WorldReferences();
             var truck = new GameObject("Food Truck - Bakery Level 1").transform;
             truck.SetParent(parent, false);
             truck.localPosition = new Vector3(0f, 0.2f, 0.5f);
@@ -497,9 +520,12 @@ namespace BakaBakeBakery.Editor
             CreateWheel(truck, new Vector3(3.55f, 0.45f, -1.94f), materials);
 
             BuildFridge(truck, materials);
-            BuildOven(truck, materials);
+            BuildOven(truck, materials, references);
             BuildPreparationArea(truck, materials);
-            BuildServiceCounter(truck, materials);
+            BuildServiceCounter(truck, materials, references);
+            references.CabinUpgrade = BuildCabinUpgrade(truck, materials);
+            references.GoldenMinuteLight = BuildGoldenMinuteLight(truck);
+            return references;
         }
 
         private static void CreateWheel(Transform parent, Vector3 position, Materials materials)
@@ -533,7 +559,7 @@ namespace BakaBakeBakery.Editor
             CreatePrimitive(PrimitiveType.Cube, "Flour Label", fridge, new Vector3(-0.25f, 1.72f, -0.7f), new Vector3(0.35f, 0.45f, 0.04f), materials.Paper);
         }
 
-        private static void BuildOven(Transform truck, Materials materials)
+        private static void BuildOven(Transform truck, Materials materials, WorldReferences references)
         {
             var oven = new GameObject("Station - Oven 1").transform;
             oven.SetParent(truck, false);
@@ -560,6 +586,17 @@ namespace BakaBakeBakery.Editor
             coveredBay.localPosition = new Vector3(0.35f, 0.6f, 0.86f);
             CreatePrimitive(PrimitiveType.Cube, "Covered Bay", coveredBay, new Vector3(0f, 0.82f, 0f), new Vector3(1.2f, 1.65f, 1.05f), materials.Cherry);
             CreatePrimitive(PrimitiveType.Cube, "Bay Strap", coveredBay, new Vector3(0f, 0.82f, -0.55f), new Vector3(0.18f, 1.72f, 0.08f), materials.Flour);
+            references.LockedOvenBay = coveredBay.gameObject;
+
+            var secondOven = new GameObject("Station - Oven 2").transform;
+            secondOven.SetParent(truck, false);
+            secondOven.localPosition = new Vector3(0.35f, 0.6f, 0.86f);
+            CreatePrimitive(PrimitiveType.Cube, "Oven Body", secondOven, new Vector3(0f, 0.84f, 0f), new Vector3(1.2f, 1.68f, 1.05f), materials.Metal);
+            CreatePrimitive(PrimitiveType.Cube, "Oven Door", secondOven, new Vector3(0f, 0.78f, -0.55f), new Vector3(0.92f, 0.82f, 0.07f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Cube, "Oven Glow", secondOven, new Vector3(0f, 0.78f, -0.6f), new Vector3(0.72f, 0.56f, 0.035f), materials.Glow);
+            CreatePrimitive(PrimitiveType.Cylinder, "Oven Dial", secondOven, new Vector3(0f, 1.38f, -0.58f), new Vector3(0.16f, 0.05f, 0.16f), materials.Cherry, Quaternion.Euler(90f, 0f, 0f));
+            secondOven.gameObject.SetActive(false);
+            references.SecondOven = secondOven.gameObject;
         }
 
         private static void BuildPreparationArea(Transform truck, Materials materials)
@@ -579,7 +616,10 @@ namespace BakaBakeBakery.Editor
             }
         }
 
-        private static void BuildServiceCounter(Transform truck, Materials materials)
+        private static void BuildServiceCounter(
+            Transform truck,
+            Materials materials,
+            WorldReferences references)
         {
             var counter = new GameObject("Station - Service Counter").transform;
             counter.SetParent(truck, false);
@@ -593,6 +633,84 @@ namespace BakaBakeBakery.Editor
             CreateCinnamonSwirl(counter, new Vector3(0.48f, 1.57f, -0.06f), materials);
             CreateFinezja(counter, new Vector3(1.45f, 1.58f, -0.06f), materials);
             CreateCinnamonMonocle(counter, new Vector3(2.35f, 1.58f, -0.06f), materials);
+
+            references.CountryBread = counter.Find("Product - Country Bread")?.gameObject;
+            references.KaiserRolls = counter.Find("Product - Kaiser Rolls")?.gameObject;
+            references.Croissant = counter.Find("Product - Butter Croissant")?.gameObject;
+            references.CinnamonSwirl = counter.Find("Product - Cinnamon Swirl")?.gameObject;
+            references.Finezja = counter.Find("Product - Finezja")?.gameObject;
+            references.CinnamonMonocle = counter.Find("Product - Cinnamon Monocle")?.gameObject;
+            SetActive(references.CountryBread, false);
+            SetActive(references.KaiserRolls, false);
+            SetActive(references.Croissant, false);
+            SetActive(references.CinnamonSwirl, false);
+            SetActive(references.Finezja, false);
+            SetActive(references.CinnamonMonocle, false);
+        }
+
+        private static GameObject BuildCabinUpgrade(Transform truck, Materials materials)
+        {
+            var cabin = new GameObject("Bakery Level 2 - Wooden Home").transform;
+            cabin.SetParent(truck, false);
+
+            CreatePrimitive(PrimitiveType.Cube, "Left Timber", cabin, new Vector3(-4.45f, 2.35f, -1.98f), new Vector3(0.28f, 3.9f, 0.28f), materials.Wood);
+            CreatePrimitive(PrimitiveType.Cube, "Right Timber", cabin, new Vector3(4.45f, 2.35f, -1.98f), new Vector3(0.28f, 3.9f, 0.28f), materials.Wood);
+            CreatePrimitive(PrimitiveType.Cube, "Front Beam", cabin, new Vector3(0f, 4.02f, -2.02f), new Vector3(9.25f, 0.28f, 0.32f), materials.Wood);
+            CreatePrimitive(PrimitiveType.Cube, "Window Shelf", cabin, new Vector3(0f, 1.54f, -2.02f), new Vector3(6.9f, 0.2f, 0.48f), materials.Wood);
+
+            CreatePrimitive(
+                PrimitiveType.Cube,
+                "Glowing Bakery Sign",
+                cabin,
+                new Vector3(0f, 4.48f, -1.98f),
+                new Vector3(5.5f, 0.74f, 0.15f),
+                materials.Cocoa);
+            var signTextObject = new GameObject("Baka-Bake-Bakery Lettering");
+            signTextObject.transform.SetParent(cabin, false);
+            signTextObject.transform.localPosition = new Vector3(0f, 4.48f, -2.08f);
+            signTextObject.transform.localScale = Vector3.one * 0.12f;
+            var signText = signTextObject.AddComponent<TextMesh>();
+            signText.text = "BAKA-BAKE-BAKERY";
+            signText.anchor = TextAnchor.MiddleCenter;
+            signText.alignment = TextAlignment.Center;
+            signText.fontSize = 52;
+            signText.characterSize = 0.72f;
+            signText.color = Hex("FFD08A");
+            signText.fontStyle = FontStyle.Bold;
+
+            for (var index = 0; index < 9; index++)
+            {
+                CreatePrimitive(
+                    PrimitiveType.Sphere,
+                    $"Sign Bulb {index:00}",
+                    cabin,
+                    new Vector3(-2.35f + index * 0.59f, 4.14f, -2.12f),
+                    new Vector3(0.1f, 0.1f, 0.08f),
+                    materials.Glow);
+            }
+
+            CreatePrimitive(PrimitiveType.Cylinder, "Herb Pot", cabin, new Vector3(-3.65f, 1.73f, -2.16f), new Vector3(0.35f, 0.28f, 0.35f), materials.Cherry);
+            CreatePrimitive(PrimitiveType.Sphere, "Herb Leaves", cabin, new Vector3(-3.65f, 2.06f, -2.16f), new Vector3(0.48f, 0.42f, 0.38f), materials.Sage);
+            CreatePrimitive(PrimitiveType.Cylinder, "Herb Pot", cabin, new Vector3(3.65f, 1.73f, -2.16f), new Vector3(0.35f, 0.28f, 0.35f), materials.Cherry);
+            CreatePrimitive(PrimitiveType.Sphere, "Herb Leaves", cabin, new Vector3(3.65f, 2.06f, -2.16f), new Vector3(0.48f, 0.42f, 0.38f), materials.Sage);
+
+            cabin.gameObject.SetActive(false);
+            return cabin.gameObject;
+        }
+
+        private static GameObject BuildGoldenMinuteLight(Transform truck)
+        {
+            var lightObject = new GameObject("Neighbourhood Warmth Light");
+            lightObject.transform.SetParent(truck, false);
+            lightObject.transform.localPosition = new Vector3(0f, 3.4f, -2.7f);
+            var light = lightObject.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = Hex("FFD08A");
+            light.intensity = 5.8f;
+            light.range = 10f;
+            light.shadows = LightShadows.None;
+            lightObject.SetActive(false);
+            return lightObject;
         }
 
         private static void CreateBread(Transform parent, Vector3 position, Materials materials)
@@ -769,31 +887,100 @@ namespace BakaBakeBakery.Editor
             light.shadows = LightShadows.Soft;
         }
 
-        private static void BuildCharacters(Transform parent, Materials materials)
+        private static CharacterReferences BuildCharacters(Transform parent, Materials materials)
         {
             var characters = new GameObject("Characters").transform;
             characters.SetParent(parent, false);
-            CreateBaker(characters, new Vector3(-0.1f, 0.72f, -0.62f), materials);
+
+            var idleStation = CreateStation(characters, "Baker Station - Idle", new Vector3(-0.1f, 0.72f, -0.62f));
+            var fridgeStation = CreateStation(characters, "Baker Station - Fridge", new Vector3(-3.25f, 0.72f, 0.02f));
+            var ovenStation = CreateStation(characters, "Baker Station - Oven", new Vector3(-1.4f, 0.72f, 0.02f));
+            var counterStation = CreateStation(characters, "Baker Station - Counter", new Vector3(1.15f, 0.72f, -0.62f));
+            var references = CreateBaker(
+                characters,
+                idleStation,
+                fridgeStation,
+                ovenStation,
+                counterStation,
+                materials);
             CreateGrandmother(characters, new Vector3(4.65f, 0.5f, -2.9f), materials);
+            CreateNeighbour(characters, new Vector3(-5.35f, 0.5f, -2.62f), materials);
+            return references;
         }
 
-        private static void CreateBaker(Transform parent, Vector3 position, Materials materials)
+        private static Transform CreateStation(Transform parent, string name, Vector3 position)
+        {
+            var station = new GameObject(name).transform;
+            station.SetParent(parent, false);
+            station.localPosition = position;
+            return station;
+        }
+
+        private static CharacterReferences CreateBaker(
+            Transform parent,
+            Transform idleStation,
+            Transform fridgeStation,
+            Transform ovenStation,
+            Transform counterStation,
+            Materials materials)
         {
             var baker = new GameObject("Baker - Manual Worker").transform;
             baker.SetParent(parent, false);
-            baker.localPosition = position;
+            baker.localPosition = idleStation.localPosition;
             baker.localRotation = Quaternion.Euler(0f, -18f, 0f);
 
-            CreatePrimitive(PrimitiveType.Capsule, "Body", baker, new Vector3(0f, 0.78f, 0f), new Vector3(0.72f, 0.72f, 0.62f), materials.Cloth);
-            CreatePrimitive(PrimitiveType.Cube, "Apron", baker, new Vector3(0f, 0.84f, -0.36f), new Vector3(0.68f, 0.9f, 0.08f), materials.Sage);
-            CreatePrimitive(PrimitiveType.Sphere, "Head", baker, new Vector3(0f, 1.92f, 0f), new Vector3(0.74f, 0.74f, 0.7f), materials.Skin);
-            CreatePrimitive(PrimitiveType.Sphere, "Hair", baker, new Vector3(0f, 2.18f, 0.14f), new Vector3(0.78f, 0.46f, 0.7f), materials.Hair);
-            CreatePrimitive(PrimitiveType.Cylinder, "Hat Band", baker, new Vector3(0f, 2.42f, 0f), new Vector3(0.74f, 0.13f, 0.74f), materials.White);
-            CreatePrimitive(PrimitiveType.Sphere, "Chef Hat", baker, new Vector3(0f, 2.62f, 0f), new Vector3(0.88f, 0.42f, 0.78f), materials.White);
-            CreatePrimitive(PrimitiveType.Sphere, "Eye Left", baker, new Vector3(-0.17f, 1.98f, -0.34f), new Vector3(0.09f, 0.11f, 0.07f), materials.Cocoa);
-            CreatePrimitive(PrimitiveType.Sphere, "Eye Right", baker, new Vector3(0.17f, 1.98f, -0.34f), new Vector3(0.09f, 0.11f, 0.07f), materials.Cocoa);
-            CreateLimb(baker, "Arm Left", new Vector3(-0.34f, 1.28f, -0.02f), new Vector3(-0.72f, 0.9f, -0.42f), 0.22f, materials.Cloth);
-            CreateLimb(baker, "Arm Right", new Vector3(0.34f, 1.28f, -0.02f), new Vector3(0.78f, 1.05f, -0.44f), 0.22f, materials.Cloth);
+            var visual = new GameObject("Baker Visual").transform;
+            visual.SetParent(baker, false);
+            CreatePrimitive(PrimitiveType.Capsule, "Body", visual, new Vector3(0f, 0.88f, 0f), new Vector3(0.72f, 0.76f, 0.62f), materials.Cloth);
+            CreatePrimitive(PrimitiveType.Cube, "Apron", visual, new Vector3(0f, 0.9f, -0.36f), new Vector3(0.68f, 0.94f, 0.07f), materials.Sage);
+            CreatePrimitive(PrimitiveType.Cube, "Apron Pocket", visual, new Vector3(0f, 0.78f, -0.41f), new Vector3(0.32f, 0.2f, 0.035f), materials.Flour);
+            CreateLimb(visual, "Leg Left", new Vector3(-0.22f, 0.48f, 0f), new Vector3(-0.22f, 0.05f, -0.02f), 0.2f, materials.Cocoa);
+            CreateLimb(visual, "Leg Right", new Vector3(0.22f, 0.48f, 0f), new Vector3(0.22f, 0.05f, 0.02f), 0.2f, materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Shoe Left", visual, new Vector3(-0.22f, 0.03f, -0.13f), new Vector3(0.28f, 0.14f, 0.4f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Shoe Right", visual, new Vector3(0.22f, 0.03f, -0.13f), new Vector3(0.28f, 0.14f, 0.4f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Head", visual, new Vector3(0f, 2.02f, 0f), new Vector3(0.72f, 0.74f, 0.68f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Hair", visual, new Vector3(0f, 2.28f, 0.14f), new Vector3(0.78f, 0.46f, 0.7f), materials.Hair);
+            CreatePrimitive(PrimitiveType.Cylinder, "Hat Band", visual, new Vector3(0f, 2.5f, 0f), new Vector3(0.74f, 0.13f, 0.74f), materials.White);
+            CreatePrimitive(PrimitiveType.Sphere, "Chef Hat", visual, new Vector3(0f, 2.7f, 0f), new Vector3(0.88f, 0.42f, 0.78f), materials.White);
+            CreatePrimitive(PrimitiveType.Sphere, "Eye Left", visual, new Vector3(-0.17f, 2.06f, -0.34f), new Vector3(0.085f, 0.1f, 0.065f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Eye Right", visual, new Vector3(0.17f, 2.06f, -0.34f), new Vector3(0.085f, 0.1f, 0.065f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Nose", visual, new Vector3(0f, 1.94f, -0.39f), new Vector3(0.11f, 0.13f, 0.11f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Cheek Left", visual, new Vector3(-0.27f, 1.9f, -0.32f), new Vector3(0.12f, 0.08f, 0.04f), materials.Cherry);
+            CreatePrimitive(PrimitiveType.Sphere, "Cheek Right", visual, new Vector3(0.27f, 1.9f, -0.32f), new Vector3(0.12f, 0.08f, 0.04f), materials.Cherry);
+            CreatePrimitive(PrimitiveType.Cube, "Smile", visual, new Vector3(0f, 1.82f, -0.37f), new Vector3(0.2f, 0.035f, 0.035f), materials.Cocoa);
+            CreateLimb(visual, "Arm Left", new Vector3(-0.34f, 1.38f, -0.02f), new Vector3(-0.72f, 1.0f, -0.42f), 0.22f, materials.Cloth);
+            CreateLimb(visual, "Arm Right", new Vector3(0.34f, 1.38f, -0.02f), new Vector3(0.78f, 1.13f, -0.44f), 0.22f, materials.Cloth);
+            CreatePrimitive(PrimitiveType.Sphere, "Hand Left", visual, new Vector3(-0.72f, 1.0f, -0.42f), new Vector3(0.2f, 0.2f, 0.2f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Hand Right", visual, new Vector3(0.78f, 1.13f, -0.44f), new Vector3(0.2f, 0.2f, 0.2f), materials.Skin);
+
+            var carriedLoaf = CreatePrimitive(
+                PrimitiveType.Sphere,
+                "Carried Loaf",
+                visual,
+                new Vector3(0.52f, 1.28f, -0.57f),
+                new Vector3(0.42f, 0.22f, 0.34f),
+                materials.Crust);
+            carriedLoaf.SetActive(false);
+
+            var hitTarget = baker.gameObject.AddComponent<CapsuleCollider>();
+            hitTarget.center = new Vector3(0f, 1.35f, 0f);
+            hitTarget.height = 3.1f;
+            hitTarget.radius = 0.7f;
+            var worker = baker.gameObject.AddComponent<BakeryWorkerView>();
+            var serializedWorker = new SerializedObject(worker);
+            serializedWorker.FindProperty("visualRoot").objectReferenceValue = visual;
+            serializedWorker.FindProperty("idleStation").objectReferenceValue = idleStation;
+            serializedWorker.FindProperty("fridgeStation").objectReferenceValue = fridgeStation;
+            serializedWorker.FindProperty("ovenStation").objectReferenceValue = ovenStation;
+            serializedWorker.FindProperty("counterStation").objectReferenceValue = counterStation;
+            serializedWorker.FindProperty("carriedLoaf").objectReferenceValue = carriedLoaf;
+            serializedWorker.ApplyModifiedPropertiesWithoutUndo();
+
+            return new CharacterReferences
+            {
+                Worker = worker,
+                BakerHitTarget = hitTarget
+            };
         }
 
         private static void CreateGrandmother(Transform parent, Vector3 position, Materials materials)
@@ -809,8 +996,33 @@ namespace BakaBakeBakery.Editor
             CreatePrimitive(PrimitiveType.Sphere, "Hair Bun", customer, new Vector3(0.42f, 2.2f, 0.16f), new Vector3(0.42f, 0.42f, 0.42f), materials.White);
             CreatePrimitive(PrimitiveType.Sphere, "Eye Left", customer, new Vector3(-0.17f, 2.0f, -0.34f), new Vector3(0.09f, 0.1f, 0.07f), materials.Cocoa);
             CreatePrimitive(PrimitiveType.Sphere, "Eye Right", customer, new Vector3(0.17f, 2.0f, -0.34f), new Vector3(0.09f, 0.1f, 0.07f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Nose", customer, new Vector3(0f, 1.9f, -0.39f), new Vector3(0.12f, 0.14f, 0.11f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Cube, "Glasses Bridge", customer, new Vector3(0f, 2.03f, -0.41f), new Vector3(0.18f, 0.035f, 0.035f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Cube, "Collar", customer, new Vector3(0f, 1.46f, -0.35f), new Vector3(0.62f, 0.18f, 0.08f), materials.Flour);
             CreateLimb(customer, "Arm Left", new Vector3(-0.38f, 1.35f, -0.02f), new Vector3(-0.27f, 0.95f, -0.42f), 0.22f, materials.Cherry);
             CreateLimb(customer, "Arm Right", new Vector3(0.38f, 1.35f, -0.02f), new Vector3(0.25f, 0.95f, -0.42f), 0.22f, materials.Cherry);
+            CreatePrimitive(PrimitiveType.Cylinder, "Walking Cane", customer, new Vector3(0.58f, 0.7f, -0.28f), new Vector3(0.08f, 0.72f, 0.08f), materials.Wood);
+        }
+
+        private static void CreateNeighbour(Transform parent, Vector3 position, Materials materials)
+        {
+            var neighbour = new GameObject("Customer - Neighbour").transform;
+            neighbour.SetParent(parent, false);
+            neighbour.localPosition = position;
+            neighbour.localRotation = Quaternion.Euler(0f, 52f, 0f);
+
+            CreatePrimitive(PrimitiveType.Capsule, "Body", neighbour, new Vector3(0f, 0.82f, 0f), new Vector3(0.76f, 0.76f, 0.66f), materials.EveningBlue);
+            CreatePrimitive(PrimitiveType.Cube, "Jacket Panel", neighbour, new Vector3(0f, 0.88f, -0.38f), new Vector3(0.6f, 0.78f, 0.06f), materials.Sage);
+            CreatePrimitive(PrimitiveType.Sphere, "Head", neighbour, new Vector3(0f, 1.95f, 0f), new Vector3(0.72f, 0.72f, 0.68f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Hair", neighbour, new Vector3(0f, 2.18f, 0.13f), new Vector3(0.75f, 0.42f, 0.7f), materials.Hair);
+            CreatePrimitive(PrimitiveType.Cylinder, "Cap", neighbour, new Vector3(0f, 2.38f, -0.02f), new Vector3(0.72f, 0.12f, 0.72f), materials.Crust);
+            CreatePrimitive(PrimitiveType.Cube, "Cap Peak", neighbour, new Vector3(0f, 2.34f, -0.42f), new Vector3(0.52f, 0.08f, 0.32f), materials.Crust);
+            CreatePrimitive(PrimitiveType.Sphere, "Eye Left", neighbour, new Vector3(-0.17f, 2.0f, -0.34f), new Vector3(0.085f, 0.1f, 0.065f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Eye Right", neighbour, new Vector3(0.17f, 2.0f, -0.34f), new Vector3(0.085f, 0.1f, 0.065f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Nose", neighbour, new Vector3(0f, 1.88f, -0.39f), new Vector3(0.11f, 0.13f, 0.11f), materials.Skin);
+            CreateLimb(neighbour, "Arm Left", new Vector3(-0.36f, 1.34f, 0f), new Vector3(-0.62f, 0.94f, -0.34f), 0.21f, materials.EveningBlue);
+            CreateLimb(neighbour, "Arm Right", new Vector3(0.36f, 1.34f, 0f), new Vector3(0.55f, 1.02f, -0.38f), 0.21f, materials.EveningBlue);
+            CreatePrimitive(PrimitiveType.Cube, "Bread Tote", neighbour, new Vector3(-0.62f, 0.72f, -0.27f), new Vector3(0.52f, 0.62f, 0.2f), materials.Cloth);
         }
 
         private static void CreateLimb(
@@ -903,6 +1115,53 @@ namespace BakaBakeBakery.Editor
             return camera;
         }
 
+        private static void BuildGameplayController(
+            GameObject root,
+            Camera camera,
+            WorldReferences world,
+            CharacterReferences characters)
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<BakeryCatalog>($"{DataRoot}/BakeryCatalog.asset");
+            if (catalog == null)
+            {
+                throw new InvalidOperationException("Bakery catalog was not available while building gameplay.");
+            }
+
+            var controller = root.AddComponent<BakeryGameController>();
+            var serializedController = new SerializedObject(controller);
+            SetReference(serializedController, "catalog", catalog);
+            SetReference(serializedController, "worker", characters.Worker);
+            SetReference(serializedController, "interactionCamera", camera);
+            SetReference(serializedController, "bakerHitTarget", characters.BakerHitTarget);
+            SetReference(serializedController, "lockedOvenBay", world.LockedOvenBay);
+            SetReference(serializedController, "secondOvenVisual", world.SecondOven);
+            SetReference(serializedController, "cabinUpgradeVisual", world.CabinUpgrade);
+            SetReference(serializedController, "goldenMinuteLight", world.GoldenMinuteLight);
+            SetReference(serializedController, "countryBreadDisplay", world.CountryBread);
+            SetReference(serializedController, "kaiserRollDisplay", world.KaiserRolls);
+            SetReference(serializedController, "croissantDisplay", world.Croissant);
+            SetReference(serializedController, "cinnamonSwirlDisplay", world.CinnamonSwirl);
+            SetReference(serializedController, "finezjaDisplay", world.Finezja);
+            SetReference(serializedController, "cinnamonMonocleDisplay", world.CinnamonMonocle);
+            serializedController.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetReference(SerializedObject serializedObject, string propertyName, Object value)
+        {
+            var property = serializedObject.FindProperty(propertyName);
+            if (property == null)
+            {
+                throw new InvalidOperationException($"Missing serialized property '{propertyName}'.");
+            }
+
+            if (value == null)
+            {
+                throw new InvalidOperationException($"Gameplay reference '{propertyName}' was not built.");
+            }
+
+            property.objectReferenceValue = value;
+        }
+
         private static void BuildHud()
         {
             BuildUiDocument<BakeryHudController>("Bakery HUD", UxmlPath, UssPath, 20);
@@ -977,6 +1236,14 @@ namespace BakaBakeBakery.Editor
             }
 
             return primitive;
+        }
+
+        private static void SetActive(GameObject target, bool active)
+        {
+            if (target != null)
+            {
+                target.SetActive(active);
+            }
         }
 
         private static Color Hex(string hex)
