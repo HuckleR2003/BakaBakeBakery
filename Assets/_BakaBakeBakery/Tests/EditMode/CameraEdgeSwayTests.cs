@@ -40,5 +40,47 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(response.x, Is.GreaterThan(0f));
             Assert.That(response.y, Is.GreaterThan(0f));
         }
+
+        [Test]
+        public void LookAroundRangeIsAtLeastSeventyFivePercentWiderThanTheOriginalFraming()
+        {
+            Assert.That(
+                CameraEdgeSway.DefaultMaximumOffset.x,
+                Is.GreaterThanOrEqualTo(CameraEdgeSway.LegacyMaximumOffset.x * 1.75f));
+            Assert.That(
+                CameraEdgeSway.DefaultMaximumOffset.y,
+                Is.GreaterThanOrEqualTo(CameraEdgeSway.LegacyMaximumOffset.y * 1.75f));
+            Assert.That(
+                CameraEdgeSway.DefaultMaximumYaw,
+                Is.GreaterThanOrEqualTo(CameraEdgeSway.LegacyMaximumYaw * 1.75f));
+            Assert.That(
+                CameraEdgeSway.DefaultMaximumPitch,
+                Is.GreaterThanOrEqualTo(CameraEdgeSway.LegacyMaximumPitch * 1.75f));
+        }
+
+        [Test]
+        public void ThePointOfViewStartsMovingNearTheCentreOfTheScreen()
+        {
+            Assert.That(CameraEdgeSway.DefaultDeadZone, Is.LessThan(CameraEdgeSway.LegacyDeadZone * 0.5f));
+
+            var slightlyOffCentre = CameraEdgeSway.EvaluatePointer(
+                new Vector2(0.62f, 0.5f),
+                CameraEdgeSway.DefaultDeadZone);
+            var legacyAtTheSamePoint = CameraEdgeSway.EvaluatePointer(
+                new Vector2(0.62f, 0.5f),
+                CameraEdgeSway.LegacyDeadZone);
+
+            Assert.That(slightlyOffCentre.x, Is.GreaterThan(0f), "A quarter of the way out must already lean the camera.");
+            Assert.That(legacyAtTheSamePoint.x, Is.Zero, "The original framing stayed frozen this close to the centre.");
+        }
+
+        [Test]
+        public void WidenedFramingKeepsTheFullEdgeTravelBounded()
+        {
+            var edge = CameraEdgeSway.EvaluatePointer(new Vector2(1f, 1f), CameraEdgeSway.DefaultDeadZone);
+
+            Assert.That(edge.x, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(edge.y, Is.EqualTo(1f).Within(0.0001f));
+        }
     }
 }
