@@ -40,19 +40,26 @@ namespace BakaBakeBakery.Tests.EditMode
         }
 
         [Test]
-        public void BakeryHudPresentsSixRecipeCards()
+        public void BakeryHudSeparatesProductJourneyAndCraftingWorkbench()
         {
             var root = Clone("MainBakery.uxml");
 
-            Assert.That(root.Query<Button>(className: "recipe-card").ToList(), Has.Count.EqualTo(6));
-            Assert.That(root.Q<Button>("recipe-finezja"), Is.Not.Null);
-            Assert.That(root.Q<Button>("recipe-monocle"), Is.Not.Null);
+            Assert.That(root.Query<Button>(className: "recipe-card").ToList(), Has.Count.EqualTo(9));
+            Assert.That(root.Q<Button>("home-tab"), Is.Not.Null);
+            Assert.That(root.Q<Button>("craft-tab"), Is.Not.Null);
+            Assert.That(root.Q<Button>("craft-result"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("next-unlock"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("market-map"), Is.Not.Null);
+            Assert.That(
+                Enumerable.Range(0, 4).All(index => root.Q<Button>($"craft-slot-{index}") != null),
+                Is.True);
             Assert.That(root.Q<Button>("action-button"), Is.Not.Null);
             Assert.That(root.Q<Button>("second-oven-button"), Is.Not.Null);
             Assert.That(root.Q<Button>("bakery-upgrade-button"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("warmth-fill"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("baker-bubble"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("grandmother-bubble"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("friend-bubble"), Is.Not.Null);
         }
 
         private static VisualElement Clone(string fileName)

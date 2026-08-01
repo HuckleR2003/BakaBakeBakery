@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BakaBakeBakery.Data;
 using BakaBakeBakery.Gameplay;
@@ -13,11 +14,22 @@ namespace BakaBakeBakery.UI
         [SerializeField] private StyleSheet styleSheet;
 
         private readonly Dictionary<Button, RecipeId> recipeCards = new();
+        private readonly Dictionary<VisualElement, IngredientId> ingredientCards = new();
         private readonly Dictionary<VisualElement, IVisualElementScheduledItem> bubbleSchedules = new();
+        private readonly List<IngredientId> craftingSlots = new();
+        private readonly List<Button> recipeSlotButtons = new();
+        private readonly List<Button> craftSlotButtons = new();
 
-        private UIDocument document;
         private VisualElement root;
         private VisualElement ledger;
+        private VisualElement homePanel;
+        private VisualElement craftPanel;
+        private VisualElement homeContent;
+        private VisualElement nextUnlock;
+        private VisualElement marketMap;
+        private VisualElement mapRouteFill;
+        private VisualElement bikeMarker;
+        private VisualElement dragGhost;
         private VisualElement actionProgressFill;
         private VisualElement milestoneProgressFill;
         private VisualElement warmthFill;
@@ -37,16 +49,26 @@ namespace BakaBakeBakery.UI
         private Label bakeryLevel;
         private Label toastTitle;
         private Label toastCopy;
+        private Label nextUnlockTitle;
+        private Label nextUnlockCopy;
+        private Label ledgerDay;
+        private Label dragGhostLabel;
         private Button ledgerButton;
+        private Button dayButton;
         private Button actionButton;
         private Button secondOvenButton;
         private Button bakeryUpgradeButton;
+        private Button homeTab;
+        private Button craftTab;
+        private Button clearCraftButton;
+        private Button craftResult;
         private BakeryGameController game;
         private IVisualElementScheduledItem toastSchedule;
+        private IngredientId? draggedIngredient;
 
         private void OnEnable()
         {
-            document = GetComponent<UIDocument>();
+            var document = GetComponent<UIDocument>();
             root = document.rootVisualElement;
             if (styleSheet != null && !root.styleSheets.Contains(styleSheet))
             {
@@ -59,9 +81,7 @@ namespace BakaBakeBakery.UI
 
         private void Start()
         {
-            var controller = FindAnyObjectByType<BakeryGameController>();
-            controller?.BindHud(this);
-            actionButton?.schedule.Execute(actionButton.Focus).StartingIn(180);
+            FindAnyObjectByType<BakeryGameController>()?.BindHud(this);
         }
 
         private void OnDisable()
@@ -79,9 +99,7 @@ namespace BakaBakeBakery.UI
                 return;
             }
 
-            if (Keyboard.current.escapeKey.wasPressedThisFrame
-                && ledger != null
-                && !ledger.ClassListContains("ledger--closed"))
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 CloseLedger();
             }
@@ -94,31 +112,6 @@ namespace BakaBakeBakery.UI
             if (Keyboard.current.spaceKey.wasPressedThisFrame && CanUseSpaceForBaker())
             {
                 game?.RequestBakerAction();
-            }
-
-            if (Keyboard.current.digit1Key.wasPressedThisFrame)
-            {
-                game?.TrySelectRecipe(RecipeId.CountryBread);
-            }
-            else if (Keyboard.current.digit2Key.wasPressedThisFrame)
-            {
-                game?.TrySelectRecipe(RecipeId.KaiserRoll);
-            }
-            else if (Keyboard.current.digit3Key.wasPressedThisFrame)
-            {
-                game?.TrySelectRecipe(RecipeId.ButterCroissant);
-            }
-            else if (Keyboard.current.digit4Key.wasPressedThisFrame)
-            {
-                game?.TrySelectRecipe(RecipeId.CinnamonSwirl);
-            }
-            else if (Keyboard.current.digit5Key.wasPressedThisFrame)
-            {
-                game?.TrySelectRecipe(RecipeId.Finezja);
-            }
-            else if (Keyboard.current.digit6Key.wasPressedThisFrame)
-            {
-                game?.TrySelectRecipe(RecipeId.CinnamonMonocle);
             }
         }
 
@@ -146,8 +139,10 @@ namespace BakaBakeBakery.UI
 
             RenderMilestone(snapshot);
             RenderWarmth(snapshot);
+            RenderDay();
             RenderWorkCard(snapshot);
-            RenderRecipeCards(snapshot);
+            RenderProductJourney(snapshot);
+            RenderCrafting();
             RenderLedger(snapshot);
         }
 
@@ -157,12 +152,14 @@ namespace BakaBakeBakery.UI
             {
                 BakerySpeaker.Baker => "baker-bubble",
                 BakerySpeaker.Grandmother => "grandmother-bubble",
+                BakerySpeaker.Friend => "friend-bubble",
                 _ => "neighbour-bubble"
             };
             var labelName = speaker switch
             {
                 BakerySpeaker.Baker => "baker-bubble-text",
                 BakerySpeaker.Grandmother => "grandmother-bubble-text",
+                BakerySpeaker.Friend => "friend-bubble-text",
                 _ => "neighbour-bubble-text"
             };
 
@@ -196,9 +193,7 @@ namespace BakaBakeBakery.UI
             SetText(toastCopy, copy);
             toast.AddToClassList("toast--visible");
             toastSchedule?.Pause();
-            toastSchedule = toast.schedule
-                .Execute(() => toast.RemoveFromClassList("toast--visible"))
-                .StartingIn(4200);
+            toastSchedule = toast.schedule.Execute(() => toast.RemoveFromClassList("toast--visible")).StartingIn(4200);
         }
 
         public bool IsPointerOverInteractiveUi(Vector2 screenPosition)
@@ -213,8 +208,7 @@ namespace BakaBakeBakery.UI
             var picked = root.panel.Pick(panelPosition);
             for (var current = picked; current != null; current = current.parent)
             {
-                if (current is Button || current is Toggle || current is Slider
-                    || current.ClassListContains("blocks-world-input"))
+                if (current is Button || current is Toggle || current is Slider || current.ClassListContains("blocks-world-input"))
                 {
                     return true;
                 }
@@ -226,6 +220,14 @@ namespace BakaBakeBakery.UI
         private void QueryElements()
         {
             ledger = root.Q<VisualElement>("upgrade-ledger");
+            homePanel = root.Q<VisualElement>("home-panel");
+            craftPanel = root.Q<VisualElement>("craft-panel");
+            homeContent = root.Q<VisualElement>("home-content");
+            nextUnlock = root.Q<VisualElement>("next-unlock");
+            marketMap = root.Q<VisualElement>("market-map");
+            mapRouteFill = root.Q<VisualElement>("map-route-fill");
+            bikeMarker = root.Q<VisualElement>("bike-marker");
+            dragGhost = root.Q<VisualElement>("drag-ghost");
             actionProgressFill = root.Q<VisualElement>("action-progress-fill");
             milestoneProgressFill = root.Q<VisualElement>("milestone-progress-fill");
             warmthFill = root.Q<VisualElement>("warmth-fill");
@@ -245,73 +247,148 @@ namespace BakaBakeBakery.UI
             bakeryLevel = root.Q<Label>("bakery-level");
             toastTitle = root.Q<Label>("toast-title");
             toastCopy = root.Q<Label>("toast-copy");
+            nextUnlockTitle = root.Q<Label>("next-unlock-title");
+            nextUnlockCopy = root.Q<Label>("next-unlock-copy");
+            ledgerDay = root.Q<Label>("ledger-day");
+            dragGhostLabel = root.Q<Label>("drag-ghost-label");
             ledgerButton = root.Q<Button>("ledger-button");
+            dayButton = root.Q<Button>("day-button");
             actionButton = root.Q<Button>("action-button");
             secondOvenButton = root.Q<Button>("second-oven-button");
             bakeryUpgradeButton = root.Q<Button>("bakery-upgrade-button");
+            homeTab = root.Q<Button>("home-tab");
+            craftTab = root.Q<Button>("craft-tab");
+            clearCraftButton = root.Q<Button>("clear-craft-button");
+            craftResult = root.Q<Button>("craft-result");
 
-            recipeCards.Clear();
-            AddRecipeCard("recipe-bread", RecipeId.CountryBread);
-            AddRecipeCard("recipe-kaiser", RecipeId.KaiserRoll);
-            AddRecipeCard("recipe-croissant", RecipeId.ButterCroissant);
-            AddRecipeCard("recipe-swirl", RecipeId.CinnamonSwirl);
-            AddRecipeCard("recipe-finezja", RecipeId.Finezja);
-            AddRecipeCard("recipe-monocle", RecipeId.CinnamonMonocle);
+            recipeSlotButtons.Clear();
+            craftSlotButtons.Clear();
+            for (var index = 0; index < 9; index++)
+            {
+                var button = root.Q<Button>($"recipe-slot-{index}");
+                if (button != null)
+                {
+                    recipeSlotButtons.Add(button);
+                }
+            }
+
+            for (var index = 0; index < BakeryCraftingSystem.MaximumIngredients; index++)
+            {
+                var button = root.Q<Button>($"craft-slot-{index}");
+                if (button != null)
+                {
+                    craftSlotButtons.Add(button);
+                }
+            }
+
+            ingredientCards.Clear();
+            AddIngredientCard("ingredient-flour", IngredientId.Flour);
+            AddIngredientCard("ingredient-milk", IngredientId.Milk);
+            AddIngredientCard("ingredient-pastry", IngredientId.PuffPastry);
+            AddIngredientCard("ingredient-jam", IngredientId.Jam);
+            AddIngredientCard("ingredient-chocolate", IngredientId.Chocolate);
         }
 
         private void RegisterCallbacks()
         {
-            foreach (var card in recipeCards.Keys)
+            foreach (var card in recipeSlotButtons)
             {
                 card.RegisterCallback<ClickEvent>(OnRecipeCardClicked);
             }
 
-            if (ledgerButton != null)
+            foreach (var card in craftSlotButtons)
             {
-                ledgerButton.clicked += ToggleLedger;
+                card.RegisterCallback<ClickEvent>(OnCraftSlotClicked);
             }
 
-            if (actionButton != null)
+            foreach (var card in ingredientCards.Keys)
             {
-                actionButton.clicked += OnActionClicked;
+                card.RegisterCallback<PointerDownEvent>(OnIngredientPointerDown);
+                card.RegisterCallback<PointerMoveEvent>(OnIngredientPointerMove);
+                card.RegisterCallback<PointerUpEvent>(OnIngredientPointerUp);
+                card.RegisterCallback<PointerCaptureOutEvent>(OnIngredientPointerCaptureOut);
             }
 
-            if (secondOvenButton != null)
-            {
-                secondOvenButton.clicked += OnSecondOvenClicked;
-            }
-
-            if (bakeryUpgradeButton != null)
-            {
-                bakeryUpgradeButton.clicked += OnBakeryUpgradeClicked;
-            }
+            ledgerButton.clicked += ToggleLedger;
+            dayButton.clicked += OnDayButtonClicked;
+            actionButton.clicked += OnActionClicked;
+            secondOvenButton.clicked += OnSecondOvenClicked;
+            bakeryUpgradeButton.clicked += OnBakeryUpgradeClicked;
+            homeTab.clicked += ShowHome;
+            craftTab.clicked += ShowCraft;
+            clearCraftButton.clicked += ClearCrafting;
+            craftResult.clicked += OnCraftResultClicked;
         }
 
         private void UnregisterCallbacks()
         {
-            foreach (var card in recipeCards.Keys)
+            foreach (var card in recipeSlotButtons)
             {
                 card.UnregisterCallback<ClickEvent>(OnRecipeCardClicked);
             }
 
-            if (ledgerButton != null)
+            foreach (var card in craftSlotButtons)
             {
-                ledgerButton.clicked -= ToggleLedger;
+                card.UnregisterCallback<ClickEvent>(OnCraftSlotClicked);
             }
 
-            if (actionButton != null)
+            foreach (var card in ingredientCards.Keys)
             {
-                actionButton.clicked -= OnActionClicked;
+                card.UnregisterCallback<PointerDownEvent>(OnIngredientPointerDown);
+                card.UnregisterCallback<PointerMoveEvent>(OnIngredientPointerMove);
+                card.UnregisterCallback<PointerUpEvent>(OnIngredientPointerUp);
+                card.UnregisterCallback<PointerCaptureOutEvent>(OnIngredientPointerCaptureOut);
             }
 
-            if (secondOvenButton != null)
+            if (ledgerButton != null) ledgerButton.clicked -= ToggleLedger;
+            if (dayButton != null) dayButton.clicked -= OnDayButtonClicked;
+            if (actionButton != null) actionButton.clicked -= OnActionClicked;
+            if (secondOvenButton != null) secondOvenButton.clicked -= OnSecondOvenClicked;
+            if (bakeryUpgradeButton != null) bakeryUpgradeButton.clicked -= OnBakeryUpgradeClicked;
+            if (homeTab != null) homeTab.clicked -= ShowHome;
+            if (craftTab != null) craftTab.clicked -= ShowCraft;
+            if (clearCraftButton != null) clearCraftButton.clicked -= ClearCrafting;
+            if (craftResult != null) craftResult.clicked -= OnCraftResultClicked;
+        }
+
+        private void RenderDay()
+        {
+            if (game?.DayCycle == null)
             {
-                secondOvenButton.clicked -= OnSecondOvenClicked;
+                return;
             }
 
-            if (bakeryUpgradeButton != null)
+            var day = game.DayCycle;
+            SetText(ledgerDay, $"MORNING {day.DayNumber:00}");
+            marketMap.EnableInClassList("market-map--visible", day.Phase == BakeryDayPhase.TravellingToMarket);
+            SetWidth(mapRouteFill, day.TravelProgress);
+            if (bikeMarker != null)
             {
-                bakeryUpgradeButton.clicked -= OnBakeryUpgradeClicked;
+                bikeMarker.style.left = Length.Percent(Mathf.Lerp(0f, 91f, day.TravelProgress));
+            }
+
+            switch (day.Phase)
+            {
+                case BakeryDayPhase.MorningPreparation:
+                    dayButton.text = $"MORNING {day.DayNumber:00}\nGO TO MARKET";
+                    dayButton.SetEnabled(true);
+                    break;
+                case BakeryDayPhase.TravellingToMarket:
+                    dayButton.text = $"ON THE ROAD\n{day.RemainingSeconds:0.0} S";
+                    dayButton.SetEnabled(false);
+                    break;
+                case BakeryDayPhase.ReadyToOpen:
+                    dayButton.text = $"MORNING {day.DayNumber:00}\nSTART DAY!";
+                    dayButton.SetEnabled(true);
+                    break;
+                case BakeryDayPhase.Open:
+                    dayButton.text = $"DAY {day.DayNumber:00} · {FormatTime(day.RemainingSeconds)}\nPROFIT {day.DailyProfit:+#;-#;0} · END EARLY";
+                    dayButton.SetEnabled(true);
+                    break;
+                case BakeryDayPhase.DaySummary:
+                    dayButton.text = $"DAY {day.DayNumber:00} CLOSED\nPROFIT {day.DailyProfit:+#;-#;0} · NEXT MORNING";
+                    dayButton.SetEnabled(true);
+                    break;
             }
         }
 
@@ -330,8 +407,8 @@ namespace BakaBakeBakery.UI
             {
                 SetText(milestoneTitle, "A BIGGER MORNING");
                 SetText(milestoneValue, $"Kaiser rolls · {snapshot.CountryBreadSold} / {BakeryLoop.KaiserUnlockBreadSales} breads");
-                current = snapshot.CountryBreadSold - BakeryLoop.ManagerUnlockBreadSales;
-                target = BakeryLoop.KaiserUnlockBreadSales - BakeryLoop.ManagerUnlockBreadSales;
+                current = snapshot.CountryBreadSold;
+                target = BakeryLoop.KaiserUnlockBreadSales;
             }
             else if (snapshot.BakeryLevel == 1)
             {
@@ -344,29 +421,37 @@ namespace BakaBakeBakery.UI
             {
                 SetText(milestoneTitle, "THE STREET KNOWS OUR NAME");
                 SetText(milestoneValue, "New recipes arrive with every warm morning");
-                current = 1;
-                target = 1;
+                current = target = 1;
             }
 
-            SetWidth(milestoneProgressFill, target <= 0 ? 1f : Mathf.Clamp01((float)current / target));
+            SetWidth(milestoneProgressFill, target <= 0 ? 1f : (float)current / target);
         }
 
         private void RenderWarmth(BakerySnapshot snapshot)
         {
             SetText(warmthValue, $"{snapshot.Warmth} / {snapshot.WarmthGoal}");
             SetWidth(warmthFill, (float)snapshot.Warmth / snapshot.WarmthGoal);
-            if (goldenChip != null)
-            {
-                goldenChip.EnableInClassList("golden-chip--visible", snapshot.GoldenMinuteActive);
-            }
-
+            goldenChip.EnableInClassList("golden-chip--visible", snapshot.GoldenMinuteActive);
             SetText(goldenValue, snapshot.GoldenMinuteActive
-                ? $"2× COINS · {Mathf.CeilToInt(snapshot.GoldenMinuteRemaining)} s"
+                ? $"2x COINS · {Mathf.CeilToInt(snapshot.GoldenMinuteRemaining)} s"
                 : "KINDNESS FILLS THE STREET");
         }
 
         private void RenderWorkCard(BakerySnapshot snapshot)
         {
+            if (game?.DayCycle != null && game.DayCycle.Phase != BakeryDayPhase.Open)
+            {
+                SetText(shiftMode, game.DayCycle.Phase == BakeryDayPhase.DaySummary ? "SHIFT COMPLETE · SHUTTER DOWN" : "MORNING PREPARATION · PANTRY FIRST");
+                SetText(actionTitle, game.DayCycle.Phase == BakeryDayPhase.ReadyToOpen ? "Everything is ready" : "The bakery is resting");
+                SetText(actionDetail, game.DayCycle.Phase == BakeryDayPhase.MorningPreparation
+                    ? "Take the bicycle to the market before warming the ovens."
+                    : "Use the wooden day sign above to continue.");
+                actionButton.text = "BAKERY CLOSED";
+                actionButton.SetEnabled(false);
+                SetWidth(actionProgressFill, game.DayCycle.Phase == BakeryDayPhase.TravellingToMarket ? game.DayCycle.TravelProgress : 0f);
+                return;
+            }
+
             SetText(shiftMode, snapshot.ManagerUnlocked ? "MILA · MANAGER ON DUTY" : "MANUAL MORNING · LOAF BY LOAF");
             var title = string.Empty;
             var detail = string.Empty;
@@ -377,22 +462,18 @@ namespace BakaBakeBakery.UI
             {
                 case BakeryWorkPhase.WaitingForDough:
                     title = snapshot.CounterStock >= snapshot.CounterCapacity ? "The counter is beautifully full" : "Prepare a fresh batch";
-                    detail = snapshot.CounterStock >= snapshot.CounterCapacity
-                        ? "A neighbour is already walking over."
-                        : snapshot.ManagerUnlocked ? "Mila will send Jules — or lend a hand now." : "Click Jules in the truck or press Space.";
+                    detail = snapshot.CounterStock >= snapshot.CounterCapacity ? "A neighbour is already walking over." : "Click Jules or press Space: pantry, prep board, then oven.";
                     button = snapshot.CounterStock >= snapshot.CounterCapacity ? "WAIT FOR A CUSTOMER" : "GATHER INGREDIENTS";
                     progress = 0f;
                     break;
                 case BakeryWorkPhase.FetchingDough:
-                    title = snapshot.PhaseProgress < 0.4f ? "Gathering the chilled ingredients" : "Working the fresh dough";
-                    detail = snapshot.PhaseProgress < 0.4f
-                        ? "Jules checks the refrigerator before crossing to the prep board."
-                        : "Flour, butter and patient hands become today's raw batch.";
+                    title = snapshot.PhaseProgress < 0.4f ? "Gathering chilled ingredients" : "Working the fresh dough";
+                    detail = "Jules crosses the whole kitchen; nothing appears by magic.";
                     button = "JULES IS MOVING";
                     break;
                 case BakeryWorkPhase.WaitingForOven:
-                    title = "The dough is ready";
-                    detail = snapshot.ManagerUnlocked ? "Mila has the next step — or click to help." : "Click Jules again to load the oven.";
+                    title = "The raw batch is ready";
+                    detail = "Click Jules again to load the glowing oven.";
                     button = "LOAD THE OVEN";
                     progress = 0f;
                     break;
@@ -402,113 +483,352 @@ namespace BakaBakeBakery.UI
                     button = "LOADING OVEN";
                     break;
                 case BakeryWorkPhase.Baking:
-                    var recipeName = game != null
-                        ? game.GetRecipe(snapshot.SelectedRecipe).DisplayName
-                        : "today's batch";
-                    title = $"Baking {recipeName}";
-                    detail = $"{snapshot.PhaseRemaining:0.0} seconds · watch the oven light breathe";
+                    title = $"Baking {game.GetRecipe(snapshot.SelectedRecipe).DisplayName}";
+                    detail = $"{snapshot.PhaseRemaining:0.0} seconds · watch the oven breathe";
                     button = "BAKING";
                     break;
                 case BakeryWorkPhase.WaitingForCounter:
                     title = "The bake is ready";
-                    detail = snapshot.ManagerUnlocked ? "Mila will collect it — your click is always welcome." : "One last click: bring it to the counter.";
+                    detail = "One last walk: carry it from oven to the empty counter.";
                     button = "LIFT THE BAKE";
                     progress = 0f;
                     break;
                 case BakeryWorkPhase.Serving:
                     title = "Setting out something warm";
-                    detail = "Customers buy from the counter in arrival order.";
+                    detail = "The display fills only when Jules reaches the counter.";
                     button = "TO THE COUNTER";
                     break;
             }
 
             SetText(actionTitle, title);
             SetText(actionDetail, detail);
-            if (actionButton != null)
-            {
-                actionButton.text = button;
-                actionButton.SetEnabled(snapshot.CanRequestAction);
-            }
-
+            actionButton.text = button;
+            actionButton.SetEnabled(snapshot.CanRequestAction);
             SetWidth(actionProgressFill, progress);
         }
 
-        private void RenderRecipeCards(BakerySnapshot snapshot)
+        private void RenderProductJourney(BakerySnapshot snapshot)
         {
-            foreach (var pair in recipeCards)
+            if (game == null)
             {
-                var unlocked = game != null && game.IsRecipeUnlocked(pair.Value);
-                pair.Key.EnableInClassList("recipe-card--locked", !unlocked);
-                pair.Key.EnableInClassList("recipe-card--selected", snapshot.SelectedRecipe == pair.Value);
-                pair.Key.SetEnabled(unlocked);
+                return;
             }
+
+            recipeCards.Clear();
+            var visibleIndex = 0;
+            RecipeId? next = null;
+            foreach (var recipeId in game.RecipeDisplayOrder)
+            {
+                if (game.IsRecipeUnlocked(recipeId))
+                {
+                    if (visibleIndex < recipeSlotButtons.Count)
+                    {
+                        var button = recipeSlotButtons[visibleIndex++];
+                        var recipe = game.GetRecipe(recipeId);
+                        button.text = $"{recipe.DisplayName.ToUpperInvariant()}\n{recipe.BatchYield} per batch · {recipe.SalePrice} coins";
+                        EnsureRecipeIcon(button, recipeId);
+                        button.AddToClassList("recipe-card--visible");
+                        button.EnableInClassList("recipe-card--selected", snapshot.SelectedRecipe == recipeId);
+                        button.SetEnabled(true);
+                        recipeCards[button] = recipeId;
+                    }
+                }
+                else if (!next.HasValue)
+                {
+                    next = recipeId;
+                }
+            }
+
+            for (var index = visibleIndex; index < recipeSlotButtons.Count; index++)
+            {
+                recipeSlotButtons[index].RemoveFromClassList("recipe-card--visible");
+                recipeSlotButtons[index].RemoveFromClassList("recipe-card--selected");
+            }
+
+            homeContent.EnableInClassList("home-content--mature", visibleIndex >= 3);
+            nextUnlock.style.display = next.HasValue ? DisplayStyle.Flex : DisplayStyle.None;
+            if (next.HasValue)
+            {
+                RenderNextUnlock(next.Value, snapshot);
+            }
+        }
+
+        private void RenderNextUnlock(RecipeId recipeId, BakerySnapshot snapshot)
+        {
+            var recipe = game.GetRecipe(recipeId);
+            SetText(nextUnlockTitle, recipe.DisplayName);
+            var progress = 0f;
+            string copy;
+            switch (recipeId)
+            {
+                case RecipeId.KaiserRoll:
+                    copy = $"{snapshot.CountryBreadSold} / {BakeryLoop.KaiserUnlockBreadSales} country breads";
+                    progress = (float)snapshot.CountryBreadSold / BakeryLoop.KaiserUnlockBreadSales;
+                    break;
+                case RecipeId.ButterCroissant:
+                case RecipeId.CinnamonSwirl:
+                case RecipeId.Finezja:
+                case RecipeId.CinnamonMonocle:
+                    copy = snapshot.BakeryLevel < recipe.RequiredBakeryLevel
+                        ? $"Bakery level {recipe.RequiredBakeryLevel} · {snapshot.TotalItemsSold} / {recipe.UnlockAtSales} sales"
+                        : $"{snapshot.TotalItemsSold} / {recipe.UnlockAtSales} neighbourhood sales";
+                    progress = recipe.UnlockAtSales <= 0 ? 0f : (float)snapshot.TotalItemsSold / recipe.UnlockAtSales;
+                    break;
+                default:
+                    copy = "Hidden in Mila's Crafting tab · experiment with 2–4 ingredients";
+                    progress = 0f;
+                    break;
+            }
+
+            SetText(nextUnlockCopy, copy);
+            SetWidth(root.Q<VisualElement>("next-unlock-fill"), progress);
+        }
+
+        private void RenderCrafting()
+        {
+            if (game == null)
+            {
+                return;
+            }
+
+            for (var index = 0; index < craftSlotButtons.Count; index++)
+            {
+                var filled = index < craftingSlots.Count;
+                craftSlotButtons[index].text = filled ? BakeryCraftingSystem.IngredientName(craftingSlots[index]).ToUpperInvariant() : "DROP";
+                craftSlotButtons[index].EnableInClassList("craft-slot--filled", filled);
+            }
+
+            foreach (var pair in ingredientCards)
+            {
+                var count = game.IngredientCount(pair.Value);
+                if (pair.Key is Button button)
+                {
+                    button.text = $"{BakeryCraftingSystem.IngredientName(pair.Value).ToUpperInvariant()}\n{count}";
+                    button.SetEnabled(count > ReservedCount(pair.Value));
+                }
+            }
+
+            var hasRecipe = BakeryCraftingSystem.TryFindRecipe(craftingSlots, out var preview);
+            craftResult.text = hasRecipe ? $"{preview.DisplayName.ToUpperInvariant()}\nDISCOVER" : "???\nDISCOVER";
+            craftResult.SetEnabled(hasRecipe);
         }
 
         private void RenderLedger(BakerySnapshot snapshot)
         {
-            if (secondOvenButton != null)
-            {
-                secondOvenButton.text = snapshot.SecondOvenPurchased
-                    ? "SECOND OVEN · INSTALLED"
-                    : snapshot.KaiserUnlocked
-                        ? $"BUY SECOND OVEN · {BakeryLoop.SecondOvenCost} COINS"
-                        : $"SECOND OVEN · {snapshot.CountryBreadSold} / {BakeryLoop.KaiserUnlockBreadSales} BREADS";
-                secondOvenButton.SetEnabled(
-                    !snapshot.SecondOvenPurchased
-                    && snapshot.KaiserUnlocked
-                    && snapshot.Coins >= BakeryLoop.SecondOvenCost);
-            }
+            secondOvenButton.text = snapshot.SecondOvenPurchased
+                ? "SECOND OVEN · INSTALLED"
+                : snapshot.KaiserUnlocked
+                    ? $"BUY SECOND OVEN · {BakeryLoop.SecondOvenCost} COINS"
+                    : $"SECOND OVEN · {snapshot.CountryBreadSold} / {BakeryLoop.KaiserUnlockBreadSales} BREADS";
+            secondOvenButton.SetEnabled(!snapshot.SecondOvenPurchased && snapshot.KaiserUnlocked && snapshot.Coins >= BakeryLoop.SecondOvenCost);
 
-            if (bakeryUpgradeButton != null)
+            bakeryUpgradeButton.text = snapshot.BakeryLevel >= 2
+                ? "BAKA-BAKE-BAKERY · HOME"
+                : snapshot.BakeryUpgradeAvailable
+                    ? $"BUILD WOODEN BAKERY · {BakeryLoop.BakeryUpgradeCost} COINS"
+                    : $"WOODEN BAKERY · {snapshot.TotalItemsSold} / {BakeryLoop.BakeryUpgradeSales} SALES";
+            bakeryUpgradeButton.SetEnabled(snapshot.BakeryUpgradeAvailable && snapshot.Coins >= BakeryLoop.BakeryUpgradeCost);
+        }
+
+        private void AddIngredientCard(string name, IngredientId ingredient)
+        {
+            var card = root.Q<VisualElement>(name);
+            if (card != null)
             {
-                bakeryUpgradeButton.text = snapshot.BakeryLevel >= 2
-                    ? "BAKA-BAKE-BAKERY · HOME"
-                    : snapshot.BakeryUpgradeAvailable
-                        ? $"BUILD WOODEN BAKERY · {BakeryLoop.BakeryUpgradeCost} COINS"
-                        : $"WOODEN BAKERY · {snapshot.TotalItemsSold} / {BakeryLoop.BakeryUpgradeSales} SALES";
-                bakeryUpgradeButton.SetEnabled(
-                    snapshot.BakeryUpgradeAvailable
-                    && snapshot.Coins >= BakeryLoop.BakeryUpgradeCost);
+                ingredientCards[card] = ingredient;
             }
         }
 
-        private void AddRecipeCard(string elementName, RecipeId recipeId)
+        private static void EnsureRecipeIcon(Button button, RecipeId recipeId)
         {
-            var button = root.Q<Button>(elementName);
-            if (button != null)
+            if (button.userData is RecipeId current && current == recipeId && button.Q<VisualElement>("product-icon") != null)
             {
-                recipeCards[button] = recipeId;
+                return;
             }
+
+            button.Q<VisualElement>("product-icon")?.RemoveFromHierarchy();
+            var icon = new VisualElement { name = "product-icon" };
+            icon.AddToClassList("product-icon");
+            icon.AddToClassList($"product-icon--{recipeId.ToString().ToLowerInvariant()}");
+            for (var index = 0; index < 3; index++)
+            {
+                var detail = new VisualElement();
+                detail.AddToClassList("product-icon-detail");
+                detail.AddToClassList($"product-icon-detail--{index}");
+                icon.Add(detail);
+            }
+
+            button.Insert(0, icon);
+            button.userData = recipeId;
         }
 
         private void OnRecipeCardClicked(ClickEvent evt)
         {
-            if (evt.currentTarget is Button selected
-                && recipeCards.TryGetValue(selected, out var recipeId))
+            if (evt.currentTarget is Button button && recipeCards.TryGetValue(button, out var recipe))
             {
-                game?.TrySelectRecipe(recipeId);
+                game?.TrySelectRecipe(recipe);
             }
         }
 
-        private void OnActionClicked()
+        private void OnCraftSlotClicked(ClickEvent evt)
         {
-            game?.RequestBakerAction();
+            if (evt.currentTarget is not Button button)
+            {
+                return;
+            }
+
+            var index = craftSlotButtons.IndexOf(button);
+            if (index >= 0 && index < craftingSlots.Count)
+            {
+                craftingSlots.RemoveAt(index);
+                RenderCrafting();
+            }
         }
 
-        private void OnSecondOvenClicked()
+        private void OnIngredientPointerDown(PointerDownEvent evt)
         {
-            game?.TryPurchaseSecondOven();
+            if (evt.button != 0 || evt.currentTarget is not VisualElement source || !ingredientCards.TryGetValue(source, out var ingredient))
+            {
+                return;
+            }
+
+            if (game == null || game.IngredientCount(ingredient) <= ReservedCount(ingredient) || craftingSlots.Count >= BakeryCraftingSystem.MaximumIngredients)
+            {
+                return;
+            }
+
+            draggedIngredient = ingredient;
+            source.CapturePointer(evt.pointerId);
+            dragGhost.AddToClassList("drag-ghost--visible");
+            SetText(dragGhostLabel, BakeryCraftingSystem.IngredientName(ingredient).ToUpperInvariant());
+            MoveDragGhost(evt.position);
+            evt.StopPropagation();
         }
 
-        private void OnBakeryUpgradeClicked()
+        private void OnIngredientPointerMove(PointerMoveEvent evt)
         {
-            game?.TryPurchaseBakeryUpgrade();
+            if (draggedIngredient.HasValue)
+            {
+                MoveDragGhost(evt.position);
+                evt.StopPropagation();
+            }
         }
 
-        private void ToggleLedger()
+        private void OnIngredientPointerUp(PointerUpEvent evt)
         {
-            ledger?.ToggleInClassList("ledger--closed");
+            if (!draggedIngredient.HasValue)
+            {
+                return;
+            }
+
+            var pointer = new Vector2(evt.position.x, evt.position.y);
+            var targetIndex = -1;
+            for (var index = 0; index < craftSlotButtons.Count; index++)
+            {
+                if (craftSlotButtons[index].worldBound.Contains(pointer))
+                {
+                    targetIndex = index;
+                    break;
+                }
+            }
+
+            if (targetIndex < 0 && craftPanel.worldBound.Contains(pointer))
+            {
+                targetIndex = craftingSlots.Count;
+            }
+
+            if (targetIndex >= 0 && targetIndex <= craftingSlots.Count && craftingSlots.Count < BakeryCraftingSystem.MaximumIngredients)
+            {
+                craftingSlots.Insert(targetIndex, draggedIngredient.Value);
+            }
+
+            if (evt.currentTarget is VisualElement source && source.HasPointerCapture(evt.pointerId))
+            {
+                source.ReleasePointer(evt.pointerId);
+            }
+
+            EndDrag();
+            RenderCrafting();
+            evt.StopPropagation();
         }
+
+        private void OnIngredientPointerCaptureOut(PointerCaptureOutEvent evt)
+        {
+            EndDrag();
+        }
+
+        private void MoveDragGhost(Vector3 position)
+        {
+            dragGhost.style.left = position.x - 54f;
+            dragGhost.style.top = position.y - 24f;
+        }
+
+        private void EndDrag()
+        {
+            draggedIngredient = null;
+            dragGhost?.RemoveFromClassList("drag-ghost--visible");
+        }
+
+        private int ReservedCount(IngredientId ingredient)
+        {
+            var count = 0;
+            foreach (var item in craftingSlots)
+            {
+                if (item == ingredient) count++;
+            }
+
+            return count;
+        }
+
+        private void OnCraftResultClicked()
+        {
+            if (game?.TryCraft(craftingSlots) == true)
+            {
+                craftingSlots.Clear();
+                ShowHome();
+            }
+        }
+
+        private void ClearCrafting()
+        {
+            craftingSlots.Clear();
+            RenderCrafting();
+        }
+
+        private void OnDayButtonClicked()
+        {
+            if (game?.DayCycle == null) return;
+            switch (game.DayCycle.Phase)
+            {
+                case BakeryDayPhase.MorningPreparation: game.GoToMarket(); break;
+                case BakeryDayPhase.ReadyToOpen: game.StartDay(); break;
+                case BakeryDayPhase.Open: game.EndDay(); break;
+                case BakeryDayPhase.DaySummary: game.BeginNextMorning(); break;
+            }
+        }
+
+        private void OnActionClicked() => game?.RequestBakerAction();
+        private void OnSecondOvenClicked() => game?.TryPurchaseSecondOven();
+        private void OnBakeryUpgradeClicked() => game?.TryPurchaseBakeryUpgrade();
+
+        private void ShowHome()
+        {
+            homePanel.RemoveFromClassList("dock-panel--hidden");
+            craftPanel.AddToClassList("dock-panel--hidden");
+            homeTab.AddToClassList("nav-button--active");
+            craftTab.RemoveFromClassList("nav-button--active");
+        }
+
+        private void ShowCraft()
+        {
+            craftPanel.RemoveFromClassList("dock-panel--hidden");
+            homePanel.AddToClassList("dock-panel--hidden");
+            craftTab.AddToClassList("nav-button--active");
+            homeTab.RemoveFromClassList("nav-button--active");
+            RenderCrafting();
+        }
+
+        private void ToggleLedger() => ledger?.ToggleInClassList("ledger--closed");
 
         private void CloseLedger()
         {
@@ -522,20 +842,20 @@ namespace BakaBakeBakery.UI
             return focused == null || focused == actionButton || focused is not Button;
         }
 
+        private static string FormatTime(float seconds)
+        {
+            var safe = Mathf.Max(0, Mathf.CeilToInt(seconds));
+            return $"{safe / 60:00}:{safe % 60:00}";
+        }
+
         private static void SetText(Label label, string value)
         {
-            if (label != null && label.text != value)
-            {
-                label.text = value;
-            }
+            if (label != null && label.text != value) label.text = value;
         }
 
         private static void SetWidth(VisualElement element, float normalized)
         {
-            if (element != null)
-            {
-                element.style.width = Length.Percent(Mathf.Clamp01(normalized) * 100f);
-            }
+            if (element != null) element.style.width = Length.Percent(Mathf.Clamp01(normalized) * 100f);
         }
     }
 }

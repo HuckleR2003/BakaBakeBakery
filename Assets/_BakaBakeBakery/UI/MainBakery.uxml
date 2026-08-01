@@ -3,119 +3,83 @@
         <ui:VisualElement class="top-row blocks-world-input">
             <ui:VisualElement class="bakery-mark">
                 <ui:Label text="BAKA-BAKE" class="bakery-mark-name" />
-                <ui:Label name="bakery-level" text="FOOD TRUCK &#183; LEVEL 1" class="bakery-mark-level" />
+                <ui:Label name="bakery-level" text="FOOD TRUCK · LEVEL 1" class="bakery-mark-level" />
             </ui:VisualElement>
             <ui:VisualElement class="metric-strip">
-                <ui:VisualElement class="metric-card">
-                    <ui:Label text="COINS" class="metric-label" />
-                    <ui:Label name="coin-value" text="0" class="metric-value" />
-                </ui:VisualElement>
-                <ui:VisualElement class="metric-card metric-card--small">
-                    <ui:Label text="SOLD" class="metric-label" />
-                    <ui:Label name="sales-value" text="0" class="metric-value metric-value--small" />
-                </ui:VisualElement>
-                <ui:VisualElement class="metric-card metric-card--small metric-card--last">
-                    <ui:Label text="COUNTER" class="metric-label" />
-                    <ui:Label name="counter-value" text="0 / 8" class="metric-value metric-value--small" />
-                </ui:VisualElement>
+                <ui:VisualElement class="metric-card"><ui:Label text="COINS" class="metric-label" /><ui:Label name="coin-value" text="0" class="metric-value" /></ui:VisualElement>
+                <ui:VisualElement class="metric-card metric-card--small"><ui:Label text="SOLD" class="metric-label" /><ui:Label name="sales-value" text="0" class="metric-value metric-value--small" /></ui:VisualElement>
+                <ui:VisualElement class="metric-card metric-card--small metric-card--last"><ui:Label text="COUNTER" class="metric-label" /><ui:Label name="counter-value" text="0 / 8" class="metric-value metric-value--small" /></ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="milestone-card">
                 <ui:Label name="milestone-title" text="A HELPING HAND" class="metric-label" />
-                <ui:Label name="milestone-value" text="Manager &#183; 0 / 10 breads" class="milestone-value" />
-                <ui:VisualElement class="thin-progress">
-                    <ui:VisualElement name="milestone-progress-fill" class="thin-progress-fill" />
-                </ui:VisualElement>
+                <ui:Label name="milestone-value" text="Manager · 0 / 10 breads" class="milestone-value" />
+                <ui:VisualElement class="thin-progress"><ui:VisualElement name="milestone-progress-fill" class="thin-progress-fill" /></ui:VisualElement>
             </ui:VisualElement>
+            <ui:Button name="day-button" text="MORNING 01\nGO TO MARKET" class="day-board" />
             <ui:Button name="ledger-button" text="BAKERY BOOK  [B]" class="ledger-button" />
         </ui:VisualElement>
 
         <ui:VisualElement class="warmth-card blocks-world-input">
-            <ui:VisualElement class="warmth-heading">
-                <ui:Label text="NEIGHBOURHOOD WARMTH" class="warmth-title" />
-                <ui:Label name="warmth-value" text="0 / 12" class="warmth-value" />
-            </ui:VisualElement>
-            <ui:VisualElement class="warmth-track">
-                <ui:VisualElement name="warmth-fill" class="warmth-fill" />
-            </ui:VisualElement>
+            <ui:VisualElement class="warmth-heading"><ui:Label text="NEIGHBOURHOOD WARMTH" class="warmth-title" /><ui:Label name="warmth-value" text="0 / 12" class="warmth-value" /></ui:VisualElement>
+            <ui:VisualElement class="warmth-track"><ui:VisualElement name="warmth-fill" class="warmth-fill" /></ui:VisualElement>
             <ui:Label name="customer-value" text="1 neighbour" class="customer-value" />
-            <ui:VisualElement name="golden-chip" class="golden-chip">
-                <ui:Label name="golden-value" text="KINDNESS FILLS THE STREET" class="golden-value" />
-            </ui:VisualElement>
+            <ui:VisualElement name="golden-chip" class="golden-chip"><ui:Label name="golden-value" text="KINDNESS FILLS THE STREET" class="golden-value" /></ui:VisualElement>
         </ui:VisualElement>
 
         <ui:VisualElement class="speech-layer">
-            <ui:VisualElement name="baker-bubble" class="speech-bubble speech-bubble--baker">
-                <ui:Label text="JULES" class="speaker-name" />
-                <ui:Label name="baker-bubble-text" text="The oven is warm." class="speech-copy" />
-                <ui:VisualElement class="bubble-tail" />
-            </ui:VisualElement>
-            <ui:VisualElement name="grandmother-bubble" class="speech-bubble speech-bubble--grandmother">
-                <ui:Label text="MRS. ROSE" class="speaker-name" />
-                <ui:Label name="grandmother-bubble-text" text="Fresh bread, darling?" class="speech-copy" />
-                <ui:VisualElement class="bubble-tail" />
-            </ui:VisualElement>
-            <ui:VisualElement name="neighbour-bubble" class="speech-bubble speech-bubble--neighbour">
-                <ui:Label text="THE NEIGHBOUR" class="speaker-name" />
-                <ui:Label name="neighbour-bubble-text" text="Morning!" class="speech-copy" />
-                <ui:VisualElement class="bubble-tail" />
-            </ui:VisualElement>
+            <ui:VisualElement name="baker-bubble" class="speech-bubble speech-bubble--baker"><ui:Label text="JULES" class="speaker-name" /><ui:Label name="baker-bubble-text" text="The oven is warm." class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
+            <ui:VisualElement name="grandmother-bubble" class="speech-bubble speech-bubble--grandmother"><ui:Label text="MRS. ROSE" class="speaker-name" /><ui:Label name="grandmother-bubble-text" text="Fresh bread, darling?" class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
+            <ui:VisualElement name="neighbour-bubble" class="speech-bubble speech-bubble--neighbour"><ui:Label text="THE NEIGHBOUR" class="speaker-name" /><ui:Label name="neighbour-bubble-text" text="Morning!" class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
+            <ui:VisualElement name="friend-bubble" class="speech-bubble speech-bubble--friend"><ui:Label text="MILA · YOUR FRIEND" class="speaker-name" /><ui:Label name="friend-bubble-text" text="Ready for our first morning?" class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement name="toast" class="toast">
-            <ui:VisualElement class="toast-mark" />
-            <ui:VisualElement class="toast-copy-wrap">
-                <ui:Label name="toast-title" text="MILESTONE" class="toast-title" />
-                <ui:Label name="toast-copy" text="Something lovely just happened." class="toast-copy" />
-            </ui:VisualElement>
+        <ui:VisualElement name="market-map" class="market-map blocks-world-input">
+            <ui:Label text="THE LITTLE MORNING ROAD" class="map-kicker" />
+            <ui:VisualElement class="map-route"><ui:VisualElement name="map-route-fill" class="map-route-fill" /><ui:VisualElement name="bike-marker" class="bike-marker"><ui:VisualElement class="bike-wheel" /><ui:VisualElement class="bike-frame" /><ui:VisualElement class="bike-wheel" /></ui:VisualElement></ui:VisualElement>
+            <ui:VisualElement class="map-labels"><ui:Label text="BAKA-BAKE · VILLAGE" /><ui:Label text="MORNING MARKET · TOWN" /></ui:VisualElement>
+            <ui:Label name="map-status" text="Pedalling past the sleeping gardens..." class="map-status" />
         </ui:VisualElement>
+
+        <ui:VisualElement name="toast" class="toast"><ui:VisualElement class="toast-mark" /><ui:VisualElement class="toast-copy-wrap"><ui:Label name="toast-title" text="MILESTONE" class="toast-title" /><ui:Label name="toast-copy" text="Something lovely just happened." class="toast-copy" /></ui:VisualElement></ui:VisualElement>
 
         <ui:VisualElement name="upgrade-ledger" class="ledger ledger--closed blocks-world-input">
-            <ui:VisualElement class="ledger-heading-row">
-                <ui:VisualElement>
-                    <ui:Label text="THE BAKERY BOOK" class="ledger-heading" />
-                    <ui:Label text="Useful plans, written in flour and pencil." class="ledger-copy" />
-                </ui:VisualElement>
-                <ui:Label text="MORNING 01" class="ledger-stamp" />
-            </ui:VisualElement>
+            <ui:VisualElement class="ledger-heading-row"><ui:VisualElement><ui:Label text="THE BAKERY BOOK" class="ledger-heading" /><ui:Label text="Useful plans, written in flour and pencil." class="ledger-copy" /></ui:VisualElement><ui:Label name="ledger-day" text="MORNING 01" class="ledger-stamp" /></ui:VisualElement>
             <ui:VisualElement class="ledger-divider" />
-            <ui:VisualElement class="upgrade-card">
-                <ui:Label text="A SECOND AMBER WINDOW" class="upgrade-name" />
-                <ui:Label text="Bakes 40% faster and lets the counter hold twelve pastries." class="upgrade-detail" />
-                <ui:Button name="second-oven-button" text="SECOND OVEN &#183; 0 / 30 BREADS" class="upgrade-button" />
-            </ui:VisualElement>
-            <ui:VisualElement class="upgrade-card">
-                <ui:Label text="A WOODEN HOME" class="upgrade-name" />
-                <ui:Label text="At 55 sales the neighbours help turn the truck into Baka-Bake-Bakery." class="upgrade-detail" />
-                <ui:Button name="bakery-upgrade-button" text="WOODEN BAKERY &#183; 0 / 55 SALES" class="upgrade-button" />
-            </ui:VisualElement>
+            <ui:VisualElement class="upgrade-card"><ui:Label text="A SECOND AMBER WINDOW" class="upgrade-name" /><ui:Label text="Bakes 40% faster and lets the counter hold twelve pastries." class="upgrade-detail" /><ui:Button name="second-oven-button" text="SECOND OVEN · 0 / 30 BREADS" class="upgrade-button" /></ui:VisualElement>
+            <ui:VisualElement class="upgrade-card"><ui:Label text="A WOODEN HOME" class="upgrade-name" /><ui:Label text="At 55 sales the neighbours help turn the truck into Baka-Bake-Bakery." class="upgrade-detail" /><ui:Button name="bakery-upgrade-button" text="WOODEN BAKERY · 0 / 55 SALES" class="upgrade-button" /></ui:VisualElement>
             <ui:Label text="ESC closes the book" class="ledger-footnote" />
         </ui:VisualElement>
 
         <ui:VisualElement class="work-card blocks-world-input">
-            <ui:VisualElement class="work-copy">
-                <ui:Label name="shift-mode" text="MANUAL MORNING &#183; LOAF BY LOAF" class="work-kicker" />
-                <ui:Label name="action-title" text="Fetch fresh dough" class="work-title" />
-                <ui:Label name="action-detail" text="Click Jules in the truck or press Space." class="work-detail" />
-                <ui:VisualElement class="action-progress">
-                    <ui:VisualElement name="action-progress-fill" class="action-progress-fill" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:Button name="action-button" text="FETCH DOUGH" class="action-button" />
+            <ui:VisualElement class="work-copy"><ui:Label name="shift-mode" text="MORNING PREPARATION" class="work-kicker" /><ui:Label name="action-title" text="Visit the morning market" class="work-title" /><ui:Label name="action-detail" text="The oven waits for a properly stocked pantry." class="work-detail" /><ui:VisualElement class="action-progress"><ui:VisualElement name="action-progress-fill" class="action-progress-fill" /></ui:VisualElement></ui:VisualElement>
+            <ui:Button name="action-button" text="BAKERY CLOSED" class="action-button" />
         </ui:VisualElement>
 
-        <ui:VisualElement class="recipe-dock blocks-world-input">
-            <ui:VisualElement class="dock-heading">
-                <ui:Label text="TODAY'S RECIPE CARDS" class="dock-kicker" />
-                <ui:Label text="Keys 1—6 select &#183; a fresh counter must be cleared first" class="dock-hint" />
+        <ui:VisualElement class="bottom-shell blocks-world-input">
+            <ui:VisualElement class="nav-rail">
+                <ui:Button name="home-tab" text="HOME" class="nav-button nav-button--active" />
+                <ui:Button name="craft-tab" text="CRAFT" class="nav-button" />
             </ui:VisualElement>
-            <ui:VisualElement class="recipe-row">
-                <ui:Button name="recipe-bread" text="01&#10;COUNTRY BREAD&#10;4 s &#183; 6 coins" class="recipe-card recipe-card--selected" />
-                <ui:Button name="recipe-kaiser" text="02&#10;KAISER ROLLS&#10;30 bread sales" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-croissant" text="03&#10;BUTTER CROISSANT&#10;45 total sales" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-swirl" text="04&#10;CINNAMON SWIRL&#10;Bakery level 2" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-finezja" text="05&#10;FINEZJA&#10;100 total sales" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-monocle" text="06&#10;CINNAMON MONOCLE&#10;125 total sales" class="recipe-card recipe-card--locked" />
+
+            <ui:VisualElement name="home-panel" class="dock-panel">
+                <ui:VisualElement name="home-content" class="home-content">
+                    <ui:VisualElement name="next-unlock" class="unlock-banner">
+                        <ui:VisualElement class="lock-mark"><ui:VisualElement class="lock-loop" /><ui:VisualElement class="lock-body" /></ui:VisualElement>
+                        <ui:VisualElement class="unlock-copy"><ui:Label text="COMING TO THE COUNTER" class="dock-kicker" /><ui:Label name="next-unlock-title" text="Basic Kaiser Rolls" class="unlock-title" /><ui:Label name="next-unlock-copy" text="0 / 30 country breads" class="unlock-detail" /><ui:VisualElement class="unlock-progress"><ui:VisualElement name="next-unlock-fill" class="unlock-progress-fill" /></ui:VisualElement></ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:ScrollView name="recipe-scroll" mode="Horizontal" class="recipe-scroll">
+                        <ui:Button name="recipe-slot-0" text="COUNTRY BREAD" class="recipe-card recipe-card--selected" /><ui:Button name="recipe-slot-1" text="" class="recipe-card" /><ui:Button name="recipe-slot-2" text="" class="recipe-card" /><ui:Button name="recipe-slot-3" text="" class="recipe-card" /><ui:Button name="recipe-slot-4" text="" class="recipe-card" /><ui:Button name="recipe-slot-5" text="" class="recipe-card" /><ui:Button name="recipe-slot-6" text="" class="recipe-card" /><ui:Button name="recipe-slot-7" text="" class="recipe-card" /><ui:Button name="recipe-slot-8" text="" class="recipe-card" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="craft-panel" class="dock-panel dock-panel--hidden">
+                <ui:VisualElement class="craft-heading"><ui:VisualElement><ui:Label text="MILA'S LITTLE TEST KITCHEN" class="dock-kicker" /><ui:Label text="Drag 2–4 pantry ingredients. Unknown mixtures cost nothing until you press Discover." class="craft-hint" /></ui:VisualElement><ui:Button name="clear-craft-button" text="CLEAR" class="clear-button" /></ui:VisualElement>
+                <ui:VisualElement class="craft-equation"><ui:Button name="craft-slot-0" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-1" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-2" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-3" text="DROP" class="craft-slot" /><ui:Label text="=" class="equation-mark equation-mark--equals" /><ui:Button name="craft-result" text="???\nDISCOVER" class="craft-result" /></ui:VisualElement>
+                <ui:VisualElement class="pantry-row"><ui:Button name="ingredient-flour" text="FLOUR\n0" class="ingredient-card ingredient-card--flour" /><ui:Button name="ingredient-milk" text="MILK\n0" class="ingredient-card ingredient-card--milk" /><ui:Button name="ingredient-pastry" text="PUFF PASTRY\n0" class="ingredient-card ingredient-card--pastry" /><ui:Button name="ingredient-jam" text="JAM\n0" class="ingredient-card ingredient-card--jam" /><ui:Button name="ingredient-chocolate" text="CHOCOLATE\n0" class="ingredient-card ingredient-card--chocolate" /></ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
+
+        <ui:VisualElement name="drag-ghost" class="drag-ghost"><ui:Label name="drag-ghost-label" text="FLOUR" /></ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

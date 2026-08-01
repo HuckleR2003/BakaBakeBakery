@@ -151,7 +151,7 @@
 }
 
 .ledger-button {
-    width: 160px;
+    width: 142px;
     margin-left: auto;
     padding-left: 15px;
     padding-right: 15px;
@@ -160,6 +160,31 @@
     border-radius: 10px;
     letter-spacing: 1px;
     -unity-font-style: bold;
+}
+
+.day-board {
+    width: 176px;
+    margin-right: 9px;
+    padding: 8px 12px;
+    background-color: rgb(105, 68, 43);
+    color: var(--flour);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 5px;
+    border-color: rgb(67, 43, 31);
+    border-bottom-color: rgb(48, 31, 24);
+    border-radius: 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.day-board:hover,
+.day-board:focus {
+    background-color: rgb(128, 82, 49);
+    border-top-color: var(--glow);
 }
 
 .ledger-button:hover,
@@ -268,6 +293,15 @@
 .speech-bubble--neighbour {
     left: 10%;
     top: 53%;
+}
+
+.speech-bubble--friend {
+    left: 22%;
+    top: 28%;
+    max-width: 330px;
+    background-color: rgba(246, 231, 207, 0.93);
+    border-left-width: 5px;
+    border-left-color: var(--sage);
 }
 
 .speaker-name {
@@ -443,7 +477,7 @@
 .work-card {
     position: absolute;
     left: 24px;
-    bottom: 166px;
+    bottom: 208px;
     width: 470px;
     min-height: 112px;
     padding: 14px;
@@ -451,6 +485,557 @@
     align-items: stretch;
     background-color: rgba(250, 239, 216, 0.95);
     border-radius: 11px;
+}
+
+.market-map {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 620px;
+    height: 214px;
+    margin-left: -310px;
+    margin-top: -130px;
+    padding: 22px 28px;
+    background-color: rgba(39, 29, 28, 0.97);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 7px;
+    border-color: rgba(244, 229, 198, 0.28);
+    border-bottom-color: rgb(20, 16, 17);
+    border-radius: 18px;
+}
+
+.market-map--visible {
+    display: flex;
+}
+
+.map-kicker {
+    color: var(--glow);
+    letter-spacing: 2px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.map-route {
+    height: 16px;
+    margin: 34px 34px 14px 34px;
+    background-color: rgba(244, 229, 198, 0.12);
+    border-radius: 99px;
+}
+
+.map-route-fill {
+    width: 0;
+    height: 100%;
+    background-color: var(--crust);
+    border-radius: 99px;
+}
+
+.bike-marker {
+    position: absolute;
+    left: -18px;
+    top: -15px;
+    width: 56px;
+    height: 42px;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.bike-wheel {
+    width: 18px;
+    height: 18px;
+    border-width: 4px;
+    border-color: var(--flour);
+    border-radius: 99px;
+}
+
+.bike-frame {
+    width: 20px;
+    height: 12px;
+    margin-left: -3px;
+    margin-right: -3px;
+    margin-bottom: 6px;
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    border-color: var(--cherry);
+}
+
+.map-labels {
+    flex-direction: row;
+    justify-content: space-between;
+    color: rgba(244, 229, 198, 0.72);
+    font-size: 9px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.map-status {
+    margin-top: 22px;
+    color: rgba(244, 229, 198, 0.52);
+    font-size: 11px;
+    -unity-text-align: middle-center;
+}
+
+.bottom-shell {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 14px;
+    height: 180px;
+    flex-direction: row;
+    background-color: rgba(42, 30, 29, 0.97);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 5px;
+    border-color: rgba(244, 229, 198, 0.24);
+    border-bottom-color: rgba(20, 16, 17, 0.92);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.nav-rail {
+    width: 88px;
+    padding: 12px 9px;
+    background-color: rgba(20, 16, 17, 0.48);
+    border-right-width: 1px;
+    border-right-color: rgba(244, 229, 198, 0.12);
+}
+
+.nav-button {
+    flex-grow: 1;
+    margin: 3px 0;
+    background-color: transparent;
+    color: rgba(244, 229, 198, 0.55);
+    border-width: 1px;
+    border-color: transparent;
+    border-radius: 9px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.nav-button--active {
+    color: var(--flour);
+    background-color: rgba(200, 117, 61, 0.24);
+    border-color: rgba(255, 180, 93, 0.48);
+    border-left-width: 4px;
+    border-left-color: var(--glow);
+}
+
+.dock-panel {
+    flex-grow: 1;
+    padding: 10px 14px;
+}
+
+.dock-panel--hidden {
+    display: none;
+}
+
+.home-content {
+    height: 100%;
+    flex-direction: row;
+}
+
+.home-content--mature {
+    flex-direction: column;
+}
+
+.unlock-banner {
+    width: 38%;
+    min-width: 315px;
+    margin-right: 10px;
+    padding: 13px 15px;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(250, 239, 216, 0.95);
+    border-left-width: 5px;
+    border-left-color: var(--glow);
+    border-radius: 10px;
+}
+
+.home-content--mature .unlock-banner {
+    width: auto;
+    min-width: 0;
+    height: 54px;
+    margin-right: 0;
+    margin-bottom: 7px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.lock-mark {
+    width: 40px;
+    height: 50px;
+    margin-right: 14px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.home-content--mature .lock-mark {
+    width: 28px;
+    height: 34px;
+    margin-right: 10px;
+}
+
+.lock-loop {
+    position: absolute;
+    top: 2px;
+    width: 25px;
+    height: 26px;
+    border-left-width: 5px;
+    border-right-width: 5px;
+    border-top-width: 5px;
+    border-color: var(--cocoa);
+    border-radius: 14px;
+}
+
+.lock-body {
+    width: 34px;
+    height: 30px;
+    background-color: var(--crust);
+    border-radius: 5px;
+}
+
+.home-content--mature .lock-loop {
+    width: 18px;
+    height: 18px;
+    border-width: 3px;
+}
+
+.home-content--mature .lock-body {
+    width: 26px;
+    height: 22px;
+}
+
+.unlock-copy {
+    flex-grow: 1;
+}
+
+.unlock-title {
+    margin-top: 4px;
+    color: var(--cocoa);
+    font-size: 17px;
+    -unity-font-style: bold;
+}
+
+.unlock-detail {
+    margin-top: 2px;
+    color: rgba(56, 40, 36, 0.62);
+    font-size: 10px;
+}
+
+.home-content--mature .unlock-title {
+    margin-top: 1px;
+    font-size: 13px;
+}
+
+.home-content--mature .unlock-detail {
+    position: absolute;
+    right: 4px;
+    top: 3px;
+}
+
+.unlock-progress {
+    height: 7px;
+    margin-top: 9px;
+    overflow: hidden;
+    background-color: rgba(56, 40, 36, 0.14);
+    border-radius: 99px;
+}
+
+.home-content--mature .unlock-progress {
+    height: 5px;
+    margin-top: 4px;
+}
+
+.unlock-progress-fill {
+    width: 0;
+    height: 100%;
+    background-color: var(--cherry);
+    border-radius: 99px;
+}
+
+.recipe-scroll {
+    flex-grow: 1;
+    height: 100%;
+}
+
+.recipe-scroll .unity-scroll-view__content-container {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.home-content--mature .recipe-scroll {
+    height: 94px;
+}
+
+.recipe-scroll .recipe-card {
+    display: none;
+    width: 150px;
+    min-width: 150px;
+    height: 138px;
+    flex-grow: 0;
+    flex-basis: auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-content--mature .recipe-card {
+    height: 82px;
+}
+
+.recipe-scroll .recipe-card--visible {
+    display: flex;
+}
+
+.product-icon {
+    width: 48px;
+    height: 31px;
+    margin-bottom: 5px;
+    background-color: var(--crust);
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(132, 72, 39);
+    border-radius: 48% 48% 38% 38%;
+}
+
+.product-icon-detail {
+    position: absolute;
+    top: 5px;
+    width: 5px;
+    height: 19px;
+    background-color: rgba(250, 239, 216, 0.78);
+    border-radius: 99px;
+    rotate: -18deg;
+}
+
+.product-icon-detail--0 { left: 12px; }
+.product-icon-detail--1 { left: 22px; }
+.product-icon-detail--2 { left: 32px; }
+
+.product-icon--kaiserroll {
+    width: 38px;
+    height: 35px;
+    border-radius: 99px;
+}
+
+.product-icon--kaiserroll .product-icon-detail {
+    top: 15px;
+    left: 9px;
+    width: 21px;
+    height: 3px;
+    rotate: 0deg;
+}
+
+.product-icon--buttercroissant {
+    width: 52px;
+    height: 25px;
+    border-radius: 70% 70% 28% 28%;
+}
+
+.product-icon--buttercroissant .product-icon-detail {
+    top: 4px;
+    height: 16px;
+    background-color: rgba(116, 63, 35, 0.42);
+}
+
+.product-icon--cinnamonswirl,
+.product-icon--cinnamonmonocle {
+    width: 38px;
+    height: 38px;
+    border-radius: 99px;
+}
+
+.product-icon--cinnamonswirl .product-icon-detail,
+.product-icon--cinnamonmonocle .product-icon-detail {
+    top: 10px;
+    left: 10px;
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border-width: 4px;
+    border-color: var(--cocoa);
+    border-radius: 99px;
+    rotate: 0deg;
+}
+
+.product-icon--finezja .product-icon-detail {
+    top: 4px;
+    width: 10px;
+    height: 20px;
+    rotate: 0deg;
+    background-color: var(--paper);
+}
+
+.product-icon--finezja .product-icon-detail--1 {
+    background-color: var(--cherry);
+}
+
+.product-icon--chocolatemuffin {
+    width: 38px;
+    height: 31px;
+    background-color: rgb(91, 53, 40);
+    border-radius: 50% 50% 22% 22%;
+}
+
+.product-icon--chocolatemuffin .product-icon-detail {
+    top: 5px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--glow);
+    border-radius: 99px;
+    rotate: 0deg;
+}
+
+.product-icon--jamturnover {
+    width: 38px;
+    height: 38px;
+    rotate: 45deg;
+    border-radius: 8px;
+}
+
+.product-icon--jamturnover .product-icon-detail {
+    display: none;
+}
+
+.product-icon--chocolatepillow {
+    border-radius: 8px;
+}
+
+.product-icon--chocolatepillow .product-icon-detail {
+    top: 9px;
+    left: 15px;
+    width: 18px;
+    height: 13px;
+    rotate: 0deg;
+    background-color: var(--cocoa);
+}
+
+.craft-heading {
+    height: 34px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.craft-hint {
+    margin-top: 3px;
+    color: rgba(244, 229, 198, 0.48);
+    font-size: 9px;
+}
+
+.clear-button {
+    width: 72px;
+    background-color: transparent;
+    color: rgba(244, 229, 198, 0.64);
+    border-width: 1px;
+    border-color: rgba(244, 229, 198, 0.24);
+    border-radius: 6px;
+    font-size: 9px;
+}
+
+.craft-equation {
+    height: 70px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.craft-slot {
+    width: 110px;
+    height: 58px;
+    background-color: rgba(244, 229, 198, 0.08);
+    color: rgba(244, 229, 198, 0.38);
+    border-width: 2px;
+    border-color: rgba(244, 229, 198, 0.2);
+    border-radius: 9px;
+    font-size: 9px;
+    white-space: normal;
+}
+
+.craft-slot--filled {
+    color: var(--cocoa);
+    background-color: var(--paper);
+    border-color: var(--crust);
+}
+
+.equation-mark {
+    width: 26px;
+    color: rgba(244, 229, 198, 0.44);
+    font-size: 17px;
+    -unity-text-align: middle-center;
+}
+
+.equation-mark--equals {
+    color: var(--glow);
+    font-size: 24px;
+}
+
+.craft-result {
+    flex-grow: 1;
+    height: 62px;
+    background-color: var(--cherry);
+    color: var(--paper);
+    border-width: 0;
+    border-bottom-width: 5px;
+    border-bottom-color: rgb(92, 45, 42);
+    border-radius: 9px;
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.craft-result:disabled {
+    opacity: 0.5;
+    background-color: var(--sage);
+}
+
+.pantry-row {
+    height: 57px;
+    flex-direction: row;
+}
+
+.ingredient-card {
+    flex-grow: 1;
+    margin-right: 7px;
+    color: var(--cocoa);
+    background-color: var(--flour);
+    border-width: 0;
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(128, 86, 56);
+    border-radius: 7px;
+    font-size: 9px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.ingredient-card--milk { background-color: rgb(238, 240, 226); }
+.ingredient-card--pastry { background-color: rgb(232, 195, 125); }
+.ingredient-card--jam { background-color: rgb(204, 91, 86); color: var(--paper); }
+.ingredient-card--chocolate { background-color: rgb(92, 57, 45); color: var(--paper); }
+.ingredient-card:disabled { opacity: 0.35; }
+
+.drag-ghost {
+    display: none;
+    position: absolute;
+    width: 108px;
+    height: 44px;
+    padding: 8px;
+    background-color: rgba(250, 239, 216, 0.96);
+    color: var(--cocoa);
+    border-width: 2px;
+    border-color: var(--glow);
+    border-radius: 8px;
+    -unity-text-align: middle-center;
+    font-size: 9px;
+    -unity-font-style: bold;
+}
+
+.drag-ghost--visible {
+    display: flex;
 }
 
 .work-copy {
