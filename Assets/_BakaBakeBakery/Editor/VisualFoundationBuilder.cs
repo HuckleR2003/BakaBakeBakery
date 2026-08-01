@@ -431,7 +431,7 @@ namespace BakaBakeBakery.Editor
         {
             PlayerSettings.companyName = "HCK Labs";
             PlayerSettings.productName = "Baka Bake Bakery";
-            PlayerSettings.bundleVersion = "0.5.0";
+            PlayerSettings.bundleVersion = "0.6.0";
             PlayerSettings.defaultScreenWidth = 1600;
             PlayerSettings.defaultScreenHeight = 900;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

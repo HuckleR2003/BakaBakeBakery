@@ -25,7 +25,7 @@ namespace BakaBakeBakery.Tests.EditMode
         {
             Assert.That(PlayerSettings.companyName, Is.EqualTo("HCK Labs"));
             Assert.That(PlayerSettings.productName, Is.EqualTo("Baka Bake Bakery"));
-            Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.5.0"));
+            Assert.That(PlayerSettings.bundleVersion, Is.EqualTo("0.6.0"));
             Assert.That(PlayerSettings.defaultScreenWidth, Is.EqualTo(1600));
             Assert.That(PlayerSettings.defaultScreenHeight, Is.EqualTo(900));
             Assert.That(PlayerSettings.resizableWindow, Is.True);

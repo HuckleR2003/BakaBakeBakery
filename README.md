@@ -6,7 +6,7 @@ Start with a food truck, bake the first loaves by hand, train a manager, expand 
 
 ## Current status
 
-The project contains a playable `0.5.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, then customer parcel. Mila later automates the same guarded command loop.
+The project contains a playable `0.6.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, then customer parcel. Mila arrives on the first morning with a clickable, event-driven guide and later automates the same guarded command loop.
 
 The current build includes:
 
