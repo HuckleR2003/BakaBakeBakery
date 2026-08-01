@@ -11,3 +11,6 @@ These images are automated runtime captures from the Windows build at `1600 × 9
 - `11-baker-moving.png` — Jules crossing to the refrigerator after a valid action.
 - `12-oven-rhythm.png` — active bake, progress feedback, and a neighbourhood conversation.
 - `13-first-sale.png` — finished loaf reaching the counter and the opening sale completing.
+- `14-counter-stocked.png` — the finished loaf remains physically visible before a customer can take it.
+- `16-oven-baked.png` — the raw oven load has visibly become a baked Country Bread.
+- `17-prep-board.png` — Jules crosses from the refrigerator to the ingredient-covered preparation board.

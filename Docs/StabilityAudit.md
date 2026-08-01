@@ -7,6 +7,9 @@ This audit covers the playable food-truck vertical slice, including the producti
 - Every loaf follows one explicit state machine. Input is accepted only while waiting for dough, oven loading, or counter placement; click spam during movement and baking is rejected.
 - The manager calls the same action interface as the player. It cannot skip a station, overfill the counter, or start a batch that will not fit.
 - Counter stock keeps one recipe identity until sold out, so selecting another card cannot relabel existing products.
+- A completed batch receives a protected counter-display interval before any sale can consume it. The world therefore renders the stocked product for more than a single frame.
+- Raw ingredients, carried dough, raw oven contents, baked oven contents, carried bakes, and counter servings are mutually exclusive state-driven displays.
+- Customer actors enter from the street, retain queue order, wait for a departing customer to clear the service point, and leave with a visible purchase parcel.
 - Customer arrivals are capped at two. Sales require both stock and a waiting customer, and each sale consumes exactly one of each.
 - Invalid, infinite, negative, or abnormally large frame deltas are ignored or capped before they reach production timers.
 - Save values are versioned, clamped, and validated. Missing, malformed, unavailable, or locked recipe selections safely fall back to Country Bread.
@@ -22,6 +25,7 @@ This audit covers the playable food-truck vertical slice, including the producti
 | Area | Verification |
 |---|---|
 | Manual production | Three deliberate actions, busy-state spam rejection, bake completion, counter placement, and first sale. |
+| Physical production | Empty initial counter, raw ingredient display, raw carry, oven contents, baked carry, stocked counter, and purchased parcel. |
 | Manager | Unlock at ten Country Bread sales, automatic use of the same loop, and counter-capacity compliance. |
 | Progression | Kaiser threshold, exact second-oven price, exact wooden-bakery threshold and price, repeat-purchase rejection. |
 | Recipes | Six unique products; locked selection fallback; no switching while fresh stock remains. |
@@ -35,7 +39,7 @@ This audit covers the playable food-truck vertical slice, including the producti
 
 - EditMode tests: **23 passed, 0 failed, 0 skipped**.
 - Windows x86_64 player: **Build Finished, Result: Success**.
-- Runtime gameplay smoke: `GAMEPLAY_SMOKE_READY first manual loaf completed and sold.`
+- Runtime gameplay smoke: `GAMEPLAY_SMOKE_READY first manual loaf completed and sold.` The probe also rejects missing ingredients, invisible oven contents, or a batch that never becomes visible on the counter.
 - Player log: no exceptions, failed scene loads, compiler warnings, or unsupported UI selectors.
 - Runtime captures reviewed at `1600 × 900`: full ident, vial break, diagonal wipe, Main Menu, Settings, idle food truck, baker movement, oven phase, conversation bubble, and first sale.
 

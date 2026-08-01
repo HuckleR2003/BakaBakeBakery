@@ -13,8 +13,9 @@ The current build includes:
 - customers, a two-person queue, visible counter inventory, sales, and local progress;
 - Country Bread, Kaiser Rolls, Butter Croissants, Cinnamon Swirls, Finezja, and Cinnamon Monocles;
 - manager, second-oven, and wooden-bakery milestones;
+- a state-driven physical production story: ingredients, raw batch, oven contents, carried bake, counter stock, and customer parcel;
 - a neighbourhood Warmth meter and temporary double-income Golden Minutes;
-- conversational bubbles for Jules, Mrs. Rose, and a returning neighbour;
+- walking customers, conversational bubbles for Jules, Mrs. Rose, and a returning neighbour;
 - the animated black HCK Labs ident, Main Menu, comfort settings, and responsive bakery HUD.
 
 ## Project setup
@@ -43,6 +44,7 @@ Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/Studi
 - [Reference study](Docs/References.md)
 - [Brand and settings decisions](Docs/BrandAndSettings.md)
 - [Stability audit](Docs/StabilityAudit.md)
+- [Living-world rules](Docs/LivingWorld.md)
 - [Concept frame notes](Docs/Concepts/README.md)
 
 ## Repository layout
