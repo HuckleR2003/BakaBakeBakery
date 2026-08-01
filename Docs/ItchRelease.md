@@ -50,14 +50,24 @@ The channel name carries the platform, so `windows` is enough for this project. 
 
 ## A browser build
 
-itch.io gives browser games far more plays than downloads, and the project already lists WebGL as a secondary target. Two settings decide whether a Unity WebGL build works there at all, both under **Project Settings → Player → WebGL → Publishing Settings**:
+itch.io gives browser games far more plays than downloads. `Baka Bake Bakery/Package for itch.io (Browser)` builds it and writes `Builds/Release/baka-bake-bakery-browser-<version>.zip`, applying the two settings that decide whether a Unity web build works on itch at all:
 
 - **Compression Format:** Gzip. Brotli compresses better but needs server headers itch does not let you set.
-- **Decompression Fallback:** enabled. This embeds a JavaScript decompressor in the build so the browser can unpack the data even when the host serves no `Content-Encoding` header. Without it the page loads to a blank canvas.
+- **Decompression Fallback:** enabled. This embeds a JavaScript decompressor in the build so the browser can unpack the data even when the host serves no `Content-Encoding` header. Without it the page loads to a blank canvas. Enabling it is what gives the payload files their `.unityweb` extension.
 
-The zip must have `index.html` at its root, and the upload has to be marked **This file will be played in the browser**. Set the viewport to 1600 × 900 with fullscreen enabled to match the desktop framing.
+Exceptions are limited to explicitly thrown ones, which keeps the guarded save loading working without paying for full stack traces.
 
-This build has not been produced or verified yet. The post-processing volume, the point lights on the street lamps and the soft shadows all cost more on WebGL than on desktop, so a browser release needs its own performance pass before it is promised on the page.
+The zip has `index.html` at its root. On the itch page the upload must be marked **This file will be played in the browser**, with the viewport set to 1600 × 900 and fullscreen allowed, matching the desktop framing.
+
+### Verified
+
+The archive was served from a plain static server with no `Content-Encoding` header — the same condition itch.io provides — and the game booted: `index.html`, the loader, and the three `.unityweb` payloads all returned `200`, the client-side fallback unpacked them, a 1600 × 900 WebGL2 canvas came up, the loading bar cleared, the Unity engine and Input System initialised and the audio context resumed. No loader or template errors.
+
+### Still open for the browser build
+
+- Rendering was not visually confirmed. The verification browser did not composite frames, so the load path is proven but the picture is not.
+- Software rendering reported three internal URP shaders as unsupported: `Hidden/CoreSRP/CoreCopy`, `Hidden/Universal Render Pipeline/StencilDitherMaskSeed` and `Hidden/Universal/HDRDebugView`. These usually resolve on real GPUs, but they must be checked on a normal machine before the page promises a browser build.
+- Frame cost has not been measured. The post-processing volume, the two street-lamp point lights and the soft shadows are all more expensive on the web than on desktop.
 
 ## Before pressing publish
 
