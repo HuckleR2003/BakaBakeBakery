@@ -18,9 +18,11 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(root.Q<VisualElement>("copy-reveal"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("intact-vial"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("spill"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("scan-line"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("shockwave"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("scene-wipe"), Is.Not.Null);
             Assert.That(
-                Enumerable.Range(0, 8).All(index => root.Q<VisualElement>($"shard-{index}") != null),
+                Enumerable.Range(0, 12).All(index => root.Q<VisualElement>($"shard-{index}") != null),
                 Is.True);
         }
 
@@ -45,6 +47,12 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(root.Query<Button>(className: "recipe-card").ToList(), Has.Count.EqualTo(6));
             Assert.That(root.Q<Button>("recipe-finezja"), Is.Not.Null);
             Assert.That(root.Q<Button>("recipe-monocle"), Is.Not.Null);
+            Assert.That(root.Q<Button>("action-button"), Is.Not.Null);
+            Assert.That(root.Q<Button>("second-oven-button"), Is.Not.Null);
+            Assert.That(root.Q<Button>("bakery-upgrade-button"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("warmth-fill"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("baker-bubble"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("grandmother-bubble"), Is.Not.Null);
         }
 
         private static VisualElement Clone(string fileName)

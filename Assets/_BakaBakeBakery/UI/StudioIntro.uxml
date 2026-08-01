@@ -1,7 +1,26 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="studio-intro" class="intro-root">
-        <ui:VisualElement class="intro-orbit intro-orbit--one" />
-        <ui:VisualElement class="intro-orbit intro-orbit--two" />
+        <ui:VisualElement class="ambient-glow" />
+        <ui:VisualElement class="lab-grid">
+            <ui:VisualElement class="grid-line grid-line--v1" />
+            <ui:VisualElement class="grid-line grid-line--v2" />
+            <ui:VisualElement class="grid-line grid-line--v3" />
+            <ui:VisualElement class="grid-line grid-line--h1" />
+            <ui:VisualElement class="grid-line grid-line--h2" />
+            <ui:VisualElement class="grid-line grid-line--h3" />
+        </ui:VisualElement>
+        <ui:VisualElement class="lab-status lab-status--top">
+            <ui:Label text="HCK // EXPERIMENT 01" class="lab-status-text" />
+            <ui:Label text="SOFTWARE MATTER / PLAYFUL REACTION" class="lab-status-text lab-status-text--quiet" />
+        </ui:VisualElement>
+        <ui:VisualElement class="lab-status lab-status--bottom">
+            <ui:Label text="WARSAW &#183; 2026" class="lab-status-text lab-status-text--quiet" />
+            <ui:Label text="SIGNAL STABLE" class="lab-status-text lab-status-text--live" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="scan-line" class="scan-line" />
+        <ui:VisualElement name="shockwave" class="shockwave" />
+
         <ui:VisualElement class="brand-lockup">
             <ui:VisualElement name="vial-reveal" class="vial-reveal">
                 <ui:VisualElement name="intact-vial" class="vial">
@@ -9,14 +28,18 @@
                     <ui:VisualElement class="vial-neck" />
                     <ui:VisualElement class="vial-body">
                         <ui:VisualElement class="vial-liquid" />
+                        <ui:VisualElement class="vial-liquid-line" />
                         <ui:VisualElement class="vial-highlight" />
                         <ui:VisualElement class="vial-bubble vial-bubble--one" />
                         <ui:VisualElement class="vial-bubble vial-bubble--two" />
+                        <ui:VisualElement class="vial-bubble vial-bubble--three" />
                     </ui:VisualElement>
+                    <ui:Label text="H" class="vial-mark" />
                 </ui:VisualElement>
                 <ui:VisualElement name="spill" class="spill">
                     <ui:VisualElement class="spill-drop spill-drop--one" />
                     <ui:VisualElement class="spill-drop spill-drop--two" />
+                    <ui:VisualElement class="spill-drop spill-drop--three" />
                 </ui:VisualElement>
                 <ui:VisualElement name="shard-0" class="vial-shard vial-shard--glass" />
                 <ui:VisualElement name="shard-1" class="vial-shard vial-shard--white" />
@@ -26,17 +49,24 @@
                 <ui:VisualElement name="shard-5" class="vial-shard vial-shard--white" />
                 <ui:VisualElement name="shard-6" class="vial-shard vial-shard--glass" />
                 <ui:VisualElement name="shard-7" class="vial-shard vial-shard--white" />
+                <ui:VisualElement name="shard-8" class="vial-shard vial-shard--glass" />
+                <ui:VisualElement name="shard-9" class="vial-shard vial-shard--white" />
+                <ui:VisualElement name="shard-10" class="vial-shard vial-shard--glass" />
+                <ui:VisualElement name="shard-11" class="vial-shard vial-shard--white" />
             </ui:VisualElement>
             <ui:VisualElement name="copy-reveal" class="copy-reveal">
                 <ui:VisualElement class="brand-copy">
                     <ui:Label text="HCK Labs" class="studio-name" />
+                    <ui:VisualElement class="brand-rule" />
                     <ui:Label text="SOFTWARE &amp; GAMES" class="studio-discipline" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label text="CLICK OR PRESS ANY KEY TO SKIP" class="skip-hint" />
+
+        <ui:Label text="CLICK OR PRESS ANY KEY TO CONTINUE" class="skip-hint" />
         <ui:VisualElement name="scene-wipe" class="scene-wipe">
             <ui:VisualElement name="wipe-edge" class="wipe-edge" />
+            <ui:VisualElement class="wipe-glint" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,11 +1,12 @@
 :root {
-    --ink: rgb(42, 30, 29);
-    --deep-ink: rgb(25, 20, 22);
-    --paper: rgb(250, 239, 216);
-    --flour: rgb(244, 229, 198);
-    --cherry: rgb(168, 77, 70);
-    --glass: rgb(142, 181, 177);
-    --serum: rgb(249, 246, 232);
+    --black: rgb(3, 3, 5);
+    --ink: rgb(11, 11, 14);
+    --paper: rgb(249, 245, 233);
+    --flour: rgb(237, 230, 211);
+    --cherry: rgb(176, 55, 52);
+    --glass: rgb(111, 147, 145);
+    --serum: rgb(250, 249, 242);
+    --signal: rgb(197, 133, 79);
 }
 
 .intro-root {
@@ -15,43 +16,119 @@
     bottom: 0;
     left: 0;
     overflow: hidden;
-    background-color: var(--deep-ink);
+    background-color: var(--black);
     color: var(--paper);
 }
 
-.intro-orbit {
+.ambient-glow {
     position: absolute;
-    border-width: 1px;
-    border-color: rgba(244, 229, 198, 0.08);
-    border-radius: 1000px;
-}
-
-.intro-orbit--one {
-    width: 620px;
-    height: 620px;
+    width: 720px;
+    height: 360px;
     left: 50%;
     top: 50%;
-    margin-left: -510px;
-    margin-top: -310px;
+    margin-left: -360px;
+    margin-top: -180px;
+    background-color: rgba(176, 55, 52, 0.035);
+    border-radius: 50%;
 }
 
-.intro-orbit--two {
-    width: 920px;
-    height: 920px;
+.lab-grid {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.42;
+}
+
+.grid-line {
+    position: absolute;
+    background-color: rgba(249, 245, 233, 0.038);
+}
+
+.grid-line--v1,
+.grid-line--v2,
+.grid-line--v3 {
+    top: 0;
+    bottom: 0;
+    width: 1px;
+}
+
+.grid-line--v1 { left: 24%; }
+.grid-line--v2 { left: 50%; }
+.grid-line--v3 { left: 76%; }
+
+.grid-line--h1,
+.grid-line--h2,
+.grid-line--h3 {
+    right: 0;
+    left: 0;
+    height: 1px;
+}
+
+.grid-line--h1 { top: 23%; }
+.grid-line--h2 { top: 50%; }
+.grid-line--h3 { top: 77%; }
+
+.lab-status {
+    position: absolute;
+    right: 34px;
+    left: 34px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.lab-status--top { top: 28px; }
+.lab-status--bottom { bottom: 28px; }
+
+.lab-status-text {
+    color: rgba(249, 245, 233, 0.48);
+    font-size: 8px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+}
+
+.lab-status-text--quiet {
+    color: rgba(249, 245, 233, 0.2);
+}
+
+.lab-status-text--live {
+    color: rgba(197, 133, 79, 0.72);
+}
+
+.scan-line {
+    position: absolute;
+    width: 2px;
+    height: 46%;
+    left: 50%;
+    top: 27%;
+    opacity: 0;
+    background-color: rgba(249, 245, 233, 0.62);
+}
+
+.shockwave {
+    position: absolute;
+    width: 190px;
+    height: 190px;
     left: 50%;
     top: 50%;
-    margin-left: -220px;
-    margin-top: -460px;
+    margin-left: -405px;
+    margin-top: -95px;
+    opacity: 0;
+    scale: 0.15 0.15;
+    border-width: 2px;
+    border-color: rgba(249, 245, 233, 0.62);
+    border-radius: 50%;
 }
 
 .brand-lockup {
     position: absolute;
-    width: 720px;
-    height: 154px;
+    width: 760px;
+    height: 164px;
     left: 50%;
     top: 50%;
-    margin-left: -360px;
-    margin-top: -77px;
+    margin-left: -380px;
+    margin-top: -82px;
     flex-direction: row;
     align-items: center;
 }
@@ -59,36 +136,36 @@
 .vial-reveal {
     position: relative;
     width: 0;
-    height: 154px;
+    height: 164px;
     overflow: hidden;
     flex-shrink: 0;
 }
 
 .vial {
     position: absolute;
-    width: 116px;
-    height: 150px;
-    left: 10px;
+    width: 120px;
+    height: 158px;
+    left: 12px;
     top: 2px;
 }
 
 .vial-lip {
     position: absolute;
-    width: 64px;
-    height: 13px;
-    left: 26px;
+    width: 66px;
+    height: 12px;
+    left: 27px;
     top: 0;
     background-color: var(--paper);
-    border-radius: 5px;
+    border-radius: 3px;
 }
 
 .vial-neck {
     position: absolute;
     width: 42px;
-    height: 34px;
-    left: 37px;
-    top: 10px;
-    background-color: rgba(142, 181, 177, 0.68);
+    height: 37px;
+    left: 39px;
+    top: 9px;
+    background-color: rgba(111, 147, 145, 0.18);
     border-left-width: 3px;
     border-right-width: 3px;
     border-color: var(--paper);
@@ -96,44 +173,64 @@
 
 .vial-body {
     position: absolute;
-    width: 94px;
-    height: 108px;
+    width: 98px;
+    height: 112px;
     left: 11px;
-    top: 40px;
+    top: 42px;
     overflow: hidden;
-    background-color: rgba(142, 181, 177, 0.42);
-    border-width: 4px;
+    background-color: rgba(111, 147, 145, 0.13);
+    border-width: 3px;
     border-color: var(--paper);
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-    border-bottom-left-radius: 34px;
-    border-bottom-right-radius: 34px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-left-radius: 38px;
+    border-bottom-right-radius: 38px;
 }
 
 .vial-liquid {
     position: absolute;
-    height: 52px;
+    height: 54px;
     right: 0;
     bottom: 0;
     left: 0;
     background-color: var(--serum);
-    border-top-left-radius: 42px;
-    border-top-right-radius: 18px;
+    border-top-left-radius: 46px;
+    border-top-right-radius: 16px;
+}
+
+.vial-liquid-line {
+    position: absolute;
+    height: 2px;
+    right: 3px;
+    bottom: 52px;
+    left: 3px;
+    background-color: rgba(197, 133, 79, 0.78);
 }
 
 .vial-highlight {
     position: absolute;
-    width: 8px;
-    height: 50px;
+    width: 6px;
+    height: 48px;
     left: 15px;
-    top: 15px;
-    background-color: rgba(255, 255, 255, 0.42);
+    top: 14px;
+    background-color: rgba(255, 255, 255, 0.34);
     border-radius: 8px;
+}
+
+.vial-mark {
+    position: absolute;
+    width: 26px;
+    left: 47px;
+    top: 77px;
+    color: var(--black);
+    font-size: 17px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
 }
 
 .vial-bubble {
     position: absolute;
-    background-color: rgba(142, 181, 177, 0.9);
+    background-color: rgba(111, 147, 145, 0.82);
     border-radius: 50%;
 }
 
@@ -141,27 +238,34 @@
     width: 10px;
     height: 10px;
     right: 17px;
-    bottom: 25px;
+    bottom: 24px;
 }
 
 .vial-bubble--two {
     width: 6px;
     height: 6px;
-    right: 33px;
-    bottom: 14px;
+    right: 34px;
+    bottom: 13px;
+}
+
+.vial-bubble--three {
+    width: 4px;
+    height: 4px;
+    left: 29px;
+    bottom: 35px;
 }
 
 .copy-reveal {
     width: 0;
-    height: 132px;
+    height: 136px;
     overflow: hidden;
     flex-shrink: 0;
-    margin-left: 24px;
+    margin-left: 30px;
 }
 
 .brand-copy {
-    width: 530px;
-    height: 132px;
+    width: 550px;
+    height: 136px;
     justify-content: center;
 }
 
@@ -173,22 +277,29 @@
     white-space: nowrap;
 }
 
+.brand-rule {
+    width: 100%;
+    height: 1px;
+    margin-top: 1px;
+    margin-bottom: 9px;
+    background-color: rgba(249, 245, 233, 0.24);
+}
+
 .studio-discipline {
-    margin-top: 6px;
     margin-left: 4px;
-    font-size: 16px;
-    letter-spacing: 8px;
-    color: rgba(244, 229, 198, 0.72);
+    font-size: 13px;
+    letter-spacing: 9px;
+    color: rgba(249, 245, 233, 0.58);
     -unity-font-style: bold;
     white-space: nowrap;
 }
 
 .spill {
     position: absolute;
-    width: 104px;
-    height: 24px;
-    left: 9px;
-    bottom: 1px;
+    width: 110px;
+    height: 22px;
+    left: 8px;
+    bottom: 0;
     background-color: var(--serum);
     border-radius: 50%;
     transform-origin: center;
@@ -204,70 +315,87 @@
     width: 18px;
     height: 10px;
     left: -9px;
-    top: 8px;
+    top: 7px;
 }
 
 .spill-drop--two {
     width: 13px;
     height: 8px;
     right: -7px;
-    top: 4px;
+    top: 3px;
+}
+
+.spill-drop--three {
+    width: 9px;
+    height: 7px;
+    right: 14px;
+    top: -4px;
 }
 
 .vial-shard {
     position: absolute;
     display: none;
     width: 20px;
-    height: 10px;
-    left: 59px;
-    top: 78px;
-    border-radius: 3px;
+    height: 9px;
+    left: 61px;
+    top: 80px;
+    border-radius: 2px;
     transform-origin: center;
 }
 
 .vial-shard--glass {
-    background-color: var(--glass);
-    border-width: 2px;
+    background-color: rgba(111, 147, 145, 0.88);
+    border-width: 1px;
     border-color: var(--paper);
 }
 
 .vial-shard--white {
-    width: 15px;
-    height: 7px;
+    width: 14px;
+    height: 6px;
     background-color: var(--serum);
 }
 
 .skip-hint {
     position: absolute;
-    bottom: 34px;
+    bottom: 54px;
     left: 50%;
-    width: 420px;
-    margin-left: -210px;
-    font-size: 10px;
+    width: 440px;
+    margin-left: -220px;
+    font-size: 8px;
     letter-spacing: 3px;
-    color: rgba(244, 229, 198, 0.36);
+    color: rgba(249, 245, 233, 0.25);
     -unity-text-align: middle-center;
 }
 
 .scene-wipe {
     position: absolute;
-    width: 145%;
-    height: 160%;
-    left: -8%;
-    top: -30%;
+    width: 148%;
+    height: 165%;
+    left: -9%;
+    top: -33%;
     overflow: visible;
     background-color: var(--flour);
     rotate: 8deg;
-    translate: -145% 0;
+    translate: -148% 0;
 }
 
 .wipe-edge {
     position: absolute;
-    width: 180%;
-    height: 14px;
-    right: -75%;
+    width: 190%;
+    height: 11px;
+    right: -78%;
     top: 50%;
+    opacity: 0;
     background-color: var(--cherry);
     rotate: 24deg;
-    opacity: 0;
+}
+
+.wipe-glint {
+    position: absolute;
+    width: 190%;
+    height: 2px;
+    right: -78%;
+    top: 48.8%;
+    background-color: rgba(255, 255, 255, 0.8);
+    rotate: 24deg;
 }

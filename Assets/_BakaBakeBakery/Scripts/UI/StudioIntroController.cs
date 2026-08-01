@@ -13,9 +13,9 @@ namespace BakaBakeBakery.UI
         private const float VialRevealEnd = 0.88f;
         private const float CopyRevealStart = 0.68f;
         private const float CopyRevealEnd = 1.48f;
-        private const float ExplosionStart = 3.48f;
-        private const float WipeStart = 4.25f;
-        private const float SceneChangeTime = 5.05f;
+        private const float ExplosionStart = 3.58f;
+        private const float WipeStart = 4.42f;
+        private const float SceneChangeTime = 5.28f;
         private const float FailsafeTime = 8f;
 
         private static readonly Vector2[] ShardDirections =
@@ -27,7 +27,11 @@ namespace BakaBakeBakery.UI
             new(58f, -35f),
             new(70f, 24f),
             new(30f, 58f),
-            new(-34f, 64f)
+            new(-34f, 64f),
+            new(-92f, 8f),
+            new(91f, -2f),
+            new(-10f, 93f),
+            new(12f, -98f)
         };
 
         [SerializeField] private StyleSheet styleSheet;
@@ -37,6 +41,8 @@ namespace BakaBakeBakery.UI
         private VisualElement copyReveal;
         private VisualElement intactVial;
         private VisualElement spill;
+        private VisualElement scanLine;
+        private VisualElement shockwave;
         private VisualElement wipe;
         private VisualElement wipeEdge;
         private float elapsed;
@@ -55,6 +61,8 @@ namespace BakaBakeBakery.UI
             copyReveal = root.Q<VisualElement>("copy-reveal");
             intactVial = root.Q<VisualElement>("intact-vial");
             spill = root.Q<VisualElement>("spill");
+            scanLine = root.Q<VisualElement>("scan-line");
+            shockwave = root.Q<VisualElement>("shockwave");
             wipe = root.Q<VisualElement>("scene-wipe");
             wipeEdge = root.Q<VisualElement>("wipe-edge");
 
@@ -72,6 +80,8 @@ namespace BakaBakeBakery.UI
                 && copyReveal != null
                 && intactVial != null
                 && spill != null
+                && scanLine != null
+                && shockwave != null
                 && wipe != null
                 && wipeEdge != null
                 && shards.Count == ShardDirections.Length;
@@ -134,12 +144,14 @@ namespace BakaBakeBakery.UI
         private void RenderReducedMotionFrame(float time)
         {
             vialReveal.style.width = 144f;
-            copyReveal.style.width = 530f;
+            copyReveal.style.width = 550f;
             intactVial.style.opacity = 1f;
             spill.style.opacity = 0f;
+            scanLine.style.opacity = 0f;
+            shockwave.style.opacity = 0f;
             HideShards();
 
-            var fade = SmoothProgress(time, 2.9f, 3.48f);
+            var fade = SmoothProgress(time, 3.05f, ExplosionStart);
             intactVial.style.opacity = 1f - fade;
             copyReveal.style.opacity = 1f - fade;
             RenderWipe(Mathf.Max(0f, time - WipeStart));
@@ -150,8 +162,16 @@ namespace BakaBakeBakery.UI
             var vialProgress = EaseOutCubic(Progress(time, VialRevealStart, VialRevealEnd));
             var copyProgress = EaseOutCubic(Progress(time, CopyRevealStart, CopyRevealEnd));
             vialReveal.style.width = 144f * vialProgress;
-            copyReveal.style.width = 530f * copyProgress;
+            copyReveal.style.width = 550f * copyProgress;
             copyReveal.style.opacity = SmoothProgress(time, CopyRevealStart, CopyRevealStart + 0.25f);
+
+            var scanProgress = EaseInOutCubic(Progress(time, 0.08f, 1.62f));
+            scanLine.style.opacity = scanProgress > 0f && scanProgress < 1f
+                ? Mathf.Sin(scanProgress * Mathf.PI) * 0.82f
+                : 0f;
+            scanLine.style.translate = new Translate(
+                new Length(Mathf.Lerp(-410f, 410f, scanProgress), LengthUnit.Pixel),
+                new Length(0f, LengthUnit.Pixel));
 
             var explosionProgress = Progress(time, ExplosionStart, WipeStart);
             intactVial.style.opacity = explosionProgress <= 0f ? 1f : 0f;
@@ -165,6 +185,8 @@ namespace BakaBakeBakery.UI
             {
                 spill.style.opacity = 0f;
                 spill.style.scale = new Scale(Vector2.zero);
+                shockwave.style.opacity = 0f;
+                shockwave.style.scale = new Scale(Vector2.one * 0.15f);
                 HideShards();
                 return;
             }
@@ -174,6 +196,8 @@ namespace BakaBakeBakery.UI
             spill.style.scale = new Scale(new Vector2(
                 Mathf.Lerp(0.12f, 1f, eased),
                 Mathf.Lerp(0.2f, 1f, eased)));
+            shockwave.style.opacity = Mathf.Clamp01(1f - progress * 1.35f) * 0.82f;
+            shockwave.style.scale = new Scale(Vector2.one * Mathf.Lerp(0.15f, 2.8f, eased));
 
             for (var index = 0; index < shards.Count; index++)
             {

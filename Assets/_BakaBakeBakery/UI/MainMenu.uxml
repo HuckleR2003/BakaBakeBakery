@@ -45,7 +45,7 @@
                         <ui:VisualElement class="oven-window" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Label text="OPENING SOON  ·  ONE LOAF AT A TIME" class="card-caption" />
+                <ui:Label text="OPENING SOON  &#183;  ONE LOAF AT A TIME" class="card-caption" />
             </ui:VisualElement>
         </ui:VisualElement>
 
