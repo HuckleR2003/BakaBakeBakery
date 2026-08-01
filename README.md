@@ -49,6 +49,7 @@ Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/Studi
 - Open Craft, then drag two to four pantry ingredients into the equation. Clicking an ingredient is an accessible shortcut to the next empty slot.
 - Press `B` to open the Bakery Book and buy available upgrades.
 - Press `Escape` to close the open Bakery Book or Settings panel.
+- The Main Menu continues a saved bakery, or starts a fresh one with **New Bakery**; erasing a save takes two clicks.
 - Move the pointer away from the centre of the screen to lean the diorama camera; the further out, the wider the view.
 
 ## Direction
@@ -59,6 +60,7 @@ Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/Studi
 - [Reference study](Docs/References.md)
 - [Brand and settings decisions](Docs/BrandAndSettings.md)
 - [Stability audit](Docs/StabilityAudit.md)
+- [Releasing on itch.io](Docs/ItchRelease.md)
 - [Living-world rules](Docs/LivingWorld.md)
 - [Days and recipe discovery](Docs/DaysAndDiscovery.md)
 - [Concept frame notes](Docs/Concepts/README.md)

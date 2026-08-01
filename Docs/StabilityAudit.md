@@ -4,6 +4,8 @@ This audit covers the playable vertical slice: production, customers, days, craf
 
 ## Runtime guardrails
 
+- Decoration never takes a click. The speech bubbles, toasts and drag ghost are drawn over the whole screen and sit after the top row in document order, so with the default picking mode they silently swallowed every click on the day sign, the bakery book and the guide — a save could open on its first morning with no reachable way to the market. Those layers are now transparent to the pointer, and the smoke run pick-tests each top-row control against the element that actually receives the click.
+- A saved bakery is escapable. The main menu offers a new game beside continue, behind a two-click confirmation, so no player is trapped in a stuck save.
 - Entering the morning market is never gated on coins. The basket costs nothing, so an empty cash tin cannot end a run at the tutorial sign. A new bakery opens with a ten-coin float.
 - Every discovery bit survives a save. The persisted book covers all eight test-kitchen recipes, and the product dock lists all fourteen products once unlocked.
 - Every batch follows one explicit state machine. Input is accepted only while waiting for ingredients, oven loading, or counter placement; click spam during movement and baking is rejected.
@@ -40,6 +42,7 @@ This audit covers the playable vertical slice: production, customers, days, craf
 | UI contracts | Intro fragments, navigation, four crafting slots, pantry, market map, friend bubble, upgrades, and nine dynamic product slots. |
 | Living diorama | Five configured ambient actors, deep park path, traffic loop, customer snack route, two-hand carry anchor, and oven reach. |
 | Player journey | Studio ident, Main Menu, Main Bakery, and the first complete loaf-and-sale path in the built player. |
+| Reachable controls | The day sign, bakery book, guide and baker action are pick-tested in the built player: the element under each control's centre must be that control. |
 | Fifteen-minute session | Simulated quarter-hour soak: no production silence beyond 45 s, three trading days, manager inside the first shift, second oven and wooden bakery both affordable, no counter overflow, no negative balance, no NaN timer, no backwards day phase. |
 | Hostile input | The same quarter-hour replayed with click spam, mid-batch recipe switching and NaN / infinite / negative frame deltas injected throughout. |
 
