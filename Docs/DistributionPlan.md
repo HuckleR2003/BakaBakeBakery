@@ -62,7 +62,7 @@ Steam ma sens, kiedy istnieją już:
 - krótki gameplay trailer;
 - wiarygodny opis zakresu premiery.
 
-Steam Direct kosztuje 100 USD za aplikację. Opłata jest odzyskiwana dopiero po osiągnięciu co najmniej 1000 USD skorygowanego przychodu brutto. Strona Coming Soon musi być publiczna przez minimum dwa tygodnie przed premierą, a Valve zaleca wysłanie strony i builda do kontroli co najmniej siedem dni roboczych wcześniej.
+Steam Direct kosztuje 100 USD za aplikację — również wtedy, gdy aplikacja jest grą free-to-play. Opłata jest odzyskiwana dopiero po osiągnięciu co najmniej 1000 USD skorygowanego przychodu brutto ze sprzedaży i mikrotransakcji łącznie. Czyste F2P bez monetyzacji tego progu nie osiągnie. Strona Coming Soon musi być publiczna przez minimum dwa tygodnie przed premierą, a Valve zaleca wysłanie strony i builda do kontroli co najmniej siedem dni roboczych wcześniej.
 
 Nie kupować wpisu Steam wyłącznie po to, by „już tam być”. Kupić go wtedy, gdy każdy film lub wpis może kończyć się jednym konkretnym wezwaniem: „Dodaj Baka Bake Bakery do wishlisty”.
 
@@ -98,6 +98,29 @@ Nie próbować prowadzić pięciu kanałów naraz. Wybrać dwa miejsca z krótki
 
 Najlepsze tematy nie brzmią „dodałem UI”. Brzmią: „Dlaczego w naszej piekarni chleb nie teleportuje się na ladę” albo „Mila nie pozwala kliknięciem pominąć nauki pierwszego bochenka”. To są cechy rozpoznawalne, a nie lista zmian.
 
+## SEO i miejsca, które mogą pracować dłużej niż jeden post
+
+Najważniejszym adresem pod wyszukiwarki powinna być jedna publiczna strona gry należąca do HCK Labs. GitHub dokumentuje produkcję, itch.io dostarcza build, a później Steam zbiera wishlisty; żaden z tych serwisów nie zastępuje własnego, kanonicznego opisu gry.
+
+Minimalna strona powinna zawierać:
+
+- jeden stały adres, tytuł `Baka Bake Bakery — cosy bakery idle game by HCK Labs` i naturalny opis bez upychania słów kluczowych;
+- osobne, linkujące się wersje polską i angielską, z prawidłowym `hreflang`;
+- prawdziwe ujęcia rozgrywki, krótki film, opis Mili, craftingu i żywej dioramy oraz jedno aktualne CTA;
+- dane JSON-LD `SoftwareApplication` z `applicationCategory: GameApplication`, systemem Windows i realną ceną oferty, także `0` dla darmowego builda;
+- sitemapę zgłoszoną w Google Search Console, poprawne Open Graph i kartę społecznościową;
+- mały press kit: logo, pięć zrzutów, 50- i 150-słowny opis, kontakt oraz podpis „Marcin ‘HCK’ Firmuga — HCK Labs”.
+
+Kanały uzupełniające, w kolejności wartości:
+
+1. itch.io — indeksowalna strona projektu, kontrolowane buildy, devlogi i obserwujący; konto i publikacja strony są bezpłatne;
+2. YouTube — krótkie, nazwane problemem filmy przed/po oraz jeden zwiastun osadzony na stronie gry;
+3. Steam Coming Soon — nie jako klasyczne Google SEO, lecz jako cel wishlisty i wewnętrzne odkrywanie przez precyzyjnie uporządkowane tagi;
+4. IndieDB albo Game Jolt — tylko jeśli każdy wpis prowadzi do aktualnego dema i da się utrzymać regularność; nie kopiować wszędzie martwego profilu;
+5. GitHub Releases i README — techniczne potwierdzenie, historia wersji i link do właściwej strony gry, nie główny lejek dla graczy.
+
+Na Steam nie należy mylić ruchu strony z widocznością algorytmiczną. Valve wprost wskazuje, że sam ruch i współczynnik konwersji strony nie są sygnałami widoczności; liczą się reakcje graczy, granie, zakupy, języki i trafne tagi. Dla Baka Bake Bakery pierwsza piątka robocza to `Idler`, `Management`, `Cooking`, `Cute`, `Relaxing`, a dalej między innymi `Crafting`, `Resource Management`, `3D`, `Atmospheric` i `Singleplayer`. Ostateczną listę trzeba porównać z faktycznie podobnymi grami przed uruchomieniem strony.
+
 ## Materiały, które warto zbierać już podczas produkcji
 
 - ten sam kadr piekarni w czterech porach dnia;
@@ -115,8 +138,12 @@ Najlepsze tematy nie brzmią „dodałem UI”. Brzmią: „Dlaczego w naszej pi
 - Steam review: https://partner.steamgames.com/doc/store/review_process
 - Steam graphical assets: https://partner.steamgames.com/doc/store/assets
 - Steam wishlists: https://partner.steamgames.com/doc/marketing/wishlist
+- Steam tags: https://partner.steamgames.com/doc/store/tags
+- Steam visibility: https://partner.steamgames.com/doc/marketing/visibility
 - itch.io — pierwsza strona projektu: https://itch.io/docs/creators/getting-started
 - itch.io — kontrolowane playtesty: https://itch.io/docs/creators/limited-releases
 - itch.io — płatności i revenue share: https://itch.io/docs/creators/payments
+- itch.io — koszty i zasady dla twórców: https://itch.io/docs/creators/faq
+- Google Search Central — SoftwareApplication: https://developers.google.com/search/docs/appearance/structured-data/software-app
 
 To jest plan produkcyjny i promocyjny, nie porada księgowa ani prawna. Przed rozpoczęciem sprzedaży trzeba osobno potwierdzić aktualne obowiązki podatkowe i sposób rozliczeń dla Polski.
