@@ -11,6 +11,7 @@ using UnityEditor.Build;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -503,13 +504,15 @@ namespace BakaBakeBakery.Editor
 
         private static Camera BuildScene(Materials materials)
         {
-            RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = Hex("32445A") * 0.72f;
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = Hex("4A6180") * 0.86f;
+            RenderSettings.ambientEquatorColor = Hex("41485C") * 0.8f;
+            RenderSettings.ambientGroundColor = Hex("2E2A2C") * 0.7f;
             RenderSettings.fog = true;
-            RenderSettings.fogColor = Hex("1D2C43");
+            RenderSettings.fogColor = Hex("22344E");
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogStartDistance = 29f;
-            RenderSettings.fogEndDistance = 62f;
+            RenderSettings.fogStartDistance = 33f;
+            RenderSettings.fogEndDistance = 70f;
 
             var root = new GameObject("MainBakery");
             root.AddComponent<BuildSmokeProbe>();
@@ -518,8 +521,10 @@ namespace BakaBakeBakery.Editor
             BuildBackdrop(root.transform, materials);
             var world = BuildFoodTruck(root.transform, materials);
             BuildStreetDetails(root.transform, materials);
+            BuildLivingDistrict(root.transform, materials);
             var characters = BuildCharacters(root.transform, materials);
             BuildLighting(root.transform, materials);
+            BuildAtmosphere(root.transform);
             var camera = BuildCamera(root.transform);
             BuildGameplayController(root, camera, world, characters);
             return camera;
@@ -1661,6 +1666,56 @@ namespace BakaBakeBakery.Editor
             CreatePrimitive(PrimitiveType.Sphere, "Cheek Right Detail", visual, headPosition + new Vector3(0.27f, -0.12f, -0.33f), new Vector3(0.1f, 0.055f, 0.035f), materials.Cherry);
         }
 
+        /// <summary>
+        /// Three knuckle pivots per hand. The capsule hangs below its pivot so a rotation curls the
+        /// finger around whatever the baker is holding instead of spinning it in place.
+        /// </summary>
+        private static Transform[] CreateFingers(Transform hand, Materials materials, bool isLeft)
+        {
+            var side = isLeft ? "Left" : "Right";
+            var fingers = new Transform[3];
+            for (var index = 0; index < fingers.Length; index++)
+            {
+                var knuckle = CreateStation(
+                    hand,
+                    $"Finger Knuckle {side} {index}",
+                    new Vector3((index - 1) * 0.052f, -0.048f, -0.052f));
+                CreatePrimitive(
+                    PrimitiveType.Capsule,
+                    $"Finger {side} {index}",
+                    knuckle,
+                    new Vector3(0f, -0.052f, 0f),
+                    new Vector3(0.03f, 0.055f, 0.03f),
+                    materials.Skin);
+                CreatePrimitive(
+                    PrimitiveType.Sphere,
+                    $"Fingertip {side} {index}",
+                    knuckle,
+                    new Vector3(0f, -0.104f, 0f),
+                    Vector3.one * 0.033f,
+                    materials.Skin);
+                fingers[index] = knuckle;
+            }
+
+            return fingers;
+        }
+
+        private static Transform CreateThumb(Transform hand, Materials materials, bool isLeft)
+        {
+            var side = isLeft ? -1f : 1f;
+            var label = isLeft ? "Left" : "Right";
+            var knuckle = CreateStation(hand, $"Thumb Knuckle {label}", new Vector3(side * 0.072f, -0.014f, -0.012f));
+            CreatePrimitive(
+                PrimitiveType.Capsule,
+                $"Thumb {label}",
+                knuckle,
+                new Vector3(side * 0.022f, -0.042f, -0.026f),
+                new Vector3(0.032f, 0.048f, 0.032f),
+                materials.Skin,
+                Quaternion.Euler(18f, 0f, side * -26f));
+            return knuckle;
+        }
+
         private static Transform CreateStation(Transform parent, string name, Vector3 position)
         {
             var station = new GameObject(name).transform;
@@ -1722,13 +1777,12 @@ namespace BakaBakeBakery.Editor
             var rightForearm = CreateLimb(visual, "Forearm Right", rightElbow, rightHandPosition, 0.2f, materials.Skin);
             var leftHand = CreateStation(visual, "Hand Left Rig", leftHandPosition);
             var rightHand = CreateStation(visual, "Hand Right Rig", rightHandPosition);
-            CreatePrimitive(PrimitiveType.Sphere, "Palm Left", leftHand, Vector3.zero, new Vector3(0.2f, 0.18f, 0.2f), materials.Skin);
-            CreatePrimitive(PrimitiveType.Sphere, "Palm Right", rightHand, Vector3.zero, new Vector3(0.2f, 0.18f, 0.2f), materials.Skin);
-            for (var finger = -1; finger <= 1; finger++)
-            {
-                CreatePrimitive(PrimitiveType.Capsule, "Finger Left", leftHand, new Vector3(finger * 0.055f, -0.1f, -0.04f), new Vector3(0.032f, 0.09f, 0.032f), materials.Skin);
-                CreatePrimitive(PrimitiveType.Capsule, "Finger Right", rightHand, new Vector3(finger * 0.055f, -0.1f, -0.04f), new Vector3(0.032f, 0.09f, 0.032f), materials.Skin);
-            }
+            CreatePrimitive(PrimitiveType.Sphere, "Palm Left", leftHand, Vector3.zero, new Vector3(0.19f, 0.13f, 0.21f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Palm Right", rightHand, Vector3.zero, new Vector3(0.19f, 0.13f, 0.21f), materials.Skin);
+            var leftFingers = CreateFingers(leftHand, materials, true);
+            var rightFingers = CreateFingers(rightHand, materials, false);
+            var leftThumb = CreateThumb(leftHand, materials, true);
+            var rightThumb = CreateThumb(rightHand, materials, false);
 
             var carryAnchor = CreateStation(visual, "Two Hand Carry Anchor", new Vector3(0f, 1.42f, -0.68f));
             var carryTray = CreatePrimitive(
@@ -1788,6 +1842,10 @@ namespace BakaBakeBakery.Editor
             serializedWorker.FindProperty("rightForearm").objectReferenceValue = rightForearm;
             serializedWorker.FindProperty("leftHand").objectReferenceValue = leftHand;
             serializedWorker.FindProperty("rightHand").objectReferenceValue = rightHand;
+            serializedWorker.FindProperty("leftThumb").objectReferenceValue = leftThumb;
+            serializedWorker.FindProperty("rightThumb").objectReferenceValue = rightThumb;
+            SetReferenceArray(serializedWorker, "leftFingers", leftFingers);
+            SetReferenceArray(serializedWorker, "rightFingers", rightFingers);
             serializedWorker.FindProperty("carryAnchor").objectReferenceValue = carryAnchor;
             serializedWorker.FindProperty("carryTray").objectReferenceValue = carryTray;
             SetReferenceArray(serializedWorker, "rawCarryDisplays", rawCarryDisplays);
@@ -1993,6 +2051,131 @@ namespace BakaBakeBakery.Editor
             return limb.transform;
         }
 
+        /// <summary>
+        /// Everything that exists only to make the street feel inhabited: weather in the sky, lamps
+        /// that carry the evening, bunting over the truck, drifting leaves and a cat that owns the
+        /// bench. <see cref="BakeryAmbientDistrict"/> finds these by name and animates them.
+        /// </summary>
+        private static void BuildLivingDistrict(Transform parent, Materials materials)
+        {
+            var district = new GameObject("Living District").transform;
+            district.SetParent(parent, false);
+
+            for (var index = 0; index < 6; index++)
+            {
+                var cloud = CreateStation(district, $"Sky Cloud {index:00}", new Vector3(
+                    -13f + index * 4.6f,
+                    9.4f + index % 3 * 1.35f,
+                    17f + index % 4 * 2.6f));
+                var puffs = 3 + index % 2;
+                for (var puff = 0; puff < puffs; puff++)
+                {
+                    CreatePrimitive(
+                        PrimitiveType.Sphere,
+                        $"Cloud Puff {puff}",
+                        cloud,
+                        new Vector3(puff * 0.85f - puffs * 0.42f, Mathf.Sin(puff * 1.4f) * 0.22f, 0f),
+                        new Vector3(1.7f, 0.92f, 1.15f) * (0.78f + index % 3 * 0.16f),
+                        materials.White);
+                }
+            }
+
+            for (var index = 0; index < 3; index++)
+            {
+                var bird = CreateStation(district, $"Sky Bird {index:00}", new Vector3(-12f, 8.2f + index * 1.1f, 12f + index * 3.2f));
+                CreatePrimitive(PrimitiveType.Sphere, "Bird Body", bird, Vector3.zero, new Vector3(0.24f, 0.15f, 0.34f), materials.Cocoa);
+                CreatePrimitive(PrimitiveType.Cube, "Bird Wing Left", bird, new Vector3(-0.2f, 0.04f, 0f), new Vector3(0.34f, 0.03f, 0.14f), materials.Cocoa);
+                CreatePrimitive(PrimitiveType.Cube, "Bird Wing Right", bird, new Vector3(0.2f, 0.04f, 0f), new Vector3(0.34f, 0.03f, 0.14f), materials.Cocoa);
+            }
+
+            for (var index = 0; index < 10; index++)
+            {
+                var leaf = CreateStation(district, $"Park Leaf {index:00}", new Vector3(-6.2f + index * 1.4f, 3.4f, 5.2f + index % 4 * 2.1f));
+                CreatePrimitive(
+                    PrimitiveType.Sphere,
+                    "Leaf Blade",
+                    leaf,
+                    Vector3.zero,
+                    new Vector3(0.16f, 0.03f, 0.1f),
+                    index % 3 == 0 ? materials.Crust : index % 3 == 1 ? materials.Cherry : materials.Sage);
+            }
+
+            BuildStreetLamp(district, new Vector3(-5.35f, 0f, 1.35f), materials);
+            BuildStreetLamp(district, new Vector3(5.85f, 0f, 2.15f), materials);
+
+            var bunting = CreateStation(district, "Bunting Line", new Vector3(0f, 4.32f, -1.05f));
+            CreatePrimitive(PrimitiveType.Cylinder, "Bunting Rope", bunting, Vector3.zero, new Vector3(0.02f, 3.6f, 0.02f), materials.Cocoa, Quaternion.Euler(0f, 0f, 90f));
+            for (var index = 0; index < 9; index++)
+            {
+                var pin = CreateStation(bunting, $"Bunting Flag {index:00}", new Vector3(-3.2f + index * 0.8f, -0.03f, 0f));
+                CreatePrimitive(
+                    PrimitiveType.Cube,
+                    "Flag Cloth",
+                    pin,
+                    new Vector3(0f, -0.16f, 0f),
+                    new Vector3(0.28f, 0.3f, 0.02f),
+                    index % 3 == 0 ? materials.Cherry : index % 3 == 1 ? materials.Sage : materials.Flour,
+                    Quaternion.Euler(0f, 0f, 45f));
+            }
+
+            var laundry = CreateStation(district, "Laundry Line", new Vector3(-7.6f, 3.15f, 4.4f));
+            CreatePrimitive(PrimitiveType.Cylinder, "Laundry Rope", laundry, Vector3.zero, new Vector3(0.02f, 1.8f, 0.02f), materials.Cloth, Quaternion.Euler(0f, 0f, 90f));
+            for (var index = 0; index < 4; index++)
+            {
+                var peg = CreateStation(laundry, $"Laundry Cloth {index:00}", new Vector3(-1.35f + index * 0.9f, -0.04f, 0f));
+                CreatePrimitive(
+                    PrimitiveType.Cube,
+                    "Cloth",
+                    peg,
+                    new Vector3(0f, -0.34f, 0f),
+                    new Vector3(0.46f, 0.66f, 0.03f),
+                    index % 2 == 0 ? materials.White : materials.EveningBlue);
+            }
+
+            var cat = CreateStation(district, "Street Cat", new Vector3(3.05f, 0.5f, 6.05f));
+            cat.localRotation = Quaternion.Euler(0f, -34f, 0f);
+            CreatePrimitive(PrimitiveType.Capsule, "Cat Body", cat, new Vector3(0f, 0.12f, 0f), new Vector3(0.24f, 0.22f, 0.24f), materials.Cocoa, Quaternion.Euler(90f, 0f, 0f));
+            CreatePrimitive(PrimitiveType.Sphere, "Cat Head", cat, new Vector3(0f, 0.26f, -0.24f), Vector3.one * 0.19f, materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Cube, "Cat Ear Left", cat, new Vector3(-0.07f, 0.36f, -0.24f), new Vector3(0.06f, 0.09f, 0.02f), materials.Cocoa, Quaternion.Euler(0f, 0f, 14f));
+            CreatePrimitive(PrimitiveType.Cube, "Cat Ear Right", cat, new Vector3(0.07f, 0.36f, -0.24f), new Vector3(0.06f, 0.09f, 0.02f), materials.Cocoa, Quaternion.Euler(0f, 0f, -14f));
+            var tail = CreateStation(cat, "Cat Tail", new Vector3(0f, 0.16f, 0.24f));
+            CreatePrimitive(PrimitiveType.Capsule, "Tail Segment", tail, new Vector3(0f, 0.1f, 0.06f), new Vector3(0.05f, 0.16f, 0.05f), materials.Cocoa, Quaternion.Euler(38f, 0f, 0f));
+        }
+
+        /// <summary>
+        /// Volume overrides only survive a domain reload when they live inside the profile asset,
+        /// so every override is added as a sub-asset instead of a loose instance.
+        /// </summary>
+        private static T AddVolumeOverride<T>(VolumeProfile profile)
+            where T : VolumeComponent
+        {
+            var component = profile.Add<T>(true);
+            component.name = typeof(T).Name;
+            component.hideFlags = HideFlags.HideInHierarchy;
+            AssetDatabase.AddObjectToAsset(component, profile);
+            return component;
+        }
+
+        private static void BuildStreetLamp(Transform parent, Vector3 position, Materials materials)
+        {
+            var lamp = CreateStation(parent, "Street Lamp", position);
+            CreatePrimitive(PrimitiveType.Cylinder, "Lamp Base", lamp, new Vector3(0f, 0.09f, 0f), new Vector3(0.34f, 0.09f, 0.34f), materials.Metal);
+            CreatePrimitive(PrimitiveType.Cylinder, "Lamp Post", lamp, new Vector3(0f, 1.5f, 0f), new Vector3(0.11f, 1.45f, 0.11f), materials.Metal);
+            CreatePrimitive(PrimitiveType.Cylinder, "Lamp Arm", lamp, new Vector3(0.24f, 2.92f, 0f), new Vector3(0.07f, 0.28f, 0.07f), materials.Metal, Quaternion.Euler(0f, 0f, 68f));
+            CreatePrimitive(PrimitiveType.Sphere, "Lamp Hood", lamp, new Vector3(0.48f, 2.98f, 0f), new Vector3(0.42f, 0.24f, 0.42f), materials.Metal);
+
+            var glow = CreateStation(lamp, "Street Lamp Glow", new Vector3(0.48f, 2.83f, 0f));
+            CreatePrimitive(PrimitiveType.Sphere, "Lamp Bulb", glow, Vector3.zero, Vector3.one * 0.28f, materials.Glow);
+            var light = new GameObject("Lamp Light");
+            light.transform.SetParent(glow, false);
+            var pointLight = light.AddComponent<Light>();
+            pointLight.type = LightType.Point;
+            pointLight.color = Hex("FFCB86");
+            pointLight.intensity = 2.4f;
+            pointLight.range = 6.4f;
+            pointLight.shadows = LightShadows.None;
+        }
+
         private static void BuildLighting(Transform parent, Materials materials)
         {
             var lighting = new GameObject("Lighting").transform;
@@ -2000,13 +2183,25 @@ namespace BakaBakeBakery.Editor
 
             var sunObject = new GameObject("Late Afternoon Key");
             sunObject.transform.SetParent(lighting, false);
-            sunObject.transform.localRotation = Quaternion.Euler(48f, -34f, 0f);
+            sunObject.transform.localRotation = Quaternion.Euler(46f, -32f, 0f);
             var sun = sunObject.AddComponent<Light>();
             sun.type = LightType.Directional;
-            sun.color = Hex("C9DCFF");
-            sun.intensity = 0.96f;
+            sun.color = Hex("FFE3C0");
+            sun.intensity = 1.18f;
             sun.shadows = LightShadows.Soft;
-            sun.shadowStrength = 0.72f;
+            sun.shadowStrength = 0.66f;
+            sun.shadowBias = 0.035f;
+            sun.shadowNormalBias = 0.28f;
+
+            // A cool rim behind the diorama lifts every silhouette off the night backdrop.
+            var rimObject = new GameObject("Backdrop Rim");
+            rimObject.transform.SetParent(lighting, false);
+            rimObject.transform.localRotation = Quaternion.Euler(-14f, 18f, 0f);
+            var rim = rimObject.AddComponent<Light>();
+            rim.type = LightType.Directional;
+            rim.color = Hex("9FC4FF");
+            rim.intensity = 0.62f;
+            rim.shadows = LightShadows.None;
 
             var fillObject = new GameObject("Evening Fill");
             fillObject.transform.SetParent(lighting, false);
@@ -2044,10 +2239,20 @@ namespace BakaBakeBakery.Editor
             var counter = counterObject.AddComponent<Light>();
             counter.type = LightType.Spot;
             counter.color = Hex("FFC879");
-            counter.intensity = 1.55f;
-            counter.range = 5.2f;
-            counter.spotAngle = 54f;
+            counter.intensity = 1.75f;
+            counter.range = 5.6f;
+            counter.spotAngle = 56f;
             counter.shadows = LightShadows.Soft;
+
+            var parkObject = new GameObject("Park Moon Wash");
+            parkObject.transform.SetParent(lighting, false);
+            parkObject.transform.localPosition = new Vector3(4.6f, 5.4f, 10.5f);
+            var park = parkObject.AddComponent<Light>();
+            park.type = LightType.Point;
+            park.color = Hex("A9C4E8");
+            park.intensity = 1.35f;
+            park.range = 18f;
+            park.shadows = LightShadows.None;
         }
 
         private static Camera BuildCamera(Transform parent)
@@ -2055,7 +2260,14 @@ namespace BakaBakeBakery.Editor
             var rig = new GameObject("Camera Rig").transform;
             rig.SetParent(parent, false);
             rig.localPosition = new Vector3(0f, 1.82f, 0f);
-            rig.gameObject.AddComponent<CameraEdgeSway>();
+            var sway = rig.gameObject.AddComponent<CameraEdgeSway>();
+            var serializedSway = new SerializedObject(sway);
+            serializedSway.FindProperty("deadZone").floatValue = CameraEdgeSway.DefaultDeadZone;
+            serializedSway.FindProperty("maximumOffset").vector2Value = CameraEdgeSway.DefaultMaximumOffset;
+            serializedSway.FindProperty("maximumYaw").floatValue = CameraEdgeSway.DefaultMaximumYaw;
+            serializedSway.FindProperty("maximumPitch").floatValue = CameraEdgeSway.DefaultMaximumPitch;
+            serializedSway.FindProperty("smoothTime").floatValue = 0.2f;
+            serializedSway.ApplyModifiedPropertiesWithoutUndo();
 
             var cameraObject = new GameObject("Main Camera");
             cameraObject.transform.SetParent(rig, false);
@@ -2072,8 +2284,101 @@ namespace BakaBakeBakery.Editor
             camera.allowHDR = true;
             camera.allowMSAA = true;
 
+            var cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();
+            cameraData.renderPostProcessing = true;
+            cameraData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+            cameraData.antialiasingQuality = AntialiasingQuality.High;
+            cameraData.renderShadows = true;
+            cameraData.dithering = true;
+
             cameraObject.AddComponent<AudioListener>();
             return camera;
+        }
+
+        /// <summary>
+        /// A global volume gives the diorama its film grade: warm tone mapping, a soft bloom on the
+        /// oven and the sign, and a gentle vignette so the eye stays on the production chain.
+        /// </summary>
+        private static void BuildAtmosphere(Transform parent)
+        {
+            EnsureFolder(Root + "/Art/PostProcessing");
+            const string profilePath = Root + "/Art/PostProcessing/BakeryVolumeProfile.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profilePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                AssetDatabase.CreateAsset(profile, profilePath);
+            }
+
+            foreach (var existing in profile.components.ToArray())
+            {
+                profile.components.Remove(existing);
+                if (AssetDatabase.IsSubAsset(existing))
+                {
+                    AssetDatabase.RemoveObjectFromAsset(existing);
+                }
+
+                Object.DestroyImmediate(existing, true);
+            }
+
+            var tonemapping = AddVolumeOverride<Tonemapping>(profile);
+            tonemapping.mode.overrideState = true;
+            tonemapping.mode.value = TonemappingMode.Neutral;
+
+            var colourAdjustments = AddVolumeOverride<ColorAdjustments>(profile);
+            colourAdjustments.postExposure.overrideState = true;
+            colourAdjustments.postExposure.value = 0.28f;
+            colourAdjustments.contrast.overrideState = true;
+            colourAdjustments.contrast.value = 11f;
+            colourAdjustments.saturation.overrideState = true;
+            colourAdjustments.saturation.value = 9f;
+            colourAdjustments.colorFilter.overrideState = true;
+            colourAdjustments.colorFilter.value = Hex("FFF3E2");
+
+            var whiteBalance = AddVolumeOverride<WhiteBalance>(profile);
+            whiteBalance.temperature.overrideState = true;
+            whiteBalance.temperature.value = 9f;
+            whiteBalance.tint.overrideState = true;
+            whiteBalance.tint.value = -3f;
+
+            var bloom = AddVolumeOverride<Bloom>(profile);
+            bloom.threshold.overrideState = true;
+            bloom.threshold.value = 0.92f;
+            bloom.intensity.overrideState = true;
+            bloom.intensity.value = 0.72f;
+            bloom.scatter.overrideState = true;
+            bloom.scatter.value = 0.68f;
+            bloom.tint.overrideState = true;
+            bloom.tint.value = Hex("FFD8A6");
+
+            var vignette = AddVolumeOverride<Vignette>(profile);
+            vignette.intensity.overrideState = true;
+            vignette.intensity.value = 0.27f;
+            vignette.smoothness.overrideState = true;
+            vignette.smoothness.value = 0.55f;
+            vignette.color.overrideState = true;
+            vignette.color.value = Hex("140E14");
+
+            var grain = AddVolumeOverride<FilmGrain>(profile);
+            grain.type.overrideState = true;
+            grain.type.value = FilmGrainLookup.Thin1;
+            grain.intensity.overrideState = true;
+            grain.intensity.value = 0.16f;
+
+            var shadowsMidtonesHighlights = AddVolumeOverride<ShadowsMidtonesHighlights>(profile);
+            shadowsMidtonesHighlights.shadows.overrideState = true;
+            shadowsMidtonesHighlights.shadows.value = new Vector4(0.94f, 0.97f, 1.12f, 0f);
+            shadowsMidtonesHighlights.highlights.overrideState = true;
+            shadowsMidtonesHighlights.highlights.value = new Vector4(1.06f, 1.01f, 0.94f, 0f);
+
+            EditorUtility.SetDirty(profile);
+
+            var volumeObject = new GameObject("Bakery Atmosphere");
+            volumeObject.transform.SetParent(parent, false);
+            var volume = volumeObject.AddComponent<Volume>();
+            volume.isGlobal = true;
+            volume.priority = 10f;
+            volume.sharedProfile = profile;
         }
 
         private static void BuildGameplayController(
@@ -2306,3 +2611,4 @@ namespace BakaBakeBakery.Editor
         }
     }
 }
+
