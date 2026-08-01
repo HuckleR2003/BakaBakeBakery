@@ -1,4 +1,5 @@
 using BakaBakeBakery.Core;
+using BakaBakeBakery.Gameplay;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -47,6 +48,7 @@ namespace BakaBakeBakery.UI
             }
 
             startButton.clicked += StartGame;
+            startButton.text = BakeryProgressStore.HasProgress ? "CONTINUE BAKING" : "START BAKING";
             settingsButton.clicked += OpenSettings;
             quitButton.clicked += QuitGame;
             if (closeSettingsButton != null)

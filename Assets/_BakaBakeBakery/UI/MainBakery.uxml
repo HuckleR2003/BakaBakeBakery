@@ -1,39 +1,120 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement name="hud" class="hud">
-        <ui:VisualElement class="top-row">
-            <ui:VisualElement class="metric-card">
-                <ui:Label text="COINS" class="metric-label" />
-                <ui:Label name="coin-value" text="0" class="metric-value" />
+        <ui:VisualElement class="top-row blocks-world-input">
+            <ui:VisualElement class="bakery-mark">
+                <ui:Label text="BAKA-BAKE" class="bakery-mark-name" />
+                <ui:Label name="bakery-level" text="FOOD TRUCK &#183; LEVEL 1" class="bakery-mark-level" />
+            </ui:VisualElement>
+            <ui:VisualElement class="metric-strip">
+                <ui:VisualElement class="metric-card">
+                    <ui:Label text="COINS" class="metric-label" />
+                    <ui:Label name="coin-value" text="0" class="metric-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="metric-card metric-card--small">
+                    <ui:Label text="SOLD" class="metric-label" />
+                    <ui:Label name="sales-value" text="0" class="metric-value metric-value--small" />
+                </ui:VisualElement>
+                <ui:VisualElement class="metric-card metric-card--small metric-card--last">
+                    <ui:Label text="COUNTER" class="metric-label" />
+                    <ui:Label name="counter-value" text="0 / 8" class="metric-value metric-value--small" />
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="milestone-card">
-                <ui:Label text="NEXT MILESTONE" class="metric-label" />
-                <ui:Label text="Manager  &#183;  0 / 10 loaves" class="milestone-value" />
+                <ui:Label name="milestone-title" text="A HELPING HAND" class="metric-label" />
+                <ui:Label name="milestone-value" text="Manager &#183; 0 / 10 breads" class="milestone-value" />
+                <ui:VisualElement class="thin-progress">
+                    <ui:VisualElement name="milestone-progress-fill" class="thin-progress-fill" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Button name="ledger-button" text="BAKERY LEDGER" class="ledger-button" />
+            <ui:Button name="ledger-button" text="BAKERY BOOK  [B]" class="ledger-button" />
         </ui:VisualElement>
 
-        <ui:VisualElement name="upgrade-ledger" class="ledger ledger--closed">
-            <ui:VisualElement class="ledger-tabs">
-                <ui:Label text="RECIPES" class="ledger-tab ledger-tab--active" />
-                <ui:Label text="STAFF" class="ledger-tab" />
-                <ui:Label text="BAKERY" class="ledger-tab" />
+        <ui:VisualElement class="warmth-card blocks-world-input">
+            <ui:VisualElement class="warmth-heading">
+                <ui:Label text="NEIGHBOURHOOD WARMTH" class="warmth-title" />
+                <ui:Label name="warmth-value" text="0 / 12" class="warmth-value" />
             </ui:VisualElement>
-            <ui:Label text="A SMALL BEGINNING" class="ledger-heading" />
-            <ui:Label text="Bake ten loaves by hand. The neighbourhood is already beginning to notice." class="ledger-copy" />
+            <ui:VisualElement class="warmth-track">
+                <ui:VisualElement name="warmth-fill" class="warmth-fill" />
+            </ui:VisualElement>
+            <ui:Label name="customer-value" text="1 neighbour" class="customer-value" />
+            <ui:VisualElement name="golden-chip" class="golden-chip">
+                <ui:Label name="golden-value" text="KINDNESS FILLS THE STREET" class="golden-value" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="speech-layer">
+            <ui:VisualElement name="baker-bubble" class="speech-bubble speech-bubble--baker">
+                <ui:Label text="JULES" class="speaker-name" />
+                <ui:Label name="baker-bubble-text" text="The oven is warm." class="speech-copy" />
+                <ui:VisualElement class="bubble-tail" />
+            </ui:VisualElement>
+            <ui:VisualElement name="grandmother-bubble" class="speech-bubble speech-bubble--grandmother">
+                <ui:Label text="MRS. ROSE" class="speaker-name" />
+                <ui:Label name="grandmother-bubble-text" text="Fresh bread, darling?" class="speech-copy" />
+                <ui:VisualElement class="bubble-tail" />
+            </ui:VisualElement>
+            <ui:VisualElement name="neighbour-bubble" class="speech-bubble speech-bubble--neighbour">
+                <ui:Label text="THE NEIGHBOUR" class="speaker-name" />
+                <ui:Label name="neighbour-bubble-text" text="Morning!" class="speech-copy" />
+                <ui:VisualElement class="bubble-tail" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="toast" class="toast">
+            <ui:VisualElement class="toast-mark" />
+            <ui:VisualElement class="toast-copy-wrap">
+                <ui:Label name="toast-title" text="MILESTONE" class="toast-title" />
+                <ui:Label name="toast-copy" text="Something lovely just happened." class="toast-copy" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="upgrade-ledger" class="ledger ledger--closed blocks-world-input">
+            <ui:VisualElement class="ledger-heading-row">
+                <ui:VisualElement>
+                    <ui:Label text="THE BAKERY BOOK" class="ledger-heading" />
+                    <ui:Label text="Useful plans, written in flour and pencil." class="ledger-copy" />
+                </ui:VisualElement>
+                <ui:Label text="MORNING 01" class="ledger-stamp" />
+            </ui:VisualElement>
             <ui:VisualElement class="ledger-divider" />
-            <ui:Label text="SECOND OVEN" class="upgrade-name" />
-            <ui:Label text="Unlocks after 30 bread sales" class="upgrade-detail" />
+            <ui:VisualElement class="upgrade-card">
+                <ui:Label text="A SECOND AMBER WINDOW" class="upgrade-name" />
+                <ui:Label text="Bakes 40% faster and lets the counter hold twelve pastries." class="upgrade-detail" />
+                <ui:Button name="second-oven-button" text="SECOND OVEN &#183; 0 / 30 BREADS" class="upgrade-button" />
+            </ui:VisualElement>
+            <ui:VisualElement class="upgrade-card">
+                <ui:Label text="A WOODEN HOME" class="upgrade-name" />
+                <ui:Label text="At 55 sales the neighbours help turn the truck into Baka-Bake-Bakery." class="upgrade-detail" />
+                <ui:Button name="bakery-upgrade-button" text="WOODEN BAKERY &#183; 0 / 55 SALES" class="upgrade-button" />
+            </ui:VisualElement>
+            <ui:Label text="ESC closes the book" class="ledger-footnote" />
         </ui:VisualElement>
 
-        <ui:VisualElement class="recipe-dock">
-            <ui:Label text="TODAY'S RECIPES" class="dock-kicker" />
+        <ui:VisualElement class="work-card blocks-world-input">
+            <ui:VisualElement class="work-copy">
+                <ui:Label name="shift-mode" text="MANUAL MORNING &#183; LOAF BY LOAF" class="work-kicker" />
+                <ui:Label name="action-title" text="Fetch fresh dough" class="work-title" />
+                <ui:Label name="action-detail" text="Click Jules in the truck or press Space." class="work-detail" />
+                <ui:VisualElement class="action-progress">
+                    <ui:VisualElement name="action-progress-fill" class="action-progress-fill" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="action-button" text="FETCH DOUGH" class="action-button" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="recipe-dock blocks-world-input">
+            <ui:VisualElement class="dock-heading">
+                <ui:Label text="TODAY'S RECIPE CARDS" class="dock-kicker" />
+                <ui:Label text="Keys 1—6 select &#183; a fresh counter must be cleared first" class="dock-hint" />
+            </ui:VisualElement>
             <ui:VisualElement class="recipe-row">
-                <ui:Button name="recipe-bread" text="B&#10;COUNTRY BREAD&#10;4.0 s  &#183;  6 coins" class="recipe-card recipe-card--selected" />
-                <ui:Button name="recipe-kaiser" text="K&#10;KAISER ROLLS&#10;30 bread sales" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-croissant" text="C&#10;BUTTER CROISSANT&#10;45 total sales" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-swirl" text="S&#10;CINNAMON SWIRL&#10;Bakery level 2" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-finezja" text="F&#10;FINEZJA&#10;100 total sales" class="recipe-card recipe-card--locked" />
-                <ui:Button name="recipe-monocle" text="M&#10;CINNAMON MONOCLE&#10;125 total sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-bread" text="01&#10;COUNTRY BREAD&#10;4 s &#183; 6 coins" class="recipe-card recipe-card--selected" />
+                <ui:Button name="recipe-kaiser" text="02&#10;KAISER ROLLS&#10;30 bread sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-croissant" text="03&#10;BUTTER CROISSANT&#10;45 total sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-swirl" text="04&#10;CINNAMON SWIRL&#10;Bakery level 2" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-finezja" text="05&#10;FINEZJA&#10;100 total sales" class="recipe-card recipe-card--locked" />
+                <ui:Button name="recipe-monocle" text="06&#10;CINNAMON MONOCLE&#10;125 total sales" class="recipe-card recipe-card--locked" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
