@@ -23,11 +23,25 @@ namespace BakaBakeBakery.Gameplay
         [SerializeField] private Transform rightForearm;
         [SerializeField] private Transform leftHand;
         [SerializeField] private Transform rightHand;
+        [SerializeField] private Transform[] leftFingers;
+        [SerializeField] private Transform[] rightFingers;
+        [SerializeField] private Transform leftThumb;
+        [SerializeField] private Transform rightThumb;
         [SerializeField] private Transform carryAnchor;
         [SerializeField] private GameObject carryTray;
         [SerializeField] private GameObject[] rawCarryDisplays;
         [SerializeField] private GameObject[] bakedCarryDisplays;
 
+        private const float OpenFingerAngle = -6f;
+        private const float ClosedFingerAngle = -78f;
+        private const float OpenThumbAngle = 4f;
+        private const float ClosedThumbAngle = 62f;
+
+        private Quaternion[] leftFingerBases;
+        private Quaternion[] rightFingerBases;
+        private Quaternion leftThumbBase;
+        private Quaternion rightThumbBase;
+        private float grip;
         private Vector3 visualBasePosition;
         private Quaternion visualBaseRotation;
         private Quaternion leftLegBase;
@@ -45,7 +59,10 @@ namespace BakaBakeBakery.Gameplay
         public bool IsCarryingRaw { get; private set; }
         public bool IsCarryingBaked { get; private set; }
         public bool IsWalking => walkBlend > 0.12f;
-        public bool NaturalHandRigReady => HasHandRig() && carryAnchor != null;
+        public bool NaturalHandRigReady => HasHandRig() && HasGripRig() && carryAnchor != null;
+
+        /// <summary>How closed the fingers are right now, 0 open palm and 1 a full grip.</summary>
+        public float GripAmount => grip;
         public float HandGripWidth => leftHand != null && rightHand != null
             ? Vector3.Distance(leftHand.position, rightHand.position)
             : float.PositiveInfinity;
@@ -61,6 +78,12 @@ namespace BakaBakeBakery.Gameplay
 
             rawCarryDisplays ??= Array.Empty<GameObject>();
             bakedCarryDisplays ??= Array.Empty<GameObject>();
+            leftFingers ??= Array.Empty<Transform>();
+            rightFingers ??= Array.Empty<Transform>();
+            leftFingerBases = CaptureRotations(leftFingers);
+            rightFingerBases = CaptureRotations(rightFingers);
+            leftThumbBase = leftThumb != null ? leftThumb.localRotation : Quaternion.identity;
+            rightThumbBase = rightThumb != null ? rightThumb.localRotation : Quaternion.identity;
             visualBasePosition = visualRoot.localPosition;
             visualBaseRotation = visualRoot.localRotation;
             leftLegBase = leftLeg != null ? leftLeg.localRotation : Quaternion.identity;
@@ -133,6 +156,8 @@ namespace BakaBakeBakery.Gameplay
 
             ResolveHandTargets(snapshot, stride, out var leftTarget, out var rightTarget, out var elbowsWide);
             var follow = 1f - Mathf.Exp(-Mathf.Max(0f, deltaTime) * 14f);
+            var gripFollow = 1f - Mathf.Exp(-Mathf.Max(0f, deltaTime) * 11f);
+            grip = Mathf.Lerp(grip, ResolveGripTarget(snapshot), gripFollow);
             currentLeftHand = Vector3.Lerp(currentLeftHand, leftTarget, follow);
             currentRightHand = Vector3.Lerp(currentRightHand, rightTarget, follow);
             PlaceArm(
@@ -144,7 +169,8 @@ namespace BakaBakeBakery.Gameplay
                 leftForearm,
                 leftHand,
                 leftUpperArmBaseScale,
-                leftForearmBaseScale);
+                leftForearmBaseScale,
+                follow);
             PlaceArm(
                 rightShoulder.localPosition,
                 currentRightHand,
@@ -154,24 +180,109 @@ namespace BakaBakeBakery.Gameplay
                 rightForearm,
                 rightHand,
                 rightUpperArmBaseScale,
-                rightForearmBaseScale);
+                rightForearmBaseScale,
+                follow);
+            CurlFingers(leftFingers, leftFingerBases, leftThumb, leftThumbBase, true);
+            CurlFingers(rightFingers, rightFingerBases, rightThumb, rightThumbBase, false);
 
             if (carryAnchor != null && (IsCarryingRaw || IsCarryingBaked))
             {
+                var handSpan = currentRightHand - currentLeftHand;
                 var carryTarget = (currentLeftHand + currentRightHand) * 0.5f + new Vector3(0f, 0.035f, -0.015f);
-                if (snapshot.Phase == BakeryWorkPhase.LoadingOven
+                var oneHandedReach = snapshot.Phase == BakeryWorkPhase.LoadingOven
                     && snapshot.PhaseProgress >= 0.48f
-                    && snapshot.PhaseProgress < 0.66f)
+                    && snapshot.PhaseProgress < 0.66f;
+                if (oneHandedReach)
                 {
                     carryTarget = currentLeftHand + new Vector3(0.42f, 0.025f, 0f);
                 }
 
+                // The load settles into the palms: a little sag while walking, and the tray keeps
+                // the tilt the hands are actually holding rather than staying rigidly level.
+                var sag = Mathf.Sin(Time.unscaledTime * 6.4f) * 0.012f * walkBlend;
                 carryAnchor.localPosition = Vector3.Lerp(
                     carryAnchor.localPosition,
-                    carryTarget,
+                    carryTarget + Vector3.down * (sag + (1f - grip) * 0.02f),
                     follow);
-                carryAnchor.localRotation = Quaternion.Slerp(carryAnchor.localRotation, Quaternion.identity, follow);
+
+                var tilt = oneHandedReach || handSpan.sqrMagnitude < 0.0001f
+                    ? Quaternion.identity
+                    : Quaternion.Euler(0f, 0f, Mathf.Clamp(handSpan.y * -46f, -14f, 14f));
+                carryAnchor.localRotation = Quaternion.Slerp(carryAnchor.localRotation, tilt, follow);
             }
+        }
+
+        private float ResolveGripTarget(BakerySnapshot snapshot)
+        {
+            if (IsWalking && (IsCarryingRaw || IsCarryingBaked))
+            {
+                return 1f;
+            }
+
+            var progress = Mathf.Clamp01(snapshot.PhaseProgress);
+            return snapshot.Phase switch
+            {
+                // Reach with an open hand, close around the chilled ingredients, knead, then carry.
+                BakeryWorkPhase.FetchingDough => progress < 0.28f
+                    ? Mathf.InverseLerp(0.16f, 0.28f, progress)
+                    : progress < 0.82f
+                        ? 0.58f
+                        : 1f,
+                BakeryWorkPhase.WaitingForOven => 1f,
+                // The right hand lets go of the tray to pull the oven handle, then releases the load.
+                BakeryWorkPhase.LoadingOven => progress < 0.66f
+                    ? 1f
+                    : 1f - Mathf.InverseLerp(0.66f, 0.91f, progress),
+                BakeryWorkPhase.Baking => 0f,
+                BakeryWorkPhase.WaitingForCounter => 0.22f,
+                BakeryWorkPhase.Serving => progress < 0.24f
+                    ? Mathf.InverseLerp(0f, 0.24f, progress)
+                    : progress < 0.78f
+                        ? 1f
+                        : 1f - Mathf.InverseLerp(0.78f, 1f, progress),
+                _ => 0f
+            };
+        }
+
+        private void CurlFingers(
+            Transform[] fingers,
+            Quaternion[] bases,
+            Transform thumb,
+            Quaternion thumbBase,
+            bool isLeft)
+        {
+            if (fingers != null && bases != null)
+            {
+                for (var index = 0; index < fingers.Length && index < bases.Length; index++)
+                {
+                    if (fingers[index] == null)
+                    {
+                        continue;
+                    }
+
+                    // Staggering the curl by a few degrees per finger reads as a hand, not a clamp.
+                    var stagger = 1f - index * 0.09f;
+                    var angle = Mathf.Lerp(OpenFingerAngle, ClosedFingerAngle * stagger, grip);
+                    fingers[index].localRotation = bases[index] * Quaternion.Euler(angle, 0f, 0f);
+                }
+            }
+
+            if (thumb != null)
+            {
+                var angle = Mathf.Lerp(OpenThumbAngle, ClosedThumbAngle, grip);
+                thumb.localRotation = thumbBase * Quaternion.Euler(angle * 0.5f, 0f, isLeft ? angle : -angle);
+            }
+        }
+
+        private static Quaternion[] CaptureRotations(Transform[] transforms)
+        {
+            var rotations = new Quaternion[transforms.Length];
+            for (var index = 0; index < transforms.Length; index++)
+            {
+                rotations[index] = transforms[index] != null ? transforms[index].localRotation : Quaternion.identity;
+            }
+
+            return rotations;
         }
 
         private void ResolveHandTargets(
@@ -297,7 +408,8 @@ namespace BakaBakeBakery.Gameplay
             Transform forearm,
             Transform hand,
             Vector3 upperBaseScale,
-            Vector3 forearmBaseScale)
+            Vector3 forearmBaseScale,
+            float follow)
         {
             var side = isLeft ? -1f : 1f;
             var elbow = Vector3.Lerp(shoulder, handPosition, 0.48f)
@@ -305,11 +417,18 @@ namespace BakaBakeBakery.Gameplay
             PlaceSegment(upperArm, shoulder, elbow, upperBaseScale);
             PlaceSegment(forearm, elbow, handPosition, forearmBaseScale);
             hand.localPosition = handPosition;
-            var grip = IsCarryingRaw || IsCarryingBaked;
-            var handTarget = grip
-                ? Quaternion.Euler(8f, 0f, isLeft ? -34f : 34f)
-                : Quaternion.identity;
-            hand.localRotation = Quaternion.Slerp(hand.localRotation, handTarget, 0.35f);
+
+            // The wrist rolls the palm inwards as the fingers close, so the grip looks like it is
+            // holding the load rather than balancing it.
+            var forearmDirection = handPosition - elbow;
+            var pitch = forearmDirection.sqrMagnitude > 0.0001f
+                ? Mathf.Clamp(forearmDirection.y * 34f, -22f, 22f)
+                : 0f;
+            var handTarget = Quaternion.Euler(
+                pitch + grip * 10f,
+                0f,
+                side * grip * 36f);
+            hand.localRotation = Quaternion.Slerp(hand.localRotation, handTarget, follow);
         }
 
         private static void PlaceSegment(Transform segment, Vector3 start, Vector3 end, Vector3 baseScale)
@@ -391,6 +510,16 @@ namespace BakaBakeBakery.Gameplay
                 && rightForearm != null
                 && leftHand != null
                 && rightHand != null;
+        }
+
+        private bool HasGripRig()
+        {
+            return leftThumb != null
+                && rightThumb != null
+                && leftFingers != null
+                && rightFingers != null
+                && leftFingers.Length > 0
+                && rightFingers.Length > 0;
         }
 
         private static Vector3 ScaleOf(Transform target)
