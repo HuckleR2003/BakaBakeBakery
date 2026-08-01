@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19b39756187bd344f81372176cd4ebe8, type: 3}
+  m_Name: BakeryCatalog
+  m_EditorClassIdentifier: BakaBakeBakery.Runtime::BakaBakeBakery.Data.BakeryCatalog
+  recipes:
+  - {fileID: 11400000, guid: 193f6609288eecc4b82261dc60d6396d, type: 2}
+  - {fileID: 11400000, guid: 57ddc480ad5360c4e80fc93ab2b9a537, type: 2}
+  - {fileID: 11400000, guid: 899b394079ed4f9489709ab78e073c85, type: 2}
+  - {fileID: 11400000, guid: 6d93d6a3669b7de4690a8b83ed175775, type: 2}
+  - {fileID: 11400000, guid: 8227f8fa34891c241abf99af5e7a0d78, type: 2}
+  - {fileID: 11400000, guid: 63f6010408918a24ea23d06c51915b00, type: 2}

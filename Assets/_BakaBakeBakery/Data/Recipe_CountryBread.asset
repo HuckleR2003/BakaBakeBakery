@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa18b5fea59734d4cb196a8ab9ea2ba5, type: 3}
+  m_Name: Recipe_CountryBread
+  m_EditorClassIdentifier: BakaBakeBakery.Runtime::BakaBakeBakery.Data.RecipeDefinition
+  id: 0
+  displayName: Country Bread
+  customerDescription: A warm country loaf with a deep cross score.
+  preparationSeconds: 0
+  bakeSeconds: 4
+  finishingSeconds: 0
+  batchYield: 1
+  salePrice: 6
+  unlockAtSales: 0
+  requiredBakeryLevel: 1

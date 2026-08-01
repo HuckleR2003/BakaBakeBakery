@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa18b5fea59734d4cb196a8ab9ea2ba5, type: 3}
+  m_Name: Recipe_Finezja
+  m_EditorClassIdentifier: BakaBakeBakery.Runtime::BakaBakeBakery.Data.RecipeDefinition
+  id: 4
+  displayName: Finezja
+  customerDescription: A soft pastry crowned with ribbons of vanilla and strawberry
+    cream.
+  preparationSeconds: 2
+  bakeSeconds: 9
+  finishingSeconds: 3
+  batchYield: 2
+  salePrice: 11
+  unlockAtSales: 100
+  requiredBakeryLevel: 2
