@@ -6,12 +6,12 @@ Start with a food truck, bake the first loaves by hand, train a manager, expand 
 
 ## Current status
 
-The project contains a playable `0.7.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, then customer parcel. Mila arrives on the first morning with a clickable, event-driven guide and later automates the same guarded command loop.
+The project contains a playable `0.8.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, hand-to-pastry customer pickup, then departure. Mila arrives on the first morning with a clickable, event-driven guide and later automates the same guarded command loop.
 
 The current build includes:
 
 - customers, a two-person queue, visible counter inventory, sales, and local progress;
-- nine playable products: six neighbourhood milestones plus Chocolate Muffins, Village Jam Turnovers, and Chocolate Pillows discovered in the test kitchen;
+- fourteen playable products: six neighbourhood milestones plus eight test-kitchen discoveries, including Pastel de Nata, Raspberry Macarons, Honey Baklava, Chocolate Cannoli, and Fudge Brownies;
 - manager, second-oven, and wooden-bakery milestones;
 - a five-minute day structure: morning market run, opening sign, live profit board, early close, shutter animation, and next-morning reset;
 - Mila's four-slot discovery workbench with draggable flour, milk, puff pastry, jam, and chocolate;
@@ -20,6 +20,8 @@ The current build includes:
 - Jules's articulated shoulder–elbow–forearm–hand rig, including a two-handed tray grip, oven-handle reach, loading gesture, and visible carried recipe;
 - a neighbourhood Warmth meter and temporary double-income Golden Minutes;
 - walking customers and translucent conversations for Jules, Mrs. Rose, a returning neighbour, and Mila;
+- owner-supplied character portraits in conversations, Mila's guide, and the morning-market map, mirrored by matching world-character colour and hair cues;
+- a taller food-truck interior with a story shelf, pantry jars, recipe board, hanging utensils, pendant lights, and more readable workstation spacing;
 - a park path running into the diorama, sideways benches, swaying trees, looping walkers, post-purchase snacks, a distant road with traffic, lit house windows and chimney smoke;
 - a three-second illustrated road to market, food-truck bicycle, bakery delivery car, flour motes, oven steam, and a closing service shutter;
 - the animated black HCK Labs ident, Main Menu, comfort settings, and responsive bakery HUD.
@@ -75,5 +77,5 @@ Docs/           Public design documentation
 - The world is the primary interface.
 - Products are identified by silhouette before labels.
 - Automation must remain enjoyable to watch.
-- Reference images guide decisions; they are never shipped as substitutes for authored assets.
+- Reference images guide decisions; only owner-supplied or explicitly licensed production assets ship, with provenance recorded beside them.
 - Changes stay small, reviewable, and reproducible in Unity.
