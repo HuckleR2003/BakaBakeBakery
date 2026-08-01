@@ -2,20 +2,24 @@
 
 **A tiny bakery automation game staged inside a living 3D diorama.**
 
-Start with a food truck, bake the first loaves by hand, train a manager, expand the menu, and grow into a glowing wooden bakery. The game is designed around a simple pleasure: every upgrade should be visible in the world, not only in a number.
+Start with a food truck, bake the first loaves by hand, train a manager, expand the menu, and grow into a glowing wooden bakery. Every upgrade should be visible in the world, not only in a number.
 
 ## Current status
 
-The project now contains a **playable vertical slice**. The first ten Country Bread sales are made through a deliberate three-step rhythm: fetch the dough, load the oven, and move the finished loaf to the counter. Mila then takes over the same safe command loop as manager.
+The project contains a playable `0.5.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, then customer parcel. Mila later automates the same guarded command loop.
 
 The current build includes:
 
 - customers, a two-person queue, visible counter inventory, sales, and local progress;
-- Country Bread, Kaiser Rolls, Butter Croissants, Cinnamon Swirls, Finezja, and Cinnamon Monocles;
+- nine playable products: six neighbourhood milestones plus Chocolate Muffins, Village Jam Turnovers, and Chocolate Pillows discovered in the test kitchen;
 - manager, second-oven, and wooden-bakery milestones;
+- a five-minute day structure: morning market run, opening sign, live profit board, early close, shutter animation, and next-morning reset;
+- Mila's four-slot discovery workbench with draggable flour, milk, puff pastry, jam, and chocolate;
+- a focused product journey that shows only available bakes and one meaningful locked target at a time;
 - a state-driven physical production story: ingredients, raw batch, oven contents, carried bake, counter stock, and customer parcel;
 - a neighbourhood Warmth meter and temporary double-income Golden Minutes;
-- walking customers, conversational bubbles for Jules, Mrs. Rose, and a returning neighbour;
+- walking customers and translucent conversations for Jules, Mrs. Rose, a returning neighbour, and Mila;
+- a three-second illustrated road to market, food-truck bicycle, bakery delivery car, living house windows, chimney smoke, flour motes, oven steam, and a closing service shutter;
 - the animated black HCK Labs ident, Main Menu, comfort settings, and responsive bakery HUD.
 
 ## Project setup
@@ -31,7 +35,9 @@ Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/Studi
 ## Controls
 
 - Click Jules in the truck or press `Space` to perform the highlighted bakery action.
-- Press `1`–`6` or click a recipe card to select an unlocked product.
+- Click an available card in Home to select a product.
+- Use the wooden day sign to visit the market, open the shift, close early, or begin the next morning.
+- Open Craft, then drag two to four pantry ingredients into the equation. Clicking an ingredient is an accessible shortcut to the next empty slot.
 - Press `B` to open the Bakery Book and buy available upgrades.
 - Press `Escape` to close the open Bakery Book or Settings panel.
 - Move the pointer toward the screen edges for the restrained diorama camera lean.
@@ -45,6 +51,7 @@ Open the repository root in Unity Hub, load `Assets/_BakaBakeBakery/Scenes/Studi
 - [Brand and settings decisions](Docs/BrandAndSettings.md)
 - [Stability audit](Docs/StabilityAudit.md)
 - [Living-world rules](Docs/LivingWorld.md)
+- [Days and recipe discovery](Docs/DaysAndDiscovery.md)
 - [Concept frame notes](Docs/Concepts/README.md)
 
 ## Repository layout

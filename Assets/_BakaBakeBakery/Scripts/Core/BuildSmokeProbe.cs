@@ -23,7 +23,7 @@ namespace BakaBakeBakery.Core
 
         private IEnumerator Start()
         {
-            if (IsVisualCapture)
+            if (IsVisualCapture || IsSmokeTest)
             {
                 Application.runInBackground = true;
             }
