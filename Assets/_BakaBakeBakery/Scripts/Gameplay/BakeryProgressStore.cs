@@ -45,6 +45,20 @@ namespace BakaBakeBakery.Gameplay
             safe.totalItemsSold = Math.Clamp(safe.totalItemsSold, safe.countryBreadSold, 100000000);
             safe.warmth = Math.Clamp(safe.warmth, 0, BakeryLoop.WarmthGoal - 1);
             safe.bakeryLevel = Math.Clamp(safe.bakeryLevel, 1, 2);
+            safe.discoveryMask = Math.Clamp(safe.discoveryMask, 0, 0b111);
+            safe.dayNumber = Math.Clamp(safe.dayNumber, 1, 9999);
+            safe.dayPhase = Enum.IsDefined(typeof(BakeryDayPhase), safe.dayPhase)
+                ? safe.dayPhase
+                : (int)BakeryDayPhase.MorningPreparation;
+            safe.daySecondsRemaining = Math.Clamp(safe.daySecondsRemaining, 0f, BakeryDayCycle.DayDurationSeconds);
+            safe.dailyCosts = Math.Clamp(safe.dailyCosts, 0, 1000000000);
+            safe.dailyRevenue = Math.Clamp(safe.dailyRevenue, 0, 1000000000);
+            safe.tutorialStep = Math.Clamp(safe.tutorialStep, 0, 8);
+            safe.flour = Math.Clamp(safe.flour, 0, 999);
+            safe.milk = Math.Clamp(safe.milk, 0, 999);
+            safe.puffPastry = Math.Clamp(safe.puffPastry, 0, 999);
+            safe.jam = Math.Clamp(safe.jam, 0, 999);
+            safe.chocolate = Math.Clamp(safe.chocolate, 0, 999);
 
             if (!Enum.IsDefined(typeof(RecipeId), safe.selectedRecipe))
             {

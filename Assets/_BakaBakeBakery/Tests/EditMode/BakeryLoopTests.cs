@@ -195,6 +195,33 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(lockedSelection.SelectedRecipe, Is.EqualTo(RecipeId.CountryBread));
         }
 
+        [Test]
+        public void CraftedRecipeUnlockPersistsAndCannotUnlockTwice()
+        {
+            var loop = CreateLoop();
+
+            Assert.That(loop.IsRecipeUnlocked(RecipeId.ChocolateMuffin), Is.False);
+            Assert.That(loop.UnlockCraftedRecipe(RecipeId.ChocolateMuffin), Is.True);
+            Assert.That(loop.UnlockCraftedRecipe(RecipeId.ChocolateMuffin), Is.False);
+
+            var restored = CreateLoop(loop.ExportProgress());
+            Assert.That(restored.IsRecipeUnlocked(RecipeId.ChocolateMuffin), Is.True);
+        }
+
+        [Test]
+        public void ClosingShiftCancelsIncompleteMotionAndClearsCustomerQueue()
+        {
+            var loop = CreateLoop();
+            Assert.That(loop.RequestAction(), Is.True);
+            Assert.That(loop.Phase, Is.EqualTo(BakeryWorkPhase.FetchingDough));
+
+            loop.CloseShift();
+
+            Assert.That(loop.Phase, Is.EqualTo(BakeryWorkPhase.WaitingForDough));
+            Assert.That(loop.WaitingCustomers, Is.Zero);
+            Assert.That(loop.CounterStock, Is.Zero);
+        }
+
         private static BakeryLoop CreateLoop(BakeryProgressData progress = null)
         {
             return new BakeryLoop(new List<BakeryRecipeSpec>
@@ -204,7 +231,10 @@ namespace BakaBakeBakery.Tests.EditMode
                 new(RecipeId.ButterCroissant, "Butter Croissant", 8f, 2, 8, 45, 1),
                 new(RecipeId.CinnamonSwirl, "Cinnamon Swirl", 9f, 3, 7, 75, 2),
                 new(RecipeId.Finezja, "Finezja", 14f, 2, 11, 100, 2),
-                new(RecipeId.CinnamonMonocle, "Cinnamon Monocle", 10f, 3, 9, 125, 2)
+                new(RecipeId.CinnamonMonocle, "Cinnamon Monocle", 10f, 3, 9, 125, 2),
+                new(RecipeId.ChocolateMuffin, "Chocolate Muffin", 10f, 3, 8, 0, 1),
+                new(RecipeId.JamTurnover, "Village Jam Turnover", 9f, 2, 10, 0, 1),
+                new(RecipeId.ChocolatePillow, "Chocolate Pillow", 11f, 2, 12, 0, 1)
             }, progress);
         }
     }

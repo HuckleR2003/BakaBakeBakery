@@ -7,6 +7,9 @@ namespace BakaBakeBakery.Data
         ButterCroissant = 2,
         CinnamonSwirl = 3,
         Finezja = 4,
-        CinnamonMonocle = 5
+        CinnamonMonocle = 5,
+        ChocolateMuffin = 6,
+        JamTurnover = 7,
+        ChocolatePillow = 8
     }
 }

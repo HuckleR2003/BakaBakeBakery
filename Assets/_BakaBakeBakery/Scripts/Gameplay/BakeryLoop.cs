@@ -124,7 +124,7 @@ namespace BakaBakeBakery.Gameplay
     [Serializable]
     public sealed class BakeryProgressData
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
 
         public int version = CurrentVersion;
         public int coins;
@@ -134,6 +134,18 @@ namespace BakaBakeBakery.Gameplay
         public int bakeryLevel = 1;
         public bool secondOvenPurchased;
         public int selectedRecipe;
+        public int discoveryMask;
+        public int dayNumber = 1;
+        public int dayPhase;
+        public float daySecondsRemaining;
+        public int dailyCosts;
+        public int dailyRevenue;
+        public int tutorialStep;
+        public int flour;
+        public int milk;
+        public int puffPastry;
+        public int jam;
+        public int chocolate;
     }
 
     public sealed class BakeryLoop
@@ -186,6 +198,7 @@ namespace BakaBakeBakery.Gameplay
             Warmth = safeProgress.warmth;
             BakeryLevel = safeProgress.bakeryLevel;
             SecondOvenPurchased = safeProgress.secondOvenPurchased;
+            DiscoveryMask = safeProgress.discoveryMask;
 
             var restoredRecipe = (RecipeId)safeProgress.selectedRecipe;
             SelectedRecipe = recipes.ContainsKey(restoredRecipe) && IsRecipeUnlocked(restoredRecipe)
@@ -209,6 +222,7 @@ namespace BakaBakeBakery.Gameplay
         public float PhaseRemaining { get; private set; }
         public float GoldenMinuteRemaining { get; private set; }
         public bool SecondOvenPurchased { get; private set; }
+        public int DiscoveryMask { get; private set; }
 
         public bool ManagerUnlocked => CountryBreadSold >= ManagerUnlockBreadSales;
         public bool KaiserUnlocked => CountryBreadSold >= KaiserUnlockBreadSales;
@@ -304,10 +318,45 @@ namespace BakaBakeBakery.Gameplay
             return true;
         }
 
+        public bool TrySpendCoins(int amount)
+        {
+            if (amount < 0 || Coins < amount)
+            {
+                return false;
+            }
+
+            Coins -= amount;
+            return true;
+        }
+
+        public void CloseShift()
+        {
+            if (Phase != BakeryWorkPhase.WaitingForDough)
+            {
+                EnterWaitingPhase(BakeryWorkPhase.WaitingForDough);
+            }
+
+            WaitingCustomers = 0;
+            managerActionRemaining = ManagerActionDelay;
+        }
+
         public bool IsRecipeUnlocked(RecipeId recipeId)
         {
             return recipes.TryGetValue(recipeId, out var recipe)
-                && IsRecipeUnlocked(recipe, TotalItemsSold, CountryBreadSold, BakeryLevel);
+                && IsRecipeUnlocked(recipe, TotalItemsSold, CountryBreadSold, BakeryLevel, DiscoveryMask);
+        }
+
+        public bool UnlockCraftedRecipe(RecipeId recipeId)
+        {
+            var bit = DiscoveryBit(recipeId);
+            if (bit == 0 || (DiscoveryMask & bit) != 0 || !recipes.ContainsKey(recipeId))
+            {
+                return false;
+            }
+
+            DiscoveryMask |= bit;
+            events.Enqueue(new BakeryLoopEvent(BakeryLoopEventType.RecipeUnlocked, recipeId));
+            return true;
         }
 
         public BakeryRecipeSpec GetRecipe(RecipeId recipeId)
@@ -340,7 +389,8 @@ namespace BakaBakeBakery.Gameplay
                 warmth = Warmth,
                 bakeryLevel = BakeryLevel,
                 secondOvenPurchased = SecondOvenPurchased,
-                selectedRecipe = (int)SelectedRecipe
+                selectedRecipe = (int)SelectedRecipe,
+                discoveryMask = DiscoveryMask
             };
         }
 
@@ -471,8 +521,8 @@ namespace BakaBakeBakery.Gameplay
 
             foreach (var candidate in recipes.Values)
             {
-                var wasUnlocked = IsRecipeUnlocked(candidate, beforeTotal, beforeBread, BakeryLevel);
-                var isUnlocked = IsRecipeUnlocked(candidate, TotalItemsSold, CountryBreadSold, BakeryLevel);
+                var wasUnlocked = IsRecipeUnlocked(candidate, beforeTotal, beforeBread, BakeryLevel, DiscoveryMask);
+                var isUnlocked = IsRecipeUnlocked(candidate, TotalItemsSold, CountryBreadSold, BakeryLevel, DiscoveryMask);
                 if (!wasUnlocked && isUnlocked)
                 {
                     events.Enqueue(new BakeryLoopEvent(BakeryLoopEventType.RecipeUnlocked, candidate.Id));
@@ -519,7 +569,8 @@ namespace BakaBakeBakery.Gameplay
             BakeryRecipeSpec recipe,
             int totalItemsSold,
             int countryBreadSold,
-            int bakeryLevel)
+            int bakeryLevel,
+            int discoveryMask)
         {
             if (recipe.Id == RecipeId.CountryBread)
             {
@@ -531,7 +582,24 @@ namespace BakaBakeBakery.Gameplay
                 return countryBreadSold >= KaiserUnlockBreadSales;
             }
 
+            var discoveryBit = DiscoveryBit(recipe.Id);
+            if (discoveryBit != 0)
+            {
+                return (discoveryMask & discoveryBit) != 0;
+            }
+
             return totalItemsSold >= recipe.UnlockAtSales && bakeryLevel >= recipe.RequiredBakeryLevel;
+        }
+
+        private static int DiscoveryBit(RecipeId recipeId)
+        {
+            return recipeId switch
+            {
+                RecipeId.ChocolateMuffin => 1 << 0,
+                RecipeId.JamTurnover => 1 << 1,
+                RecipeId.ChocolatePillow => 1 << 2,
+                _ => 0
+            };
         }
 
         private static bool IsActionPhase(BakeryWorkPhase phase)

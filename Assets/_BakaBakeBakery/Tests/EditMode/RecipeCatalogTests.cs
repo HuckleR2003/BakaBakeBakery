@@ -10,12 +10,12 @@ namespace BakaBakeBakery.Tests.EditMode
         private const string CatalogPath = "Assets/_BakaBakeBakery/Data/BakeryCatalog.asset";
 
         [Test]
-        public void FoundationCatalogContainsSixUniqueRecipes()
+        public void FoundationCatalogContainsNineUniqueRecipes()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<BakeryCatalog>(CatalogPath);
 
             Assert.That(catalog, Is.Not.Null);
-            Assert.That(catalog.Recipes, Has.Count.EqualTo(6));
+            Assert.That(catalog.Recipes, Has.Count.EqualTo(9));
 
             var identifiers = new HashSet<RecipeId>();
             foreach (var recipe in catalog.Recipes)
@@ -25,6 +25,16 @@ namespace BakaBakeBakery.Tests.EditMode
                 Assert.That(recipe.TotalProcessSeconds, Is.GreaterThan(0f));
                 Assert.That(recipe.BatchRevenue, Is.GreaterThan(0));
             }
+        }
+
+        [Test]
+        public void CraftingDiscoveriesHavePlayableRecipeDefinitions()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<BakeryCatalog>(CatalogPath);
+
+            Assert.That(catalog.Find(RecipeId.ChocolateMuffin), Is.Not.Null);
+            Assert.That(catalog.Find(RecipeId.JamTurnover), Is.Not.Null);
+            Assert.That(catalog.Find(RecipeId.ChocolatePillow), Is.Not.Null);
         }
 
         [Test]
