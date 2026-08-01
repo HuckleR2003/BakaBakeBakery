@@ -476,7 +476,6 @@
     margin-top: 10px;
     color: rgba(244, 229, 198, 0.78);
     font-size: 12px;
-    line-height: 17px;
     white-space: normal;
 }
 
@@ -757,11 +756,11 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 620px;
-    height: 214px;
-    margin-left: -310px;
-    margin-top: -130px;
-    padding: 22px 28px;
+    width: 680px;
+    height: 310px;
+    margin-left: -340px;
+    margin-top: -180px;
+    padding: 20px 26px;
     background-color: rgba(39, 29, 28, 0.97);
     border-left-width: 2px;
     border-right-width: 2px;
@@ -784,11 +783,47 @@
     -unity-text-align: middle-center;
 }
 
+.map-landscape {
+    position: relative;
+    height: 174px;
+    margin-top: 12px;
+    overflow: hidden;
+    background-color: rgba(89, 112, 91, 0.18);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-color: rgba(244, 229, 198, 0.14);
+    border-radius: 13px;
+}
+
+.map-hill {
+    position: absolute;
+    bottom: -92px;
+    width: 330px;
+    height: 170px;
+    background-color: rgba(113, 135, 111, 0.3);
+    border-radius: 50%;
+}
+
+.map-hill--left { left: -50px; }
+.map-hill--right { right: -34px; bottom: -104px; background-color: rgba(67, 94, 78, 0.42); }
+
 .map-route {
+    position: absolute;
+    left: 91px;
+    right: 103px;
+    top: 80px;
     height: 16px;
-    margin: 34px 34px 14px 34px;
+    margin: 0;
     background-color: rgba(244, 229, 198, 0.12);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+    border-color: rgba(244, 229, 198, 0.13);
     border-radius: 99px;
+    rotate: -2deg;
 }
 
 .map-route-fill {
@@ -806,6 +841,107 @@
     height: 42px;
     flex-direction: row;
     align-items: flex-end;
+}
+
+.map-village,
+.map-town {
+    position: absolute;
+    top: 27px;
+    width: 88px;
+    align-items: center;
+}
+
+.map-village { left: 14px; }
+.map-town { right: 8px; top: 22px; }
+
+.map-house {
+    width: 55px;
+    height: 49px;
+    margin-top: 13px;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: var(--flour);
+    border-bottom-width: 5px;
+    border-bottom-color: rgb(128, 74, 44);
+    border-radius: 5px;
+}
+
+.map-house-roof {
+    position: absolute;
+    top: -13px;
+    width: 48px;
+    height: 27px;
+    background-color: var(--cherry);
+    rotate: 45deg;
+    border-radius: 4px;
+}
+
+.map-house-window {
+    width: 15px;
+    height: 18px;
+    margin-bottom: 7px;
+    background-color: var(--glow);
+    border-width: 2px;
+    border-color: var(--cocoa);
+}
+
+.map-stall-roof {
+    width: 72px;
+    height: 17px;
+    background-color: var(--cherry);
+    border-left-width: 8px;
+    border-right-width: 8px;
+    border-color: var(--flour);
+    border-radius: 4px;
+}
+
+.map-stall-body {
+    width: 62px;
+    height: 45px;
+    padding: 8px;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgb(118, 73, 46);
+}
+
+.map-stall-crate {
+    width: 19px;
+    height: 21px;
+    background-color: var(--crust);
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(112, 61, 36);
+}
+
+.map-place-label {
+    margin-top: 7px;
+    color: var(--glow);
+    font-size: 8px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.map-tree {
+    position: absolute;
+    top: 41px;
+    width: 34px;
+    height: 65px;
+    align-items: center;
+}
+
+.map-tree--one { left: 192px; }
+.map-tree--two { right: 206px; top: 53px; scale: 0.8; }
+
+.map-tree-crown {
+    width: 34px;
+    height: 34px;
+    background-color: var(--sage);
+    border-radius: 50%;
+}
+
+.map-tree-trunk {
+    width: 7px;
+    height: 28px;
+    background-color: var(--crust);
 }
 
 .bike-wheel {
@@ -829,6 +965,7 @@
 }
 
 .map-labels {
+    margin-top: 8px;
     flex-direction: row;
     justify-content: space-between;
     color: rgba(244, 229, 198, 0.72);
@@ -838,7 +975,7 @@
 }
 
 .map-status {
-    margin-top: 22px;
+    margin-top: 8px;
     color: rgba(244, 229, 198, 0.52);
     font-size: 11px;
     -unity-text-align: middle-center;
@@ -881,6 +1018,8 @@
     font-size: 9px;
     letter-spacing: 1px;
     -unity-font-style: bold;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-button--active {
@@ -889,6 +1028,84 @@
     border-color: rgba(255, 180, 93, 0.48);
     border-left-width: 4px;
     border-left-color: var(--glow);
+}
+
+.nav-label {
+    margin-top: 8px;
+    color: rgba(244, 229, 198, 0.58);
+    font-size: 8px;
+    letter-spacing: 0.8px;
+    -unity-font-style: bold;
+}
+
+.nav-button--active .nav-label {
+    color: var(--flour);
+}
+
+.nav-home-icon,
+.nav-craft-icon {
+    width: 35px;
+    height: 32px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.nav-home-roof {
+    position: absolute;
+    top: 3px;
+    width: 24px;
+    height: 24px;
+    rotate: 45deg;
+    background-color: rgba(244, 229, 198, 0.58);
+    border-radius: 3px;
+}
+
+.nav-home-body {
+    width: 29px;
+    height: 20px;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: rgba(244, 229, 198, 0.58);
+    border-radius: 3px;
+}
+
+.nav-home-door {
+    width: 8px;
+    height: 12px;
+    background-color: rgb(67, 43, 37);
+}
+
+.nav-craft-loop {
+    position: absolute;
+    top: 0;
+    width: 25px;
+    height: 25px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 4px;
+    border-bottom-width: 4px;
+    border-color: rgba(244, 229, 198, 0.58);
+    border-radius: 50%;
+}
+
+.nav-craft-handle {
+    width: 7px;
+    height: 18px;
+    margin-right: -21px;
+    margin-bottom: -4px;
+    rotate: -38deg;
+    background-color: rgba(244, 229, 198, 0.58);
+    border-radius: 5px;
+}
+
+.nav-button--active .nav-home-roof,
+.nav-button--active .nav-home-body,
+.nav-button--active .nav-craft-handle {
+    background-color: var(--glow);
+}
+
+.nav-button--active .nav-craft-loop {
+    border-color: var(--glow);
 }
 
 .dock-panel {
@@ -1029,9 +1246,19 @@
     height: 100%;
 }
 
+.recipe-scroll .unity-scroll-view__content-viewport {
+    overflow: hidden;
+}
+
+.recipe-scroll .unity-scroll-view__vertical-scroller,
+.recipe-scroll .unity-scroll-view__horizontal-scroller {
+    display: none;
+}
+
 .recipe-scroll .unity-scroll-view__content-container {
     flex-direction: row;
     align-items: stretch;
+    min-width: 100%;
 }
 
 .home-content--mature .recipe-scroll {
@@ -1059,8 +1286,8 @@
 }
 
 .recipe-placeholder {
-    width: 350px;
-    min-width: 350px;
+    min-width: 300px;
+    flex-grow: 1;
     height: 138px;
     margin-left: 10px;
     padding: 18px 20px;
@@ -1248,6 +1475,37 @@
     justify-content: space-between;
 }
 
+.craft-notebook-badge {
+    width: 94px;
+    height: 31px;
+    margin-right: 12px;
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(244, 229, 198, 0.1);
+    border-width: 1px;
+    border-color: rgba(255, 180, 93, 0.28);
+    border-radius: 5px;
+}
+
+.craft-notebook-spine {
+    width: 8px;
+    height: 100%;
+    margin-right: 7px;
+    background-color: var(--cherry);
+    border-radius: 4px 0 0 4px;
+}
+
+.craft-notebook-label {
+    color: var(--glow);
+    font-size: 7px;
+    letter-spacing: 0.6px;
+    -unity-font-style: bold;
+}
+
+.craft-heading-copy {
+    flex-grow: 1;
+}
+
 .craft-hint {
     margin-top: 3px;
     color: rgba(244, 229, 198, 0.48);
@@ -1274,14 +1532,14 @@
 }
 
 .craft-equation {
-    height: 70px;
+    height: 61px;
     flex-direction: row;
     align-items: center;
 }
 
 .craft-slot {
     width: 110px;
-    height: 58px;
+    height: 50px;
     background-color: rgba(244, 229, 198, 0.08);
     color: rgba(244, 229, 198, 0.38);
     border-width: 2px;
@@ -1311,7 +1569,7 @@
 
 .craft-result {
     flex-grow: 1;
-    height: 62px;
+    height: 54px;
     background-color: var(--cherry);
     color: var(--paper);
     border-width: 0;
@@ -1330,7 +1588,7 @@
 }
 
 .pantry-row {
-    height: 57px;
+    height: 49px;
     flex-direction: row;
 }
 

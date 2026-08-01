@@ -78,6 +78,7 @@ namespace BakaBakeBakery.UI
         private BakeryGameController game;
         private IVisualElementScheduledItem toastSchedule;
         private IngredientId? draggedIngredient;
+        private bool diagnosticsMapVisible;
 
         private void OnEnable()
         {
@@ -135,6 +136,25 @@ namespace BakaBakeBakery.UI
             {
                 Render(game.CurrentSnapshot);
             }
+        }
+
+        public void ShowCraftForDiagnostics()
+        {
+            ShowCraft();
+        }
+
+        public void ShowMarketMapForDiagnostics(float progress = 0.56f)
+        {
+            var normalized = Mathf.Clamp01(progress);
+            diagnosticsMapVisible = true;
+            marketMap?.AddToClassList("market-map--visible");
+            SetWidth(mapRouteFill, normalized);
+            if (bikeMarker != null)
+            {
+                bikeMarker.style.left = Length.Percent(Mathf.Lerp(0f, 91f, normalized));
+            }
+
+            SetText(root?.Q<Label>("map-status"), "Fresh flour, two garden gates, then the market bell.");
         }
 
         public void Render(BakerySnapshot snapshot)
@@ -453,11 +473,14 @@ namespace BakaBakeBakery.UI
 
             var day = game.DayCycle;
             SetText(ledgerDay, $"MORNING {day.DayNumber:00}");
-            marketMap.EnableInClassList("market-map--visible", day.Phase == BakeryDayPhase.TravellingToMarket);
-            SetWidth(mapRouteFill, day.TravelProgress);
-            if (bikeMarker != null)
+            if (!diagnosticsMapVisible)
             {
-                bikeMarker.style.left = Length.Percent(Mathf.Lerp(0f, 91f, day.TravelProgress));
+                marketMap.EnableInClassList("market-map--visible", day.Phase == BakeryDayPhase.TravellingToMarket);
+                SetWidth(mapRouteFill, day.TravelProgress);
+                if (bikeMarker != null)
+                {
+                    bikeMarker.style.left = Length.Percent(Mathf.Lerp(0f, 91f, day.TravelProgress));
+                }
             }
 
             switch (day.Phase)

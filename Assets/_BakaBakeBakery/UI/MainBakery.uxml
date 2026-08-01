@@ -51,7 +51,14 @@
 
         <ui:VisualElement name="market-map" class="market-map blocks-world-input">
             <ui:Label text="THE LITTLE MORNING ROAD" class="map-kicker" />
-            <ui:VisualElement class="map-route"><ui:VisualElement name="map-route-fill" class="map-route-fill" /><ui:VisualElement name="bike-marker" class="bike-marker"><ui:VisualElement class="bike-wheel" /><ui:VisualElement class="bike-frame" /><ui:VisualElement class="bike-wheel" /></ui:VisualElement></ui:VisualElement>
+            <ui:VisualElement class="map-landscape">
+                <ui:VisualElement class="map-hill map-hill--left" /><ui:VisualElement class="map-hill map-hill--right" />
+                <ui:VisualElement class="map-village"><ui:VisualElement class="map-house"><ui:VisualElement class="map-house-roof" /><ui:VisualElement class="map-house-window" /></ui:VisualElement><ui:Label text="HOME" class="map-place-label" /></ui:VisualElement>
+                <ui:VisualElement class="map-tree map-tree--one"><ui:VisualElement class="map-tree-crown" /><ui:VisualElement class="map-tree-trunk" /></ui:VisualElement>
+                <ui:VisualElement class="map-tree map-tree--two"><ui:VisualElement class="map-tree-crown" /><ui:VisualElement class="map-tree-trunk" /></ui:VisualElement>
+                <ui:VisualElement class="map-route"><ui:VisualElement name="map-route-fill" class="map-route-fill" /><ui:VisualElement name="bike-marker" class="bike-marker"><ui:VisualElement class="bike-wheel" /><ui:VisualElement class="bike-frame" /><ui:VisualElement class="bike-wheel" /></ui:VisualElement></ui:VisualElement>
+                <ui:VisualElement class="map-town"><ui:VisualElement class="map-stall-roof" /><ui:VisualElement class="map-stall-body"><ui:VisualElement class="map-stall-crate" /><ui:VisualElement class="map-stall-crate" /></ui:VisualElement><ui:Label text="MARKET" class="map-place-label" /></ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement class="map-labels"><ui:Label text="BAKA-BAKE · VILLAGE" /><ui:Label text="MORNING MARKET · TOWN" /></ui:VisualElement>
             <ui:Label name="map-status" text="Pedalling past the sleeping gardens..." class="map-status" />
         </ui:VisualElement>
@@ -73,8 +80,8 @@
 
         <ui:VisualElement class="bottom-shell blocks-world-input">
             <ui:VisualElement class="nav-rail">
-                <ui:Button name="home-tab" text="HOME" class="nav-button nav-button--active" />
-                <ui:Button name="craft-tab" text="CRAFT" class="nav-button" />
+                <ui:Button name="home-tab" class="nav-button nav-button--active"><ui:VisualElement class="nav-home-icon"><ui:VisualElement class="nav-home-roof" /><ui:VisualElement class="nav-home-body"><ui:VisualElement class="nav-home-door" /></ui:VisualElement></ui:VisualElement><ui:Label text="BAKERY" class="nav-label" /></ui:Button>
+                <ui:Button name="craft-tab" class="nav-button"><ui:VisualElement class="nav-craft-icon"><ui:VisualElement class="nav-craft-loop" /><ui:VisualElement class="nav-craft-handle" /></ui:VisualElement><ui:Label text="TEST KITCHEN" class="nav-label" /></ui:Button>
             </ui:VisualElement>
 
             <ui:VisualElement name="home-panel" class="dock-panel">
@@ -91,7 +98,7 @@
             </ui:VisualElement>
 
             <ui:VisualElement name="craft-panel" class="dock-panel dock-panel--hidden">
-                <ui:VisualElement class="craft-heading"><ui:VisualElement><ui:Label text="MILA'S LITTLE TEST KITCHEN" class="dock-kicker" /><ui:Label name="craft-general-hint" text="Drag 2–4 pantry ingredients. Unknown mixtures cost nothing until you press Discover." class="craft-hint" /><ui:Label name="craft-guide-hint" text="MILA'S CLUE · FLOUR + MILK + CHOCOLATE" class="craft-guide-hint" /></ui:VisualElement><ui:Button name="clear-craft-button" text="CLEAR" class="clear-button" /></ui:VisualElement>
+                <ui:VisualElement class="craft-heading"><ui:VisualElement class="craft-notebook-badge"><ui:VisualElement class="craft-notebook-spine" /><ui:Label text="MILA'S NOTES" class="craft-notebook-label" /></ui:VisualElement><ui:VisualElement class="craft-heading-copy"><ui:Label text="MILA'S LITTLE TEST KITCHEN" class="dock-kicker" /><ui:Label name="craft-general-hint" text="Drag 2–4 pantry ingredients. Unknown mixtures cost nothing until you press Discover." class="craft-hint" /><ui:Label name="craft-guide-hint" text="MILA'S CLUE · FLOUR + MILK + CHOCOLATE" class="craft-guide-hint" /></ui:VisualElement><ui:Button name="clear-craft-button" text="CLEAR" class="clear-button" /></ui:VisualElement>
                 <ui:VisualElement class="craft-equation"><ui:Button name="craft-slot-0" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-1" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-2" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-3" text="DROP" class="craft-slot" /><ui:Label text="=" class="equation-mark equation-mark--equals" /><ui:Button name="craft-result" text="???\nDISCOVER" class="craft-result" /></ui:VisualElement>
                 <ui:VisualElement class="pantry-row"><ui:Button name="ingredient-flour" text="FLOUR\n0" class="ingredient-card ingredient-card--flour" /><ui:Button name="ingredient-milk" text="MILK\n0" class="ingredient-card ingredient-card--milk" /><ui:Button name="ingredient-pastry" text="PUFF PASTRY\n0" class="ingredient-card ingredient-card--pastry" /><ui:Button name="ingredient-jam" text="JAM\n0" class="ingredient-card ingredient-card--jam" /><ui:Button name="ingredient-chocolate" text="CHOCOLATE\n0" class="ingredient-card ingredient-card--chocolate" /></ui:VisualElement>
             </ui:VisualElement>
