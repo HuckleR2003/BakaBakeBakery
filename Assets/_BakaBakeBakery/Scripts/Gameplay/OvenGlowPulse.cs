@@ -10,7 +10,16 @@ namespace BakaBakeBakery.Gameplay
 
         private Light glow;
         private float baseIntensity;
+        private float workingBlend;
         private float phase;
+
+        public void SetWorking(bool working)
+        {
+            workingBlend = Mathf.MoveTowards(
+                workingBlend,
+                working ? 1f : 0f,
+                Time.unscaledDeltaTime * 3.5f);
+        }
 
         private void Awake()
         {
@@ -23,8 +32,9 @@ namespace BakaBakeBakery.Gameplay
         {
             var safeAmplitude = Mathf.Clamp(amplitude, 0f, 0.5f);
             var safeFrequency = Mathf.Max(0.01f, frequency);
-            glow.intensity = baseIntensity * (
-                1f + Mathf.Sin((Time.unscaledTime + phase) * safeFrequency) * safeAmplitude);
+            var restingLevel = Mathf.Lerp(0.14f, 1f, workingBlend);
+            glow.intensity = baseIntensity * restingLevel * (
+                1f + Mathf.Sin((Time.unscaledTime + phase) * safeFrequency) * safeAmplitude * workingBlend);
         }
     }
 }

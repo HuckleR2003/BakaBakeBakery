@@ -376,16 +376,18 @@ namespace BakaBakeBakery.UI
             switch (snapshot.Phase)
             {
                 case BakeryWorkPhase.WaitingForDough:
-                    title = snapshot.CounterStock >= snapshot.CounterCapacity ? "The counter is beautifully full" : "Fetch fresh dough";
+                    title = snapshot.CounterStock >= snapshot.CounterCapacity ? "The counter is beautifully full" : "Prepare a fresh batch";
                     detail = snapshot.CounterStock >= snapshot.CounterCapacity
                         ? "A neighbour is already walking over."
                         : snapshot.ManagerUnlocked ? "Mila will send Jules — or lend a hand now." : "Click Jules in the truck or press Space.";
-                    button = snapshot.CounterStock >= snapshot.CounterCapacity ? "WAIT FOR A CUSTOMER" : "FETCH DOUGH";
+                    button = snapshot.CounterStock >= snapshot.CounterCapacity ? "WAIT FOR A CUSTOMER" : "GATHER INGREDIENTS";
                     progress = 0f;
                     break;
                 case BakeryWorkPhase.FetchingDough:
-                    title = "Crossing to the refrigerator";
-                    detail = "A cool tray, a warm pair of hands.";
+                    title = snapshot.PhaseProgress < 0.4f ? "Gathering the chilled ingredients" : "Working the fresh dough";
+                    detail = snapshot.PhaseProgress < 0.4f
+                        ? "Jules checks the refrigerator before crossing to the prep board."
+                        : "Flour, butter and patient hands become today's raw batch.";
                     button = "JULES IS MOVING";
                     break;
                 case BakeryWorkPhase.WaitingForOven:

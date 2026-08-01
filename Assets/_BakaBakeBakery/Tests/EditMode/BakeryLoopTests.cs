@@ -16,7 +16,7 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(loop.RequestAction(), Is.True);
             Assert.That(loop.RequestAction(), Is.False, "Busy phases must reject click spam.");
 
-            loop.Tick(1f);
+            loop.Tick(2.5f);
             Assert.That(loop.Phase, Is.EqualTo(BakeryWorkPhase.WaitingForOven));
             Assert.That(loop.RequestAction(), Is.True);
 
@@ -26,7 +26,10 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(loop.RequestAction(), Is.True);
 
             loop.Tick(1f);
-            loop.Tick(0.1f);
+            Assert.That(loop.CounterStock, Is.EqualTo(1), "A fresh loaf must remain visible before the customer takes it.");
+            Assert.That(loop.TotalItemsSold, Is.Zero);
+
+            loop.Tick(1.3f);
             Assert.That(loop.TotalItemsSold, Is.EqualTo(1));
             Assert.That(loop.Coins, Is.EqualTo(6));
         }
@@ -90,7 +93,7 @@ namespace BakaBakeBakery.Tests.EditMode
 
             Assert.That(loop.TrySelectRecipe(RecipeId.KaiserRoll), Is.True);
             loop.RequestAction();
-            loop.Tick(1f);
+            loop.Tick(2.5f);
             loop.RequestAction();
             loop.Tick(1f);
             loop.Tick(5f);

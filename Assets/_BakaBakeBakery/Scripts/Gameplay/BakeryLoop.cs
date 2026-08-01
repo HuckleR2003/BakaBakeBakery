@@ -146,11 +146,12 @@ namespace BakaBakeBakery.Gameplay
         public const int WarmthGoal = 12;
         public const float GoldenMinuteDuration = 18f;
 
-        private const float FetchDuration = 0.9f;
+        private const float FetchDuration = 2.4f;
         private const float LoadDuration = 0.78f;
         private const float ServeDuration = 0.82f;
         private const float ManagerActionDelay = 0.72f;
         private const float SaleInterval = 0.58f;
+        private const float FreshCounterDisplayTime = 1.25f;
         private const int MaximumWaitingCustomers = 2;
 
         private readonly Dictionary<RecipeId, BakeryRecipeSpec> recipes = new();
@@ -439,6 +440,7 @@ namespace BakaBakeBakery.Gameplay
             var recipe = recipes[SelectedRecipe];
             StockRecipe = SelectedRecipe;
             CounterStock = Math.Min(CounterCapacity, CounterStock + recipe.BatchYield);
+            saleCooldown = Math.Max(saleCooldown, FreshCounterDisplayTime);
             events.Enqueue(new BakeryLoopEvent(BakeryLoopEventType.BatchCompleted, recipe.Id, recipe.BatchYield));
         }
 

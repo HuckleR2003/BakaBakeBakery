@@ -23,6 +23,7 @@ namespace BakaBakeBakery.Gameplay
 
         [Header("Interaction")]
         [SerializeField] private BakeryWorkerView worker;
+        [SerializeField] private BakeryWorldView worldView;
         [SerializeField] private Camera interactionCamera;
         [SerializeField] private Collider bakerHitTarget;
 
@@ -59,6 +60,8 @@ namespace BakaBakeBakery.Gameplay
 
         public bool IsReady { get; private set; }
         public BakerySnapshot CurrentSnapshot => loop?.Snapshot ?? default;
+        public BakeryWorkerView WorkerView => worker;
+        public BakeryWorldView WorldView => worldView;
 
         private void Start()
         {
@@ -69,6 +72,7 @@ namespace BakaBakeBakery.Gameplay
 
             IsReady = true;
             worker?.Initialize(loop.Snapshot);
+            worldView?.Initialize(loop.Snapshot);
             ApplyWorldState(loop.Snapshot);
             hud?.Bind(this);
         }
@@ -88,6 +92,7 @@ namespace BakaBakeBakery.Gameplay
             TickConversation(deltaTime);
             TickSave(deltaTime);
             ApplyWorldState(loop.Snapshot);
+            worldView?.Render(loop.Snapshot, deltaTime);
             hud?.Render(loop.Snapshot);
         }
 
@@ -233,7 +238,9 @@ namespace BakaBakeBakery.Gameplay
 
             try
             {
-                var progress = BuildSmokeProbe.IsSmokeTest ? new BakeryProgressData() : BakeryProgressStore.Load();
+                var progress = BuildSmokeProbe.IsSmokeTest || BuildSmokeProbe.IsVisualCapture
+                    ? new BakeryProgressData()
+                    : BakeryProgressStore.Load();
                 createdLoop = new BakeryLoop(specs, progress);
                 return true;
             }
@@ -257,6 +264,7 @@ namespace BakaBakeBakery.Gameplay
                         break;
                     case BakeryLoopEventType.SaleCompleted:
                         saveDirty = true;
+                        worldView?.CelebrateSale();
                         OnSaleCompleted(loopEvent);
                         break;
                     case BakeryLoopEventType.CustomerArrived:
@@ -371,17 +379,20 @@ namespace BakaBakeBakery.Gameplay
             SetActive(goldenMinuteLight, snapshot.GoldenMinuteActive);
 
             var showProduct = snapshot.CounterStock > 0;
-            SetActive(countryBreadDisplay, showProduct && snapshot.StockRecipe == RecipeId.CountryBread);
-            SetActive(kaiserRollDisplay, showProduct && snapshot.StockRecipe == RecipeId.KaiserRoll);
-            SetActive(croissantDisplay, showProduct && snapshot.StockRecipe == RecipeId.ButterCroissant);
-            SetActive(cinnamonSwirlDisplay, showProduct && snapshot.StockRecipe == RecipeId.CinnamonSwirl);
-            SetActive(finezjaDisplay, showProduct && snapshot.StockRecipe == RecipeId.Finezja);
-            SetActive(cinnamonMonocleDisplay, showProduct && snapshot.StockRecipe == RecipeId.CinnamonMonocle);
+            if (worldView == null)
+            {
+                SetActive(countryBreadDisplay, showProduct && snapshot.StockRecipe == RecipeId.CountryBread);
+                SetActive(kaiserRollDisplay, showProduct && snapshot.StockRecipe == RecipeId.KaiserRoll);
+                SetActive(croissantDisplay, showProduct && snapshot.StockRecipe == RecipeId.ButterCroissant);
+                SetActive(cinnamonSwirlDisplay, showProduct && snapshot.StockRecipe == RecipeId.CinnamonSwirl);
+                SetActive(finezjaDisplay, showProduct && snapshot.StockRecipe == RecipeId.Finezja);
+                SetActive(cinnamonMonocleDisplay, showProduct && snapshot.StockRecipe == RecipeId.CinnamonMonocle);
+            }
         }
 
         private void TickSave(float deltaTime)
         {
-            if (!saveDirty || BuildSmokeProbe.IsSmokeTest)
+            if (!saveDirty || BuildSmokeProbe.IsSmokeTest || BuildSmokeProbe.IsVisualCapture)
             {
                 return;
             }
@@ -395,7 +406,7 @@ namespace BakaBakeBakery.Gameplay
 
         private void SaveIfNeeded()
         {
-            if (!saveDirty || loop == null || BuildSmokeProbe.IsSmokeTest)
+            if (!saveDirty || loop == null || BuildSmokeProbe.IsSmokeTest || BuildSmokeProbe.IsVisualCapture)
             {
                 return;
             }

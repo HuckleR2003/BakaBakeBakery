@@ -95,12 +95,19 @@ namespace BakaBakeBakery.Core
                 game.RequestBakerAction();
                 yield return new WaitForSecondsRealtime(0.42f);
                 yield return Capture("11-baker-moving.png");
-                yield return WaitForPhase(game, BakeryWorkPhase.WaitingForOven, 3f);
+                yield return new WaitForSecondsRealtime(1.2f);
+                yield return Capture("17-prep-board.png");
+                yield return WaitForPhase(game, BakeryWorkPhase.WaitingForOven, 4f);
                 game.RequestBakerAction();
                 yield return new WaitForSecondsRealtime(2.1f);
                 yield return Capture("12-oven-rhythm.png");
                 yield return WaitForPhase(game, BakeryWorkPhase.WaitingForCounter, 8f);
+                yield return new WaitForSecondsRealtime(0.12f);
+                yield return Capture("16-oven-baked.png");
                 game.RequestBakerAction();
+                yield return WaitForPhase(game, BakeryWorkPhase.WaitingForDough, 2f);
+                yield return new WaitForSecondsRealtime(0.12f);
+                yield return Capture("14-counter-stocked.png");
                 timeout = Time.realtimeSinceStartup + 4f;
                 while (game.CurrentSnapshot.TotalItemsSold < 1 && Time.realtimeSinceStartup < timeout)
                 {
@@ -136,6 +143,16 @@ namespace BakaBakeBakery.Core
                 yield break;
             }
 
+            if (game.WorldView == null
+                || game.WorkerView == null
+                || game.WorldView.VisibleCounterItems != 0
+                || !game.WorldView.RawIngredientsVisible)
+            {
+                Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED initial world state was not an empty, prepared counter.");
+                Application.Quit(1);
+                yield break;
+            }
+
             if (!game.RequestBakerAction())
             {
                 Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED dough action was rejected.");
@@ -143,8 +160,10 @@ namespace BakaBakeBakery.Core
                 yield break;
             }
 
-            yield return WaitForPhase(game, BakeryWorkPhase.WaitingForOven, 3f);
-            if (game.CurrentSnapshot.Phase != BakeryWorkPhase.WaitingForOven || !game.RequestBakerAction())
+            yield return WaitForPhase(game, BakeryWorkPhase.WaitingForOven, 4f);
+            if (game.CurrentSnapshot.Phase != BakeryWorkPhase.WaitingForOven
+                || !game.WorkerView.IsCarryingRaw
+                || !game.RequestBakerAction())
             {
                 Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED oven action was not reached.");
                 Application.Quit(1);
@@ -152,9 +171,20 @@ namespace BakaBakeBakery.Core
             }
 
             yield return WaitForPhase(game, BakeryWorkPhase.WaitingForCounter, 8f);
-            if (game.CurrentSnapshot.Phase != BakeryWorkPhase.WaitingForCounter || !game.RequestBakerAction())
+            if (game.CurrentSnapshot.Phase != BakeryWorkPhase.WaitingForCounter
+                || !game.WorldView.OvenContentsVisible
+                || !game.RequestBakerAction())
             {
                 Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED counter action was not reached.");
+                Application.Quit(1);
+                yield break;
+            }
+
+            yield return WaitForPhase(game, BakeryWorkPhase.WaitingForDough, 2f);
+            yield return null;
+            if (game.CurrentSnapshot.CounterStock < 1 || game.WorldView.VisibleCounterItems < 1)
+            {
+                Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED finished bake never became visible on the counter.");
                 Application.Quit(1);
                 yield break;
             }
