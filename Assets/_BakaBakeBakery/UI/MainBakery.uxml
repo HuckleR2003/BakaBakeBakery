@@ -17,6 +17,7 @@
             </ui:VisualElement>
             <ui:Button name="day-button" text="MORNING 01\nGO TO MARKET" class="day-board" />
             <ui:Button name="ledger-button" text="BAKERY BOOK  [B]" class="ledger-button" />
+            <ui:Button name="guide-button" text="MILA  [?]" class="guide-button" />
         </ui:VisualElement>
 
         <ui:VisualElement class="warmth-card blocks-world-input">
@@ -31,6 +32,21 @@
             <ui:VisualElement name="grandmother-bubble" class="speech-bubble speech-bubble--grandmother"><ui:Label text="MRS. ROSE" class="speaker-name" /><ui:Label name="grandmother-bubble-text" text="Fresh bread, darling?" class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
             <ui:VisualElement name="neighbour-bubble" class="speech-bubble speech-bubble--neighbour"><ui:Label text="THE NEIGHBOUR" class="speaker-name" /><ui:Label name="neighbour-bubble-text" text="Morning!" class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
             <ui:VisualElement name="friend-bubble" class="speech-bubble speech-bubble--friend"><ui:Label text="MILA · YOUR FRIEND" class="speaker-name" /><ui:Label name="friend-bubble-text" text="Ready for our first morning?" class="speech-copy" /><ui:VisualElement class="bubble-tail" /></ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="tutorial-layer" class="tutorial-layer" picking-mode="Ignore">
+            <ui:VisualElement name="tutorial-card" class="tutorial-card blocks-world-input">
+                <ui:VisualElement class="tutorial-heading">
+                    <ui:VisualElement class="mila-portrait"><ui:VisualElement class="mila-hair" /><ui:VisualElement class="mila-face"><ui:VisualElement class="mila-eye mila-eye--left" /><ui:VisualElement class="mila-eye mila-eye--right" /><ui:VisualElement class="mila-smile" /></ui:VisualElement></ui:VisualElement>
+                    <ui:VisualElement class="tutorial-heading-copy"><ui:Label text="MILA · YOUR FRIEND" class="tutorial-speaker" /><ui:Label name="tutorial-progress" text="MORNING NOTES · 1 / 8" class="tutorial-progress" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label name="tutorial-title" text="Zaczniemy bez pośpiechu" class="tutorial-title" />
+                <ui:Label name="tutorial-copy" text="Ta ulica potrafi pokochać małą piekarnię." class="tutorial-copy" />
+                <ui:VisualElement class="tutorial-objective-card"><ui:Label text="OUR NEXT LITTLE STEP" class="tutorial-objective-kicker" /><ui:Label name="tutorial-objective" text="Przygotuj pierwszy poranek." class="tutorial-objective" /></ui:VisualElement>
+                <ui:Label name="tutorial-day-summary" text="MARKET 0 · SALES 0 · PROFIT 0" class="tutorial-day-summary" />
+                <ui:VisualElement class="tutorial-replies"><ui:Button name="tutorial-primary-button" text="JASNE. PROWADŹ." class="tutorial-reply tutorial-reply--primary" /><ui:Button name="tutorial-secondary-button" text="NAJPIERW SIĘ ROZEJRZĘ" class="tutorial-reply tutorial-reply--secondary" /></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="tutorial-ribbon" text="MILA · Przygotuj pierwszy poranek   [OPEN]" class="tutorial-ribbon blocks-world-input" />
         </ui:VisualElement>
 
         <ui:VisualElement name="market-map" class="market-map blocks-world-input">
@@ -69,12 +85,13 @@
                     </ui:VisualElement>
                     <ui:ScrollView name="recipe-scroll" mode="Horizontal" class="recipe-scroll">
                         <ui:Button name="recipe-slot-0" text="COUNTRY BREAD" class="recipe-card recipe-card--selected" /><ui:Button name="recipe-slot-1" text="" class="recipe-card" /><ui:Button name="recipe-slot-2" text="" class="recipe-card" /><ui:Button name="recipe-slot-3" text="" class="recipe-card" /><ui:Button name="recipe-slot-4" text="" class="recipe-card" /><ui:Button name="recipe-slot-5" text="" class="recipe-card" /><ui:Button name="recipe-slot-6" text="" class="recipe-card" /><ui:Button name="recipe-slot-7" text="" class="recipe-card" /><ui:Button name="recipe-slot-8" text="" class="recipe-card" />
+                        <ui:VisualElement name="recipe-placeholder" class="recipe-placeholder"><ui:VisualElement class="recipe-placeholder-whisk"><ui:VisualElement class="whisk-loop" /><ui:VisualElement class="whisk-handle" /></ui:VisualElement><ui:VisualElement><ui:Label text="YOUR RECIPE SHELF" class="recipe-placeholder-title" /><ui:Label text="New discoveries from Mila's test kitchen will be pinned here." class="recipe-placeholder-copy" /></ui:VisualElement></ui:VisualElement>
                     </ui:ScrollView>
                 </ui:VisualElement>
             </ui:VisualElement>
 
             <ui:VisualElement name="craft-panel" class="dock-panel dock-panel--hidden">
-                <ui:VisualElement class="craft-heading"><ui:VisualElement><ui:Label text="MILA'S LITTLE TEST KITCHEN" class="dock-kicker" /><ui:Label text="Drag 2–4 pantry ingredients. Unknown mixtures cost nothing until you press Discover." class="craft-hint" /></ui:VisualElement><ui:Button name="clear-craft-button" text="CLEAR" class="clear-button" /></ui:VisualElement>
+                <ui:VisualElement class="craft-heading"><ui:VisualElement><ui:Label text="MILA'S LITTLE TEST KITCHEN" class="dock-kicker" /><ui:Label name="craft-general-hint" text="Drag 2–4 pantry ingredients. Unknown mixtures cost nothing until you press Discover." class="craft-hint" /><ui:Label name="craft-guide-hint" text="MILA'S CLUE · FLOUR + MILK + CHOCOLATE" class="craft-guide-hint" /></ui:VisualElement><ui:Button name="clear-craft-button" text="CLEAR" class="clear-button" /></ui:VisualElement>
                 <ui:VisualElement class="craft-equation"><ui:Button name="craft-slot-0" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-1" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-2" text="DROP" class="craft-slot" /><ui:Label text="+" class="equation-mark" /><ui:Button name="craft-slot-3" text="DROP" class="craft-slot" /><ui:Label text="=" class="equation-mark equation-mark--equals" /><ui:Button name="craft-result" text="???\nDISCOVER" class="craft-result" /></ui:VisualElement>
                 <ui:VisualElement class="pantry-row"><ui:Button name="ingredient-flour" text="FLOUR\n0" class="ingredient-card ingredient-card--flour" /><ui:Button name="ingredient-milk" text="MILK\n0" class="ingredient-card ingredient-card--milk" /><ui:Button name="ingredient-pastry" text="PUFF PASTRY\n0" class="ingredient-card ingredient-card--pastry" /><ui:Button name="ingredient-jam" text="JAM\n0" class="ingredient-card ingredient-card--jam" /><ui:Button name="ingredient-chocolate" text="CHOCOLATE\n0" class="ingredient-card ingredient-card--chocolate" /></ui:VisualElement>
             </ui:VisualElement>

@@ -29,6 +29,7 @@ namespace BakaBakeBakery.Gameplay
                 : 0f;
             DailyCosts = Math.Max(0, safe.dailyCosts);
             DailyRevenue = Math.Max(0, safe.dailyRevenue);
+            DailyItemsSold = Math.Max(0, safe.dailyItemsSold);
         }
 
         public int DayNumber { get; private set; }
@@ -36,6 +37,7 @@ namespace BakaBakeBakery.Gameplay
         public float RemainingSeconds { get; private set; }
         public int DailyCosts { get; private set; }
         public int DailyRevenue { get; private set; }
+        public int DailyItemsSold { get; private set; }
         public int DailyProfit => DailyRevenue - DailyCosts;
         public float TravelProgress => Phase == BakeryDayPhase.TravellingToMarket
             ? 1f - RemainingSeconds / MarketTripSeconds
@@ -51,6 +53,7 @@ namespace BakaBakeBakery.Gameplay
 
             DailyCosts = cost;
             DailyRevenue = 0;
+            DailyItemsSold = 0;
             RemainingSeconds = MarketTripSeconds;
             Phase = BakeryDayPhase.TravellingToMarket;
             return true;
@@ -90,6 +93,7 @@ namespace BakaBakeBakery.Gameplay
             DayNumber = Math.Min(9999, DayNumber + 1);
             DailyCosts = 0;
             DailyRevenue = 0;
+            DailyItemsSold = 0;
             Phase = BakeryDayPhase.MorningPreparation;
             return true;
         }
@@ -99,6 +103,7 @@ namespace BakaBakeBakery.Gameplay
             if (Phase == BakeryDayPhase.Open && amount > 0)
             {
                 DailyRevenue = Math.Min(1000000000, DailyRevenue + amount);
+                DailyItemsSold = Math.Min(100000000, DailyItemsSold + 1);
             }
         }
 
@@ -138,6 +143,7 @@ namespace BakaBakeBakery.Gameplay
             progress.daySecondsRemaining = RemainingSeconds;
             progress.dailyCosts = DailyCosts;
             progress.dailyRevenue = DailyRevenue;
+            progress.dailyItemsSold = DailyItemsSold;
         }
     }
 }

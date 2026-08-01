@@ -53,7 +53,8 @@ namespace BakaBakeBakery.Gameplay
             safe.daySecondsRemaining = Math.Clamp(safe.daySecondsRemaining, 0f, BakeryDayCycle.DayDurationSeconds);
             safe.dailyCosts = Math.Clamp(safe.dailyCosts, 0, 1000000000);
             safe.dailyRevenue = Math.Clamp(safe.dailyRevenue, 0, 1000000000);
-            safe.tutorialStep = Math.Clamp(safe.tutorialStep, 0, 8);
+            safe.dailyItemsSold = Math.Clamp(safe.dailyItemsSold, 0, 100000000);
+            safe.tutorialStep = Math.Clamp(safe.tutorialStep, 0, BakeryTutorial.FinalStep);
             safe.flour = Math.Clamp(safe.flour, 0, 999);
             safe.milk = Math.Clamp(safe.milk, 0, 999);
             safe.puffPastry = Math.Clamp(safe.puffPastry, 0, 999);

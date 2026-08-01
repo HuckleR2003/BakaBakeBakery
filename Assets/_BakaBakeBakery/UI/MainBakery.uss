@@ -30,8 +30,9 @@
 
 .bakery-mark,
 .metric-strip,
-.milestone-card,
-.ledger-button,
+    .milestone-card,
+    .ledger-button,
+    .guide-button,
 .warmth-card,
 .work-card,
 .recipe-dock,
@@ -160,6 +161,26 @@
     border-radius: 10px;
     letter-spacing: 1px;
     -unity-font-style: bold;
+}
+
+.guide-button {
+    width: 94px;
+    margin-left: 9px;
+    padding: 8px 12px;
+    background-color: rgba(113, 129, 107, 0.96);
+    color: var(--flour);
+    border-radius: 10px;
+    border-bottom-color: rgb(60, 73, 58);
+    font-size: 9px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.guide-button:hover,
+.guide-button:focus {
+    background-color: rgb(132, 149, 123);
+    border-bottom-color: var(--glow);
 }
 
 .day-board {
@@ -329,6 +350,250 @@
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-color: rgba(56, 40, 36, 0.42);
+}
+
+.tutorial-layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.tutorial-card {
+    display: none;
+    position: absolute;
+    top: 112px;
+    right: 24px;
+    width: 414px;
+    min-height: 390px;
+    padding: 20px;
+    background-color: rgba(39, 29, 28, 0.985);
+    color: var(--flour);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 7px;
+    border-color: rgba(244, 229, 198, 0.3);
+    border-left-color: var(--sage);
+    border-left-width: 7px;
+    border-bottom-color: rgb(18, 14, 15);
+    border-radius: 18px;
+}
+
+.tutorial-card--visible {
+    display: flex;
+}
+
+.tutorial-heading {
+    height: 66px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.mila-portrait {
+    width: 58px;
+    height: 58px;
+    margin-right: 13px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: rgb(190, 178, 145);
+    border-width: 3px;
+    border-color: rgba(255, 180, 93, 0.72);
+    border-radius: 99px;
+}
+
+.mila-face {
+    position: absolute;
+    top: 17px;
+    left: 13px;
+    width: 32px;
+    height: 35px;
+    background-color: rgb(224, 174, 139);
+    border-radius: 47% 47% 42% 42%;
+}
+
+.mila-hair {
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    width: 43px;
+    height: 31px;
+    background-color: rgb(83, 51, 38);
+    border-radius: 52% 52% 32% 32%;
+}
+
+.mila-eye {
+    position: absolute;
+    top: 13px;
+    width: 4px;
+    height: 5px;
+    background-color: var(--cocoa);
+    border-radius: 99px;
+}
+
+.mila-eye--left { left: 7px; }
+.mila-eye--right { right: 7px; }
+
+.mila-smile {
+    position: absolute;
+    left: 12px;
+    bottom: 7px;
+    width: 9px;
+    height: 5px;
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(151, 72, 68);
+    border-radius: 99px;
+}
+
+.tutorial-heading-copy {
+    justify-content: center;
+}
+
+.tutorial-speaker {
+    color: var(--glow);
+    font-size: 10px;
+    letter-spacing: 1.6px;
+    -unity-font-style: bold;
+}
+
+.tutorial-progress {
+    margin-top: 5px;
+    color: rgba(244, 229, 198, 0.48);
+    font-size: 8px;
+    letter-spacing: 1.2px;
+}
+
+.tutorial-title {
+    margin-top: 10px;
+    font-size: 21px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.tutorial-copy {
+    margin-top: 10px;
+    color: rgba(244, 229, 198, 0.78);
+    font-size: 12px;
+    line-height: 17px;
+    white-space: normal;
+}
+
+.tutorial-objective-card {
+    margin-top: 15px;
+    padding: 11px 13px;
+    background-color: rgba(113, 129, 107, 0.18);
+    border-left-width: 4px;
+    border-left-color: var(--sage);
+    border-radius: 7px;
+}
+
+.tutorial-objective-kicker {
+    color: rgba(255, 180, 93, 0.82);
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    -unity-font-style: bold;
+}
+
+.tutorial-objective {
+    margin-top: 5px;
+    color: var(--flour);
+    font-size: 11px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.tutorial-day-summary {
+    display: none;
+    margin-top: 10px;
+    padding: 8px 10px;
+    color: var(--glow);
+    background-color: rgba(255, 180, 93, 0.08);
+    border-radius: 6px;
+    font-size: 9px;
+    letter-spacing: 0.7px;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+}
+
+.tutorial-replies {
+    height: 48px;
+    margin-top: 16px;
+    flex-direction: row;
+}
+
+.tutorial-reply {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 7px;
+    padding: 7px 9px;
+    border-radius: 7px;
+    font-size: 9px;
+    letter-spacing: 0.4px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.tutorial-reply--primary {
+    color: var(--cocoa);
+    background-color: var(--glow);
+    border-width: 0;
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(159, 91, 43);
+}
+
+.tutorial-reply--secondary {
+    color: rgba(244, 229, 198, 0.72);
+    background-color: rgba(244, 229, 198, 0.06);
+    border-width: 1px;
+    border-color: rgba(244, 229, 198, 0.25);
+}
+
+.tutorial-reply:hover,
+.tutorial-reply:focus {
+    translate: 0 -2px;
+    border-color: var(--glow);
+}
+
+.tutorial-ribbon {
+    display: none;
+    position: absolute;
+    top: 108px;
+    right: 24px;
+    width: 410px;
+    min-height: 48px;
+    padding: 9px 14px;
+    color: var(--flour);
+    background-color: rgba(39, 29, 28, 0.94);
+    border-left-width: 5px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 4px;
+    border-left-color: var(--sage);
+    border-right-color: rgba(244, 229, 198, 0.2);
+    border-top-color: rgba(244, 229, 198, 0.2);
+    border-bottom-color: rgb(18, 14, 15);
+    border-radius: 10px;
+    font-size: 9px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.tutorial-ribbon--visible {
+    display: flex;
+}
+
+.tutorial-target {
+    scale: 1.04 1.04;
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    border-left-color: var(--glow);
+    border-right-color: var(--glow);
+    border-top-color: var(--glow);
+    transition-property: scale, border-color, background-color;
+    transition-duration: 180ms;
 }
 
 .toast {
@@ -793,6 +1058,68 @@
     display: flex;
 }
 
+.recipe-placeholder {
+    width: 350px;
+    min-width: 350px;
+    height: 138px;
+    margin-left: 10px;
+    padding: 18px 20px;
+    flex-direction: row;
+    align-items: center;
+    color: rgba(244, 229, 198, 0.54);
+    background-color: rgba(244, 229, 198, 0.035);
+    border-width: 1px;
+    border-color: rgba(244, 229, 198, 0.11);
+    border-radius: 10px;
+}
+
+.recipe-placeholder-whisk {
+    width: 45px;
+    height: 72px;
+    margin-right: 16px;
+    rotate: -18deg;
+}
+
+.whisk-loop {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    width: 30px;
+    height: 44px;
+    border-width: 3px;
+    border-color: rgba(244, 229, 198, 0.3);
+    border-radius: 50%;
+}
+
+.whisk-handle {
+    position: absolute;
+    left: 19px;
+    bottom: 0;
+    width: 9px;
+    height: 34px;
+    background-color: rgba(200, 117, 61, 0.6);
+    border-radius: 5px;
+}
+
+.recipe-placeholder-title {
+    color: rgba(255, 180, 93, 0.64);
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    -unity-font-style: bold;
+}
+
+.recipe-placeholder-copy {
+    width: 230px;
+    margin-top: 7px;
+    color: rgba(244, 229, 198, 0.42);
+    font-size: 10px;
+    white-space: normal;
+}
+
+.home-content--mature .recipe-placeholder {
+    height: 82px;
+}
+
 .product-icon {
     width: 48px;
     height: 31px;
@@ -925,6 +1252,15 @@
     margin-top: 3px;
     color: rgba(244, 229, 198, 0.48);
     font-size: 9px;
+}
+
+.craft-guide-hint {
+    display: none;
+    margin-top: 3px;
+    color: var(--glow);
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    -unity-font-style: bold;
 }
 
 .clear-button {

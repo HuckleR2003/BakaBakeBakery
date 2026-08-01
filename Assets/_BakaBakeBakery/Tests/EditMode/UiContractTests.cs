@@ -60,6 +60,14 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(root.Q<VisualElement>("baker-bubble"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("grandmother-bubble"), Is.Not.Null);
             Assert.That(root.Q<VisualElement>("friend-bubble"), Is.Not.Null);
+            Assert.That(root.Q<Button>("guide-button"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("tutorial-card"), Is.Not.Null);
+            Assert.That(root.Q<Button>("tutorial-primary-button"), Is.Not.Null);
+            Assert.That(root.Q<Button>("tutorial-secondary-button"), Is.Not.Null);
+            Assert.That(root.Q<Button>("tutorial-ribbon"), Is.Not.Null);
+            Assert.That(root.Q<Label>("tutorial-day-summary"), Is.Not.Null);
+            Assert.That(root.Q<VisualElement>("recipe-placeholder"), Is.Not.Null);
+            Assert.That(root.Q<Label>("craft-guide-hint"), Is.Not.Null);
         }
 
         private static VisualElement Clone(string fileName)

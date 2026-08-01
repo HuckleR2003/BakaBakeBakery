@@ -33,6 +33,7 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(day.DailyProfit, Is.EqualTo(-BakeryDayCycle.MorningBasketCost));
             day.RecordRevenue(24);
             Assert.That(day.DailyProfit, Is.EqualTo(6));
+            Assert.That(day.DailyItemsSold, Is.EqualTo(1));
         }
 
         [Test]
@@ -48,6 +49,25 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(day.BeginNextMorning(), Is.True);
             Assert.That(day.DayNumber, Is.EqualTo(2));
             Assert.That(day.Phase, Is.EqualTo(BakeryDayPhase.MorningPreparation));
+            Assert.That(day.DailyItemsSold, Is.Zero);
+        }
+
+        [Test]
+        public void DailySalesSurviveSaveAndResume()
+        {
+            var day = new BakeryDayCycle(new BakeryProgressData());
+            day.BeginMarketTrip(false, true, out _);
+            day.Tick(BakeryDayCycle.MarketTripSeconds);
+            day.StartDay();
+            day.RecordRevenue(12);
+            day.RecordRevenue(12);
+            var progress = new BakeryProgressData();
+            day.ExportInto(progress);
+
+            var restored = new BakeryDayCycle(progress);
+
+            Assert.That(restored.DailyRevenue, Is.EqualTo(24));
+            Assert.That(restored.DailyItemsSold, Is.EqualTo(2));
         }
     }
 }

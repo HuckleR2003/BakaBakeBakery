@@ -15,7 +15,14 @@ namespace BakaBakeBakery.Gameplay
         private Transform bicycle;
         private Transform deliveryCar;
         private Transform friend;
+        private Transform friendLeftArm;
+        private Transform friendRightArm;
         private Vector3 friendBase;
+        private Quaternion friendLeftArmBase;
+        private Quaternion friendRightArmBase;
+        private float friendArrivalStartedAt;
+        private bool friendArrivalInitialized;
+        private bool playFriendArrival;
         private float nextWindowChange = 2f;
         private int windowCursor;
 
@@ -32,9 +39,13 @@ namespace BakaBakeBakery.Gameplay
                 else if (item.name == "Morning Bicycle") bicycle = item;
                 else if (item.name == "Old Delivery Car") deliveryCar = item;
                 else if (item.name == "Friend - Mila") friend = item;
+                else if (item.name == "Mila Arm Left") friendLeftArm = item;
+                else if (item.name == "Mila Arm Right") friendRightArm = item;
             }
 
             if (friend != null) friendBase = friend.localPosition;
+            if (friendLeftArm != null) friendLeftArmBase = friendLeftArm.localRotation;
+            if (friendRightArm != null) friendRightArmBase = friendRightArm.localRotation;
         }
 
         private void Update()
@@ -113,8 +124,37 @@ namespace BakaBakeBakery.Gameplay
             if (deliveryCar != null) deliveryCar.gameObject.SetActive(game.CurrentSnapshot.BakeryLevel >= 2 && !travelling);
             if (friend != null)
             {
-                friend.localPosition = friendBase + Vector3.up * (Mathf.Sin(time * 1.6f) * 0.035f);
+                if (!friendArrivalInitialized && game.IsReady)
+                {
+                    friendArrivalInitialized = true;
+                    playFriendArrival = game.TutorialStep == (int)BakeryTutorialStep.Welcome;
+                    friendArrivalStartedAt = time;
+                }
+
+                var arrivalOffset = 0f;
+                if (playFriendArrival)
+                {
+                    var progress = Mathf.Clamp01((time - friendArrivalStartedAt) / 2.4f);
+                    progress = progress * progress * (3f - 2f * progress);
+                    arrivalOffset = Mathf.Lerp(2.8f, 0f, progress);
+                    if (progress >= 1f) playFriendArrival = false;
+                }
+
+                friend.localPosition = friendBase
+                    + Vector3.right * arrivalOffset
+                    + Vector3.up * (Mathf.Sin(time * 1.6f) * 0.035f);
                 friend.localRotation = Quaternion.Euler(0f, 18f + Mathf.Sin(time * 0.43f) * 4f, 0f);
+
+                var greeting = game.TutorialStep <= (int)BakeryTutorialStep.VisitMarket;
+                var armMotion = Mathf.Sin(time * (greeting ? 3.4f : 1.25f)) * (greeting ? 8f : 2.2f);
+                if (friendLeftArm != null)
+                {
+                    friendLeftArm.localRotation = friendLeftArmBase * Quaternion.Euler(0f, 0f, -armMotion * 0.45f);
+                }
+                if (friendRightArm != null)
+                {
+                    friendRightArm.localRotation = friendRightArmBase * Quaternion.Euler(0f, 0f, armMotion);
+                }
             }
         }
     }

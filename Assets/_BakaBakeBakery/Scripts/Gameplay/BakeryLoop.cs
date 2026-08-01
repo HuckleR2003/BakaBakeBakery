@@ -124,7 +124,7 @@ namespace BakaBakeBakery.Gameplay
     [Serializable]
     public sealed class BakeryProgressData
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
 
         public int version = CurrentVersion;
         public int coins;
@@ -140,6 +140,7 @@ namespace BakaBakeBakery.Gameplay
         public float daySecondsRemaining;
         public int dailyCosts;
         public int dailyRevenue;
+        public int dailyItemsSold;
         public int tutorialStep;
         public int flour;
         public int milk;

@@ -83,6 +83,8 @@ namespace BakaBakeBakery.Gameplay
         public BakeryDayCycle DayCycle => dayCycle;
         public IReadOnlyList<RecipeId> RecipeDisplayOrder => DisplayOrder;
         public int TutorialStep => tutorialStep;
+        public bool CanOpenCrafting => IsReady
+            && (dayCycle.DayNumber > 1 || tutorialStep >= (int)BakeryTutorialStep.DiscoverRecipe);
 
         private void Start()
         {
@@ -153,15 +155,62 @@ namespace BakaBakeBakery.Gameplay
             {
                 hud.Bind(this);
                 hud.Render(loop.Snapshot);
-                if (tutorialStep == 0)
-                {
-                    tutorialStep = 1;
-                    hud.ShowDialogue(
-                        BakerySpeaker.Friend,
-                        "Hej! Zanim rozgrzejemy piec, pojedzmy po porzadne skladniki. Dobry poranek zaczyna sie od pelnej spizarni.",
-                        7f);
-                    saveDirty = true;
-                }
+                ShowCurrentTutorial();
+            }
+        }
+
+        public void OpenTutorialGuide()
+        {
+            if (IsReady)
+            {
+                ShowCurrentTutorial(true);
+            }
+        }
+
+        public void ChooseTutorialReply(bool primary)
+        {
+            if (!IsReady)
+            {
+                return;
+            }
+
+            if (!primary)
+            {
+                MinimizeCurrentTutorial();
+                return;
+            }
+
+            switch (BakeryTutorial.Normalize(tutorialStep))
+            {
+                case BakeryTutorialStep.Welcome:
+                    AdvanceTutorial(BakeryTutorialStep.VisitMarket);
+                    break;
+                case BakeryTutorialStep.VisitMarket:
+                    if (!GoToMarket()) ShowCurrentTutorial(true);
+                    break;
+                case BakeryTutorialStep.OnTheRoad:
+                    MinimizeCurrentTutorial();
+                    break;
+                case BakeryTutorialStep.OpenBakery:
+                    if (!StartDay()) ShowCurrentTutorial(true);
+                    break;
+                case BakeryTutorialStep.FirstLoaf:
+                    RequestBakerAction();
+                    MinimizeCurrentTutorial();
+                    break;
+                case BakeryTutorialStep.DiscoverRecipe:
+                    hud?.OpenCraftingForTutorial();
+                    MinimizeCurrentTutorial(BakeryTutorialTarget.CraftResult);
+                    break;
+                case BakeryTutorialStep.CloseFirstDay:
+                    MinimizeCurrentTutorial();
+                    break;
+                case BakeryTutorialStep.DaySummary:
+                    if (!BeginNextMorning()) ShowCurrentTutorial(true);
+                    break;
+                default:
+                    hud?.HideTutorial();
+                    break;
             }
         }
 
@@ -183,6 +232,10 @@ namespace BakaBakeBakery.Gameplay
             {
                 worker?.Pulse();
                 hud?.Render(loop.Snapshot);
+                if (BakeryTutorial.Normalize(tutorialStep) == BakeryTutorialStep.FirstLoaf)
+                {
+                    MinimizeCurrentTutorial();
+                }
             }
             else if (loop.Snapshot.Phase == BakeryWorkPhase.WaitingForDough
                 && loop.Snapshot.CounterStock >= loop.Snapshot.CounterCapacity)
@@ -295,12 +348,8 @@ namespace BakaBakeBakery.Gameplay
             }
 
             crafting.AddMorningBasket();
-            tutorialStep = Math.Max(tutorialStep, 2);
+            AdvanceTutorial(BakeryTutorialStep.OnTheRoad);
             saveDirty = true;
-            hud?.ShowDialogue(
-                BakerySpeaker.Friend,
-                "No dobra, chleb sie sam nie upiecze! Jedz rowerem po skladniki, ja tu poczekam.",
-                6f);
             return true;
         }
 
@@ -311,14 +360,12 @@ namespace BakaBakeBakery.Gameplay
                 return false;
             }
 
-            tutorialStep = Math.Max(tutorialStep, 4);
+            AdvanceTutorial(BakeryTutorialStep.FirstLoaf);
             saveDirty = true;
-            hud?.ShowDialogue(
-                BakerySpeaker.Friend,
-                dayCycle.DayNumber == 1
-                    ? "Wrocilismy. Kliknij Julesa: lodowka, blat, piec i dopiero potem lada. Ja pilnuje pierwszej kolejki."
-                    : "Roleta w gore. Zobaczmy, czym dzis pachnie sasiedztwo.",
-                7f);
+            if (dayCycle.DayNumber > 1)
+            {
+                hud?.ShowDialogue(BakerySpeaker.Friend, "Roleta w górę. Zobaczmy, czym dziś pachnie sąsiedztwo.", 5f);
+            }
             return true;
         }
 
@@ -342,12 +389,8 @@ namespace BakaBakeBakery.Gameplay
             }
 
             loop.CloseShift();
-            tutorialStep = Math.Max(tutorialStep, 7);
+            AdvanceTutorial(BakeryTutorialStep.DaySummary);
             saveDirty = true;
-            hud?.ShowDialogue(
-                BakerySpeaker.Friend,
-                "Dobra robota. Zasun rolete - jutro pozwolimy sobie zaskoczyc ulice czyms nowym.",
-                6f);
             return true;
         }
 
@@ -358,32 +401,30 @@ namespace BakaBakeBakery.Gameplay
                 return false;
             }
 
-            tutorialStep = Math.Max(tutorialStep, 8);
+            AdvanceTutorial(BakeryTutorialStep.Complete);
             saveDirty = true;
             return true;
         }
 
         public bool TryCraft(IReadOnlyList<IngredientId> ingredients)
         {
-            if (!IsReady || !crafting.TryCraft(ingredients, out var result))
+            if (!CanOpenCrafting)
+            {
+                hud?.ShowToast("FIRST LOAF FIRST", "Let Jules finish one honest country loaf before experimenting.");
+                return false;
+            }
+
+            if (!crafting.TryCraft(ingredients, out var result))
             {
                 hud?.ShowToast("NOT QUITE YET", "Try another combination of two to four fresh ingredients.");
                 return false;
             }
 
             loop.UnlockCraftedRecipe(result.Result);
-            tutorialStep = Math.Max(tutorialStep, 6);
+            AdvanceTutorial(BakeryTutorialStep.CloseFirstDay);
             saveDirty = true;
             HandleLoopEvents();
             hud?.ShowToast("RECIPE DISCOVERED", $"{result.DisplayName} is written into tomorrow's bakery book.");
-            if (result.Result == RecipeId.ChocolateMuffin)
-            {
-                hud?.ShowDialogue(
-                    BakerySpeaker.Friend,
-                    "Kurde, no i masz oko! Ale nie rozpedzaj sie dzis. Ujmijmy sasiedztwo cieplym chlebkiem, a jutro ich zaskoczymy!",
-                    8f);
-            }
-
             return true;
         }
 
@@ -423,7 +464,8 @@ namespace BakaBakeBakery.Gameplay
                 createdLoop = new BakeryLoop(specs, progress);
                 dayCycle = new BakeryDayCycle(progress);
                 crafting = new BakeryCraftingSystem(progress);
-                tutorialStep = progress.tutorialStep;
+                tutorialStep = (int)BakeryTutorial.Normalize(progress.tutorialStep);
+                SyncTutorialWithWorld();
                 return true;
             }
             catch (Exception exception)
@@ -442,15 +484,7 @@ namespace BakaBakeBakery.Gameplay
                 {
                     case BakeryLoopEventType.BatchCompleted:
                         worker?.Pulse();
-                        if (tutorialStep < 5)
-                        {
-                            tutorialStep = 5;
-                            saveDirty = true;
-                            hud?.ShowDialogue(
-                                BakerySpeaker.Friend,
-                                "Piekny pierwszy bochenek. Teraz zajrzyj do Pracowni: polacz make, mleko i czekolade, a odkryjemy cos wlasnego.",
-                                8f);
-                        }
+                        AdvanceTutorial(BakeryTutorialStep.DiscoverRecipe);
                         hud?.ShowDialogue(BakerySpeaker.Baker, "Fresh from the oven — easy now.", 2.6f);
                         break;
                     case BakeryLoopEventType.SaleCompleted:
@@ -606,7 +640,7 @@ namespace BakaBakeBakery.Gameplay
             var progress = loop.ExportProgress();
             dayCycle?.ExportInto(progress);
             crafting?.ExportInto(progress);
-            progress.tutorialStep = tutorialStep;
+            progress.tutorialStep = (int)BakeryTutorial.Normalize(tutorialStep);
             BakeryProgressStore.Save(progress);
             saveDirty = false;
             saveTimer = 0f;
@@ -624,16 +658,77 @@ namespace BakaBakeBakery.Gameplay
             saveDirty = true;
             if (prior == BakeryDayPhase.TravellingToMarket && dayCycle.Phase == BakeryDayPhase.ReadyToOpen)
             {
-                tutorialStep = Math.Max(tutorialStep, 3);
                 hud?.ShowToast("PANTRY RESTOCKED", "Flour, milk, pastry, jam and chocolate are safely home.");
-                hud?.ShowDialogue(BakerySpeaker.Friend, "Koszyk pelny. Kiedy jestes gotowy, odwroc tabliczke na Rozpocznij dzien.", 6f);
+                AdvanceTutorial(BakeryTutorialStep.OpenBakery);
             }
             else if (prior == BakeryDayPhase.Open && dayCycle.Phase == BakeryDayPhase.DaySummary)
             {
                 loop.CloseShift();
-                tutorialStep = Math.Max(tutorialStep, 7);
+                AdvanceTutorial(BakeryTutorialStep.DaySummary);
                 hud?.ShowToast("SHIFT COMPLETE", $"Day {dayCycle.DayNumber} closed with {dayCycle.DailyProfit:+#;-#;0} profit.");
             }
+        }
+
+        private void SyncTutorialWithWorld()
+        {
+            if (dayCycle.DayNumber > 1)
+            {
+                tutorialStep = BakeryTutorial.FinalStep;
+                return;
+            }
+
+            var minimumStep = dayCycle.Phase switch
+            {
+                BakeryDayPhase.TravellingToMarket => BakeryTutorialStep.OnTheRoad,
+                BakeryDayPhase.ReadyToOpen => BakeryTutorialStep.OpenBakery,
+                BakeryDayPhase.Open => BakeryTutorialStep.FirstLoaf,
+                BakeryDayPhase.DaySummary => BakeryTutorialStep.DaySummary,
+                _ => BakeryTutorialStep.Welcome
+            };
+            tutorialStep = Math.Max(tutorialStep, (int)minimumStep);
+        }
+
+        private bool AdvanceTutorial(BakeryTutorialStep nextStep)
+        {
+            var safeNext = (int)BakeryTutorial.Normalize((int)nextStep);
+            if (safeNext <= tutorialStep)
+            {
+                return false;
+            }
+
+            tutorialStep = safeNext;
+            saveDirty = true;
+            ShowCurrentTutorial(true);
+            return true;
+        }
+
+        private void ShowCurrentTutorial(bool forceComplete = false)
+        {
+            if (hud == null)
+            {
+                return;
+            }
+
+            var step = BakeryTutorial.Normalize(tutorialStep);
+            if (step == BakeryTutorialStep.Complete && !forceComplete)
+            {
+                hud.HideTutorial();
+                return;
+            }
+
+            hud.ShowTutorial(BakeryTutorial.GetBeat(step), dayCycle);
+        }
+
+        private void MinimizeCurrentTutorial(BakeryTutorialTarget? targetOverride = null)
+        {
+            var step = BakeryTutorial.Normalize(tutorialStep);
+            if (step == BakeryTutorialStep.Complete)
+            {
+                hud?.HideTutorial();
+                return;
+            }
+
+            hud?.MinimizeTutorial(BakeryTutorial.GetBeat(step), targetOverride);
         }
 
         private static void SetActive(GameObject target, bool active)

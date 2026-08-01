@@ -26,6 +26,7 @@ namespace BakaBakeBakery.UI
         private VisualElement craftPanel;
         private VisualElement homeContent;
         private VisualElement nextUnlock;
+        private VisualElement recipePlaceholder;
         private VisualElement marketMap;
         private VisualElement mapRouteFill;
         private VisualElement bikeMarker;
@@ -35,6 +36,8 @@ namespace BakaBakeBakery.UI
         private VisualElement warmthFill;
         private VisualElement goldenChip;
         private VisualElement toast;
+        private VisualElement tutorialCard;
+        private Label tutorialDaySummary;
         private Label coinValue;
         private Label salesValue;
         private Label counterValue;
@@ -53,6 +56,12 @@ namespace BakaBakeBakery.UI
         private Label nextUnlockCopy;
         private Label ledgerDay;
         private Label dragGhostLabel;
+        private Label tutorialTitle;
+        private Label tutorialCopy;
+        private Label tutorialObjective;
+        private Label tutorialProgress;
+        private Label craftGuideHint;
+        private Label craftGeneralHint;
         private Button ledgerButton;
         private Button dayButton;
         private Button actionButton;
@@ -62,6 +71,10 @@ namespace BakaBakeBakery.UI
         private Button craftTab;
         private Button clearCraftButton;
         private Button craftResult;
+        private Button guideButton;
+        private Button tutorialPrimaryButton;
+        private Button tutorialSecondaryButton;
+        private Button tutorialRibbon;
         private BakeryGameController game;
         private IVisualElementScheduledItem toastSchedule;
         private IngredientId? draggedIngredient;
@@ -182,6 +195,65 @@ namespace BakaBakeBakery.UI
                 .StartingIn(Mathf.RoundToInt(Mathf.Max(1.2f, duration) * 1000f));
         }
 
+        public void ShowTutorial(BakeryTutorialBeat beat, BakeryDayCycle day)
+        {
+            if (tutorialCard == null)
+            {
+                return;
+            }
+
+            CloseLedger();
+            tutorialCard.parent?.BringToFront();
+            root?.Q<VisualElement>("friend-bubble")?.RemoveFromClassList("speech-bubble--visible");
+            SetText(tutorialTitle, beat.Title);
+            SetText(tutorialCopy, beat.Copy);
+            SetText(tutorialObjective, beat.Objective);
+            SetText(tutorialProgress, $"MORNING NOTES · {beat.DisplayStage} / {BakeryTutorial.FinalStep}");
+            if (tutorialPrimaryButton != null) tutorialPrimaryButton.text = beat.PrimaryReply.ToUpperInvariant();
+            if (tutorialSecondaryButton != null) tutorialSecondaryButton.text = beat.SecondaryReply.ToUpperInvariant();
+
+            var showSummary = beat.Step == BakeryTutorialStep.DaySummary && day != null;
+            if (tutorialDaySummary != null)
+            {
+                tutorialDaySummary.style.display = showSummary ? DisplayStyle.Flex : DisplayStyle.None;
+                if (showSummary)
+                {
+                    tutorialDaySummary.text = $"MARKET -{day.DailyCosts}  ·  SALES {day.DailyItemsSold} / +{day.DailyRevenue}  ·  PROFIT {day.DailyProfit:+#;-#;0}";
+                }
+            }
+
+            tutorialCard.AddToClassList("tutorial-card--visible");
+            tutorialRibbon?.RemoveFromClassList("tutorial-ribbon--visible");
+            ApplyTutorialTarget(beat.Target);
+            tutorialPrimaryButton?.Focus();
+        }
+
+        public void MinimizeTutorial(BakeryTutorialBeat beat, BakeryTutorialTarget? targetOverride = null)
+        {
+            tutorialCard?.parent?.BringToFront();
+            tutorialCard?.RemoveFromClassList("tutorial-card--visible");
+            if (tutorialRibbon != null)
+            {
+                tutorialRibbon.text = $"MILA · {beat.Objective}   [OPEN]";
+                tutorialRibbon.AddToClassList("tutorial-ribbon--visible");
+            }
+
+            ApplyTutorialTarget(targetOverride ?? beat.Target);
+        }
+
+        public void HideTutorial()
+        {
+            tutorialCard?.RemoveFromClassList("tutorial-card--visible");
+            tutorialRibbon?.RemoveFromClassList("tutorial-ribbon--visible");
+            ApplyTutorialTarget(BakeryTutorialTarget.None);
+        }
+
+        public void OpenCraftingForTutorial()
+        {
+            ShowCraft();
+            ApplyTutorialTarget(BakeryTutorialTarget.CraftResult);
+        }
+
         public void ShowToast(string title, string copy)
         {
             if (toast == null)
@@ -224,6 +296,7 @@ namespace BakaBakeBakery.UI
             craftPanel = root.Q<VisualElement>("craft-panel");
             homeContent = root.Q<VisualElement>("home-content");
             nextUnlock = root.Q<VisualElement>("next-unlock");
+            recipePlaceholder = root.Q<VisualElement>("recipe-placeholder");
             marketMap = root.Q<VisualElement>("market-map");
             mapRouteFill = root.Q<VisualElement>("map-route-fill");
             bikeMarker = root.Q<VisualElement>("bike-marker");
@@ -233,6 +306,8 @@ namespace BakaBakeBakery.UI
             warmthFill = root.Q<VisualElement>("warmth-fill");
             goldenChip = root.Q<VisualElement>("golden-chip");
             toast = root.Q<VisualElement>("toast");
+            tutorialCard = root.Q<VisualElement>("tutorial-card");
+            tutorialDaySummary = root.Q<Label>("tutorial-day-summary");
             coinValue = root.Q<Label>("coin-value");
             salesValue = root.Q<Label>("sales-value");
             counterValue = root.Q<Label>("counter-value");
@@ -251,6 +326,12 @@ namespace BakaBakeBakery.UI
             nextUnlockCopy = root.Q<Label>("next-unlock-copy");
             ledgerDay = root.Q<Label>("ledger-day");
             dragGhostLabel = root.Q<Label>("drag-ghost-label");
+            tutorialTitle = root.Q<Label>("tutorial-title");
+            tutorialCopy = root.Q<Label>("tutorial-copy");
+            tutorialObjective = root.Q<Label>("tutorial-objective");
+            tutorialProgress = root.Q<Label>("tutorial-progress");
+            craftGuideHint = root.Q<Label>("craft-guide-hint");
+            craftGeneralHint = root.Q<Label>("craft-general-hint");
             ledgerButton = root.Q<Button>("ledger-button");
             dayButton = root.Q<Button>("day-button");
             actionButton = root.Q<Button>("action-button");
@@ -260,6 +341,10 @@ namespace BakaBakeBakery.UI
             craftTab = root.Q<Button>("craft-tab");
             clearCraftButton = root.Q<Button>("clear-craft-button");
             craftResult = root.Q<Button>("craft-result");
+            guideButton = root.Q<Button>("guide-button");
+            tutorialPrimaryButton = root.Q<Button>("tutorial-primary-button");
+            tutorialSecondaryButton = root.Q<Button>("tutorial-secondary-button");
+            tutorialRibbon = root.Q<Button>("tutorial-ribbon");
 
             recipeSlotButtons.Clear();
             craftSlotButtons.Clear();
@@ -309,15 +394,19 @@ namespace BakaBakeBakery.UI
                 card.RegisterCallback<PointerCaptureOutEvent>(OnIngredientPointerCaptureOut);
             }
 
-            ledgerButton.clicked += ToggleLedger;
-            dayButton.clicked += OnDayButtonClicked;
-            actionButton.clicked += OnActionClicked;
-            secondOvenButton.clicked += OnSecondOvenClicked;
-            bakeryUpgradeButton.clicked += OnBakeryUpgradeClicked;
-            homeTab.clicked += ShowHome;
-            craftTab.clicked += ShowCraft;
-            clearCraftButton.clicked += ClearCrafting;
-            craftResult.clicked += OnCraftResultClicked;
+            if (ledgerButton != null) ledgerButton.clicked += ToggleLedger;
+            if (dayButton != null) dayButton.clicked += OnDayButtonClicked;
+            if (actionButton != null) actionButton.clicked += OnActionClicked;
+            if (secondOvenButton != null) secondOvenButton.clicked += OnSecondOvenClicked;
+            if (bakeryUpgradeButton != null) bakeryUpgradeButton.clicked += OnBakeryUpgradeClicked;
+            if (homeTab != null) homeTab.clicked += ShowHome;
+            if (craftTab != null) craftTab.clicked += ShowCraft;
+            if (clearCraftButton != null) clearCraftButton.clicked += ClearCrafting;
+            if (craftResult != null) craftResult.clicked += OnCraftResultClicked;
+            if (guideButton != null) guideButton.clicked += OnGuideClicked;
+            if (tutorialPrimaryButton != null) tutorialPrimaryButton.clicked += OnTutorialPrimaryClicked;
+            if (tutorialSecondaryButton != null) tutorialSecondaryButton.clicked += OnTutorialSecondaryClicked;
+            if (tutorialRibbon != null) tutorialRibbon.clicked += OnGuideClicked;
         }
 
         private void UnregisterCallbacks()
@@ -349,6 +438,10 @@ namespace BakaBakeBakery.UI
             if (craftTab != null) craftTab.clicked -= ShowCraft;
             if (clearCraftButton != null) clearCraftButton.clicked -= ClearCrafting;
             if (craftResult != null) craftResult.clicked -= OnCraftResultClicked;
+            if (guideButton != null) guideButton.clicked -= OnGuideClicked;
+            if (tutorialPrimaryButton != null) tutorialPrimaryButton.clicked -= OnTutorialPrimaryClicked;
+            if (tutorialSecondaryButton != null) tutorialSecondaryButton.clicked -= OnTutorialSecondaryClicked;
+            if (tutorialRibbon != null) tutorialRibbon.clicked -= OnGuideClicked;
         }
 
         private void RenderDay()
@@ -546,6 +639,10 @@ namespace BakaBakeBakery.UI
             }
 
             homeContent.EnableInClassList("home-content--mature", visibleIndex >= 3);
+            if (recipePlaceholder != null)
+            {
+                recipePlaceholder.style.display = visibleIndex < 3 ? DisplayStyle.Flex : DisplayStyle.None;
+            }
             nextUnlock.style.display = next.HasValue ? DisplayStyle.Flex : DisplayStyle.None;
             if (next.HasValue)
             {
@@ -810,6 +907,9 @@ namespace BakaBakeBakery.UI
         private void OnActionClicked() => game?.RequestBakerAction();
         private void OnSecondOvenClicked() => game?.TryPurchaseSecondOven();
         private void OnBakeryUpgradeClicked() => game?.TryPurchaseBakeryUpgrade();
+        private void OnGuideClicked() => game?.OpenTutorialGuide();
+        private void OnTutorialPrimaryClicked() => game?.ChooseTutorialReply(true);
+        private void OnTutorialSecondaryClicked() => game?.ChooseTutorialReply(false);
 
         private void ShowHome()
         {
@@ -821,11 +921,47 @@ namespace BakaBakeBakery.UI
 
         private void ShowCraft()
         {
+            if (game != null && !game.CanOpenCrafting)
+            {
+                ShowToast("FIRST LOAF FIRST", "Mila will open the test kitchen after one warm bake reaches the counter.");
+                game.OpenTutorialGuide();
+                return;
+            }
+
             craftPanel.RemoveFromClassList("dock-panel--hidden");
             homePanel.AddToClassList("dock-panel--hidden");
             craftTab.AddToClassList("nav-button--active");
             homeTab.RemoveFromClassList("nav-button--active");
             RenderCrafting();
+            if (craftGuideHint != null)
+            {
+                var showGuideClue = game != null
+                    && game.TutorialStep == (int)BakeryTutorialStep.DiscoverRecipe
+                    && !game.IsRecipeUnlocked(RecipeId.ChocolateMuffin);
+                craftGuideHint.style.display = showGuideClue ? DisplayStyle.Flex : DisplayStyle.None;
+                if (craftGeneralHint != null)
+                {
+                    craftGeneralHint.style.display = showGuideClue ? DisplayStyle.None : DisplayStyle.Flex;
+                }
+            }
+        }
+
+        private void ApplyTutorialTarget(BakeryTutorialTarget target)
+        {
+            dayButton?.RemoveFromClassList("tutorial-target");
+            actionButton?.RemoveFromClassList("tutorial-target");
+            craftTab?.RemoveFromClassList("tutorial-target");
+            craftResult?.RemoveFromClassList("tutorial-target");
+
+            var element = target switch
+            {
+                BakeryTutorialTarget.DayBoard => dayButton,
+                BakeryTutorialTarget.BakerAction => actionButton,
+                BakeryTutorialTarget.CraftTab => craftTab,
+                BakeryTutorialTarget.CraftResult => craftResult,
+                _ => null
+            };
+            element?.AddToClassList("tutorial-target");
         }
 
         private void ToggleLedger() => ledger?.ToggleInClassList("ledger--closed");
