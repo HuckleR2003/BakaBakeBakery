@@ -10,6 +10,9 @@ namespace BakaBakeBakery.Gameplay
         [SerializeField] private Transform serviceStation;
         [SerializeField] private Transform queueStation;
         [SerializeField] private Transform exitStation;
+        [SerializeField] private Transform postPurchaseStation;
+        [SerializeField] private Transform farExitStation;
+        [SerializeField] private bool eatsPurchase;
         [SerializeField] private Transform leftLeg;
         [SerializeField] private Transform rightLeg;
         [SerializeField] private Transform leftArm;
@@ -23,12 +26,27 @@ namespace BakaBakeBakery.Gameplay
         private Vector3 visualBasePosition;
         private Vector3 targetPosition;
         private float leavePause;
+        private float eatingRemaining;
         private int queueIndex = -1;
         private bool initialized;
         private bool leaving;
+        private DepartureStage departureStage;
+        private Vector3 parcelBasePosition;
+
+        private enum DepartureStage
+        {
+            None,
+            HeadingToPark,
+            Eating,
+            Exiting
+        }
 
         public int QueueIndex => queueIndex;
         public bool IsLeaving => leaving;
+        public bool BlocksService => leaving
+            && departureStage == DepartureStage.HeadingToPark
+            && serviceStation != null
+            && Vector3.SqrMagnitude(transform.localPosition - serviceStation.localPosition) < 2.25f;
 
         public void Initialize()
         {
@@ -44,6 +62,7 @@ namespace BakaBakeBakery.Gameplay
             rightLegBase = rightLeg != null ? rightLeg.localRotation : Quaternion.identity;
             leftArmBase = leftArm != null ? leftArm.localRotation : Quaternion.identity;
             rightArmBase = rightArm != null ? rightArm.localRotation : Quaternion.identity;
+            parcelBasePosition = purchaseParcel != null ? purchaseParcel.transform.localPosition : Vector3.zero;
             SetParcel(false);
             if (visualRoot != null)
             {
@@ -86,7 +105,12 @@ namespace BakaBakeBakery.Gameplay
             queueIndex = -1;
             leaving = true;
             leavePause = 0.38f;
-            targetPosition = exitStation.localPosition;
+            departureStage = postPurchaseStation != null
+                ? DepartureStage.HeadingToPark
+                : DepartureStage.Exiting;
+            targetPosition = postPurchaseStation != null
+                ? postPurchaseStation.localPosition
+                : exitStation.localPosition;
             SetParcel(true);
         }
 
@@ -101,6 +125,31 @@ namespace BakaBakeBakery.Gameplay
             if (leavePause > 0f)
             {
                 leavePause = Mathf.Max(0f, leavePause - deltaTime);
+            }
+
+            if (departureStage == DepartureStage.Eating)
+            {
+                eatingRemaining = Mathf.Max(0f, eatingRemaining - deltaTime);
+                var bite = Mathf.SmoothStep(0f, 1f, Mathf.PingPong((3.4f - eatingRemaining) * 1.35f, 1f));
+                ApplySwing(leftArm, leftArmBase, -18f);
+                ApplySwing(rightArm, rightArmBase, -18f - bite * 48f);
+                if (purchaseParcel != null)
+                {
+                    purchaseParcel.transform.localPosition = Vector3.Lerp(
+                        parcelBasePosition,
+                        new Vector3(0.18f, 1.48f, -0.48f),
+                        bite * 0.72f);
+                }
+
+                visualRoot.localPosition = visualBasePosition + Vector3.up * (Mathf.Sin(Time.unscaledTime * 2f) * 0.012f);
+                if (eatingRemaining <= 0f)
+                {
+                    departureStage = DepartureStage.Exiting;
+                    targetPosition = farExitStation != null ? farExitStation.localPosition : exitStation.localPosition;
+                    if (purchaseParcel != null) purchaseParcel.transform.localPosition = parcelBasePosition;
+                }
+
+                return;
             }
 
             var before = transform.localPosition;
@@ -119,6 +168,11 @@ namespace BakaBakeBakery.Gameplay
             ApplySwing(rightLeg, rightLegBase, -walkWave * 20f);
             ApplySwing(leftArm, leftArmBase, -walkWave * 11f);
             ApplySwing(rightArm, rightArmBase, walkWave * 11f);
+            if (leaving && !walking)
+            {
+                ApplySwing(leftArm, leftArmBase, -18f);
+                ApplySwing(rightArm, rightArmBase, -22f);
+            }
 
             if (walking)
             {
@@ -129,12 +183,27 @@ namespace BakaBakeBakery.Gameplay
                     1f - Mathf.Exp(-deltaTime * 8f));
             }
 
-            if (Vector3.SqrMagnitude(transform.localPosition - targetPosition) <= 0.0025f
-                && queueIndex < 0)
+            if (leaving && Vector3.SqrMagnitude(transform.localPosition - targetPosition) <= 0.0025f)
             {
-                leaving = false;
-                SetParcel(false);
-                visualRoot.gameObject.SetActive(false);
+                if (departureStage == DepartureStage.HeadingToPark && eatsPurchase)
+                {
+                    departureStage = DepartureStage.Eating;
+                    eatingRemaining = 3.4f;
+                }
+                else if (departureStage == DepartureStage.HeadingToPark)
+                {
+                    departureStage = DepartureStage.Exiting;
+                    targetPosition = farExitStation != null ? farExitStation.localPosition : exitStation.localPosition;
+                }
+                else if (departureStage == DepartureStage.Exiting)
+                {
+                    leaving = false;
+                    departureStage = DepartureStage.None;
+                    SetParcel(false);
+                    visualRoot.gameObject.SetActive(false);
+                    transform.localPosition = entranceStation.localPosition;
+                    targetPosition = transform.localPosition;
+                }
             }
         }
 
@@ -143,6 +212,7 @@ namespace BakaBakeBakery.Gameplay
             if (purchaseParcel != null)
             {
                 purchaseParcel.SetActive(visible);
+                purchaseParcel.transform.localPosition = parcelBasePosition;
             }
         }
 

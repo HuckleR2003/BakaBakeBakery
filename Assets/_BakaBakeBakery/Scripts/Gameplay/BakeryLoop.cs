@@ -160,7 +160,7 @@ namespace BakaBakeBakery.Gameplay
         public const float GoldenMinuteDuration = 18f;
 
         private const float FetchDuration = 2.4f;
-        private const float LoadDuration = 0.78f;
+        private const float LoadDuration = 2.15f;
         private const float ServeDuration = 0.82f;
         private const float ManagerActionDelay = 0.72f;
         private const float SaleInterval = 0.58f;

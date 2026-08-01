@@ -20,7 +20,7 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(loop.Phase, Is.EqualTo(BakeryWorkPhase.WaitingForOven));
             Assert.That(loop.RequestAction(), Is.True);
 
-            loop.Tick(1f);
+            loop.Tick(2.2f);
             loop.Tick(4.1f);
             Assert.That(loop.Phase, Is.EqualTo(BakeryWorkPhase.WaitingForCounter));
             Assert.That(loop.RequestAction(), Is.True);
@@ -95,7 +95,7 @@ namespace BakaBakeBakery.Tests.EditMode
             loop.RequestAction();
             loop.Tick(2.5f);
             loop.RequestAction();
-            loop.Tick(1f);
+            loop.Tick(2.2f);
             loop.Tick(5f);
             loop.Tick(1.1f);
             loop.RequestAction();

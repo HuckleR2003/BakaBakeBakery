@@ -158,7 +158,7 @@ namespace BakaBakeBakery.Gameplay
                 && snapshot.PhaseProgress > 0.1f
                 && snapshot.PhaseProgress < 0.46f;
             var ovenOpen = (snapshot.Phase == BakeryWorkPhase.LoadingOven
-                    && snapshot.PhaseProgress > 0.18f)
+                    && snapshot.PhaseProgress > 0.58f)
                 || (snapshot.Phase == BakeryWorkPhase.Serving
                     && snapshot.PhaseProgress < 0.76f);
 
@@ -216,7 +216,7 @@ namespace BakaBakeBakery.Gameplay
             var counterBlockedByDeparture = false;
             foreach (var customer in customers)
             {
-                counterBlockedByDeparture |= customer != null && customer.IsLeaving;
+                counterBlockedByDeparture |= customer != null && customer.BlocksService;
             }
 
             for (var queueOffset = 0; queueOffset < waitingCount; queueOffset++)
@@ -305,7 +305,7 @@ namespace BakaBakeBakery.Gameplay
                     ? BakeryIngredientStage.MiseEnPlace
                     : BakeryIngredientStage.CarriedRaw,
                 BakeryWorkPhase.WaitingForOven => BakeryIngredientStage.CarriedRaw,
-                BakeryWorkPhase.LoadingOven => snapshot.PhaseProgress < 0.72f
+                BakeryWorkPhase.LoadingOven => snapshot.PhaseProgress < 0.91f
                     ? BakeryIngredientStage.CarriedRaw
                     : BakeryIngredientStage.InOvenRaw,
                 BakeryWorkPhase.Baking => snapshot.PhaseProgress < 0.72f
