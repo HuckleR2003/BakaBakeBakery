@@ -44,7 +44,7 @@ namespace BakaBakeBakery.Tests.EditMode
         {
             var root = Clone("MainBakery.uxml");
 
-            Assert.That(root.Query<Button>(className: "recipe-card").ToList(), Has.Count.EqualTo(9));
+            Assert.That(root.Query<Button>(className: "recipe-card").ToList(), Has.Count.EqualTo(14));
             Assert.That(root.Q<Button>("home-tab"), Is.Not.Null);
             Assert.That(root.Q<Button>("craft-tab"), Is.Not.Null);
             Assert.That(root.Q<Button>("craft-result"), Is.Not.Null);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using BakaBakeBakery.Data;
 using BakaBakeBakery.Gameplay;
 using NUnit.Framework;
@@ -51,6 +52,27 @@ namespace BakaBakeBakery.Tests.EditMode
             Assert.That(empty.TryCraft(
                 new[] { IngredientId.Flour, IngredientId.Milk, IngredientId.Jam, IngredientId.Chocolate, IngredientId.PuffPastry },
                 out _), Is.False);
+        }
+
+        [Test]
+        public void WorldSweetRecipesAreUniqueAndOrderIndependent()
+        {
+            Assert.That(BakeryCraftingSystem.Recipes.Count, Is.EqualTo(8));
+
+            var pastel = new[] { IngredientId.Milk, IngredientId.PuffPastry, IngredientId.Milk };
+            Assert.That(BakeryCraftingSystem.TryFindRecipe(pastel, out var pastelRecipe), Is.True);
+            Assert.That(pastelRecipe.Result, Is.EqualTo(RecipeId.PastelDeNata));
+
+            var brownie = new[] { IngredientId.Chocolate, IngredientId.Flour, IngredientId.Chocolate };
+            Assert.That(BakeryCraftingSystem.TryFindRecipe(brownie, out var brownieRecipe), Is.True);
+            Assert.That(brownieRecipe.Result, Is.EqualTo(RecipeId.FudgeBrownie));
+
+            var signatures = new HashSet<string>();
+            foreach (var recipe in BakeryCraftingSystem.Recipes)
+            {
+                var signature = string.Join(",", recipe.Ingredients.OrderBy(value => value));
+                Assert.That(signatures.Add(signature), Is.True, $"Duplicate crafting signature for {recipe.DisplayName}");
+            }
         }
     }
 }

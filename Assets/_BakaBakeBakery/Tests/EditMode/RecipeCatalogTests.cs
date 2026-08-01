@@ -10,12 +10,12 @@ namespace BakaBakeBakery.Tests.EditMode
         private const string CatalogPath = "Assets/_BakaBakeBakery/Data/BakeryCatalog.asset";
 
         [Test]
-        public void FoundationCatalogContainsNineUniqueRecipes()
+        public void FoundationCatalogContainsEveryUniqueRecipe()
         {
             var catalog = AssetDatabase.LoadAssetAtPath<BakeryCatalog>(CatalogPath);
 
             Assert.That(catalog, Is.Not.Null);
-            Assert.That(catalog.Recipes, Has.Count.EqualTo(9));
+            Assert.That(catalog.Recipes, Has.Count.EqualTo(System.Enum.GetValues(typeof(RecipeId)).Length));
 
             var identifiers = new HashSet<RecipeId>();
             foreach (var recipe in catalog.Recipes)
