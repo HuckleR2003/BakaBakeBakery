@@ -90,8 +90,84 @@ namespace BakaBakeBakery.UI
             }
 
             QueryElements();
+            MakeDecorationTransparentToClicks();
             ApplyPortraits();
             RegisterCallbacks();
+        }
+
+        /// <summary>
+        /// Speech bubbles, toasts and the drag ghost are decoration drawn over the whole screen.
+        /// They sit after the top row in document order, so with the default picking mode they
+        /// silently swallowed every click aimed at the day sign, the bakery book and the guide.
+        /// Nothing in these layers is interactive, so nothing in them may take a pointer.
+        /// </summary>
+        private void MakeDecorationTransparentToClicks()
+        {
+            IgnorePointer(root?.Q<VisualElement>(className: "speech-layer"));
+            IgnorePointer(root?.Q<VisualElement>(className: "tutorial-layer"));
+            IgnorePointer(toast);
+            IgnorePointer(dragGhost);
+
+            // The tutorial card and its ribbon are the only interactive parts of that layer.
+            RestorePointer(tutorialCard);
+            RestorePointer(tutorialRibbon);
+        }
+
+        private static void IgnorePointer(VisualElement element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            element.pickingMode = PickingMode.Ignore;
+            foreach (var child in element.Query<VisualElement>().Build())
+            {
+                child.pickingMode = PickingMode.Ignore;
+            }
+        }
+
+        private static void RestorePointer(VisualElement element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            element.pickingMode = PickingMode.Position;
+            foreach (var child in element.Query<VisualElement>().Build())
+            {
+                child.pickingMode = PickingMode.Position;
+            }
+        }
+
+        /// <summary>Which element actually receives a click at this panel point. Used by the smoke run.</summary>
+        public string PickedElementNameAt(Vector2 panelPosition)
+        {
+            var picked = root?.panel?.Pick(panelPosition);
+            for (var current = picked; current != null; current = current.parent)
+            {
+                if (!string.IsNullOrEmpty(current.name))
+                {
+                    return current.name;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>Centre of a named control in panel space, so a test can aim a click at it.</summary>
+        public bool TryGetControlCentre(string elementName, out Vector2 panelPosition)
+        {
+            var element = root?.Q<VisualElement>(elementName);
+            if (element == null || element.resolvedStyle.display == DisplayStyle.None)
+            {
+                panelPosition = default;
+                return false;
+            }
+
+            panelPosition = element.worldBound.center;
+            return panelPosition.x > 0f && panelPosition.y > 0f;
         }
 
         private void Start()

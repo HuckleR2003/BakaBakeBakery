@@ -312,6 +312,36 @@ namespace BakaBakeBakery.Core
                 yield break;
             }
 
+            // The day sign, the bakery book and the guide live under a full screen decoration layer.
+            // If anything in that layer takes the pointer the player is stuck on the first morning
+            // with no way to reach the market, so every top-row control is pick-tested here.
+            var hudController = FindAnyObjectByType<BakeryHudController>();
+            if (hudController == null)
+            {
+                Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED the bakery HUD was missing.");
+                Application.Quit(1);
+                yield break;
+            }
+
+            yield return null;
+            foreach (var controlName in new[] { "day-button", "ledger-button", "guide-button", "action-button" })
+            {
+                if (!hudController.TryGetControlCentre(controlName, out var centre))
+                {
+                    Debug.LogError($"[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED '{controlName}' was not laid out.");
+                    Application.Quit(1);
+                    yield break;
+                }
+
+                var picked = hudController.PickedElementNameAt(centre);
+                if (picked != controlName)
+                {
+                    Debug.LogError($"[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED a click on '{controlName}' is swallowed by '{picked}'.");
+                    Application.Quit(1);
+                    yield break;
+                }
+            }
+
             var parkActors = FindObjectsByType<BakeryParkActor>();
             if (parkActors.Length < 5 || Array.Exists(parkActors, actor => actor == null || !actor.IsConfigured))
             {
