@@ -6,7 +6,7 @@ Start with a food truck, bake the first loaves by hand, train a manager, expand 
 
 ## Current status
 
-The project contains a playable `0.6.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, then customer parcel. Mila arrives on the first morning with a clickable, event-driven guide and later automates the same guarded command loop.
+The project contains a playable `0.7.0` vertical slice. The first ten Country Bread sales use a deliberate physical rhythm: pantry, preparation board, oven, counter, then customer parcel. Mila arrives on the first morning with a clickable, event-driven guide and later automates the same guarded command loop.
 
 The current build includes:
 
@@ -17,9 +17,11 @@ The current build includes:
 - Mila's four-slot discovery workbench with draggable flour, milk, puff pastry, jam, and chocolate;
 - a focused product journey that shows only available bakes and one meaningful locked target at a time;
 - a state-driven physical production story: ingredients, raw batch, oven contents, carried bake, counter stock, and customer parcel;
+- Jules's articulated shoulder–elbow–forearm–hand rig, including a two-handed tray grip, oven-handle reach, loading gesture, and visible carried recipe;
 - a neighbourhood Warmth meter and temporary double-income Golden Minutes;
 - walking customers and translucent conversations for Jules, Mrs. Rose, a returning neighbour, and Mila;
-- a three-second illustrated road to market, food-truck bicycle, bakery delivery car, living house windows, chimney smoke, flour motes, oven steam, and a closing service shutter;
+- a park path running into the diorama, sideways benches, swaying trees, looping walkers, post-purchase snacks, a distant road with traffic, lit house windows and chimney smoke;
+- a three-second illustrated road to market, food-truck bicycle, bakery delivery car, flour motes, oven steam, and a closing service shutter;
 - the animated black HCK Labs ident, Main Menu, comfort settings, and responsive bakery HUD.
 
 ## Project setup

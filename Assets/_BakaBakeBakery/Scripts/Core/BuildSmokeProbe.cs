@@ -92,14 +92,20 @@ namespace BakaBakeBakery.Core
 
                 yield return new WaitForSecondsRealtime(1.15f);
                 yield return Capture("10-gameplay-home.png");
+                game.ChooseTutorialReply(false);
+                yield return new WaitForSecondsRealtime(0.22f);
                 game.RequestBakerAction();
                 yield return new WaitForSecondsRealtime(0.42f);
                 yield return Capture("11-baker-moving.png");
                 yield return new WaitForSecondsRealtime(1.2f);
                 yield return Capture("17-prep-board.png");
                 yield return WaitForPhase(game, BakeryWorkPhase.WaitingForOven, 4f);
+                yield return new WaitForSecondsRealtime(0.15f);
+                yield return Capture("18-two-hand-carry.png");
                 game.RequestBakerAction();
-                yield return new WaitForSecondsRealtime(2.1f);
+                yield return new WaitForSecondsRealtime(1.38f);
+                yield return Capture("19-oven-handle.png");
+                yield return new WaitForSecondsRealtime(1.04f);
                 yield return Capture("12-oven-rhythm.png");
                 yield return WaitForPhase(game, BakeryWorkPhase.WaitingForCounter, 8f);
                 yield return new WaitForSecondsRealtime(0.12f);
@@ -116,6 +122,15 @@ namespace BakaBakeBakery.Core
 
                 yield return new WaitForSecondsRealtime(0.35f);
                 yield return Capture("13-first-sale.png");
+                var hud = FindAnyObjectByType<BakeryHudController>();
+                hud?.ShowCraftForDiagnostics();
+                yield return new WaitForSecondsRealtime(0.2f);
+                yield return Capture("20-test-kitchen.png");
+                game.ChooseTutorialReply(false);
+                yield return new WaitForSecondsRealtime(0.06f);
+                hud?.ShowMarketMapForDiagnostics();
+                yield return new WaitForSecondsRealtime(0.2f);
+                yield return Capture("21-market-map.png");
                 yield return new WaitForSecondsRealtime(0.2f);
                 Application.Quit(game.CurrentSnapshot.TotalItemsSold >= 1 ? 0 : 1);
             }
@@ -145,10 +160,19 @@ namespace BakaBakeBakery.Core
 
             if (game.WorldView == null
                 || game.WorkerView == null
+                || !game.WorkerView.NaturalHandRigReady
                 || game.WorldView.VisibleCounterItems != 0
                 || !game.WorldView.RawIngredientsVisible)
             {
                 Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED initial world state was not an empty, prepared counter.");
+                Application.Quit(1);
+                yield break;
+            }
+
+            var parkActors = FindObjectsByType<BakeryParkActor>();
+            if (parkActors.Length < 5 || Array.Exists(parkActors, actor => actor == null || !actor.IsConfigured))
+            {
+                Debug.LogError("[Baka Bake Bakery] GAMEPLAY_SMOKE_FAILED living park actors were missing or incomplete.");
                 Application.Quit(1);
                 yield break;
             }

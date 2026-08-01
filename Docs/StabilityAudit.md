@@ -10,6 +10,8 @@ This audit covers the playable vertical slice: production, customers, days, craf
 - A completed batch receives a protected display interval before a sale can consume it.
 - Raw ingredients, carried dough, raw oven contents, baked oven contents, carried bakes, and counter servings are mutually exclusive state-driven displays.
 - Customer actors retain queue order and leave with a visible purchase. Arrivals are capped at two; a sale requires both stock and a waiting customer.
+- A departing customer blocks the service point only while physically beside it; a later park walk and eating loop cannot stall the next sale.
+- Jules's carried recipe is attached to a shared two-hand anchor. The Windows smoke run rejects an incomplete hand rig or missing park pedestrian and traffic actors.
 - Invalid, infinite, negative, or abnormally large frame deltas are ignored or capped before reaching production and day timers.
 - Day transitions are one-way: preparation, travel, ready, open, summary. Repeated input cannot skip or rewind a phase.
 - Early close waits for the active batch to reach its resting station. A timed close cancels unfinished movement and clears the customer queue, so tomorrow never resumes yesterday's gesture.
@@ -34,13 +36,14 @@ This audit covers the playable vertical slice: production, customers, days, craf
 | Days | Three-second trip, exact morning cost, five-minute shift, negative opening profit, revenue, early close, and next morning. |
 | Persistence | Sanitisation and round-trip restoration of purchases, selection, discoveries, pantry, tutorial, and day state. |
 | UI contracts | Intro fragments, navigation, four crafting slots, pantry, market map, friend bubble, upgrades, and nine dynamic product slots. |
+| Living diorama | Five configured ambient actors, deep park path, traffic loop, customer snack route, two-hand carry anchor, and oven reach. |
 | Player journey | Studio ident, Main Menu, Main Bakery, and the first complete loaf-and-sale path in the built player. |
 
 ## Latest verified run — 2026-08-01
 
-- EditMode tests: **32 passed, 0 failed, 0 skipped**.
+- EditMode tests: **39 passed, 0 failed, 0 skipped**.
 - Windows x86_64 player: **Build Finished, Result: Success**.
-- Runtime smoke expects `GAMEPLAY_SMOKE_READY first manual loaf completed and sold`; it also rejects missing ingredients, invisible oven contents, or a batch that never appears on the counter.
+- Runtime smoke expects `GAMEPLAY_SMOKE_READY first manual loaf completed and sold`; it also rejects missing ingredients, an incomplete natural-hand rig, missing park actors, invisible oven contents, or a batch that never appears on the counter.
 - The visual-foundation frame was regenerated. Existing runtime captures remain regression baselines; the current player journey is verified by the full smoke run.
 
 ## Remaining production boundaries
