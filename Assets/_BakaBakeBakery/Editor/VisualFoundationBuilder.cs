@@ -51,6 +51,8 @@ namespace BakaBakeBakery.Editor
             public Material Skin;
             public Material Cloth;
             public Material White;
+            public Material Grass;
+            public Material Road;
         }
 
         private sealed class WorldReferences
@@ -166,7 +168,9 @@ namespace BakaBakeBakery.Editor
                 Hair = GetOrCreateMaterial("M_Hair", Hex("5A3528"), 0f, 0.24f),
                 Skin = GetOrCreateMaterial("M_Skin", Hex("E5B18B"), 0f, 0.3f),
                 Cloth = GetOrCreateMaterial("M_Cloth", Hex("D9C8A8"), 0f, 0.08f),
-                White = GetOrCreateMaterial("M_SoftWhite", Hex("F7F0E5"), 0f, 0.18f)
+                White = GetOrCreateMaterial("M_SoftWhite", Hex("F7F0E5"), 0f, 0.18f),
+                Grass = GetOrCreateMaterial("M_ParkGrass", Hex("426653"), 0f, 0.12f),
+                Road = GetOrCreateMaterial("M_DistantRoad", Hex("343A43"), 0.04f, 0.18f)
             };
         }
 
@@ -431,7 +435,7 @@ namespace BakaBakeBakery.Editor
         {
             PlayerSettings.companyName = "HCK Labs";
             PlayerSettings.productName = "Baka Bake Bakery";
-            PlayerSettings.bundleVersion = "0.6.0";
+            PlayerSettings.bundleVersion = "0.7.0";
             PlayerSettings.defaultScreenWidth = 1600;
             PlayerSettings.defaultScreenHeight = 900;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
@@ -471,8 +475,8 @@ namespace BakaBakeBakery.Editor
             RenderSettings.fog = true;
             RenderSettings.fogColor = Hex("1D2C43");
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogStartDistance = 18f;
-            RenderSettings.fogEndDistance = 36f;
+            RenderSettings.fogStartDistance = 29f;
+            RenderSettings.fogEndDistance = 62f;
 
             var root = new GameObject("MainBakery");
             root.AddComponent<BuildSmokeProbe>();
@@ -519,9 +523,187 @@ namespace BakaBakeBakery.Editor
             var backdrop = new GameObject("Backdrop").transform;
             backdrop.SetParent(parent, false);
 
-            CreateFacade(backdrop, new Vector3(-7.5f, 2.2f, 4.4f), new Vector3(4f, 4.4f, 0.8f), materials.Cherry, materials.Glow, materials.White);
-            CreateFacade(backdrop, new Vector3(-2.9f, 2.6f, 4.65f), new Vector3(4.2f, 5.2f, 0.8f), materials.Flour, materials.Glow, materials.White);
-            CreateFacade(backdrop, new Vector3(6.8f, 2.35f, 4.5f), new Vector3(4.5f, 4.7f, 0.8f), materials.EveningBlue, materials.Glow, materials.White);
+            CreatePrimitive(PrimitiveType.Cube, "Park Lawn", backdrop, new Vector3(0f, -0.01f, 11.2f), new Vector3(19f, 0.16f, 17.5f), materials.Grass);
+            for (var segment = 0; segment < 7; segment++)
+            {
+                var depth = 4.25f + segment * 2.15f;
+                var width = Mathf.Lerp(2.9f, 1.95f, segment / 6f);
+                CreatePrimitive(
+                    PrimitiveType.Cube,
+                    $"Park Path Into Depth {segment:00}",
+                    backdrop,
+                    new Vector3(5.15f + segment * 0.08f, 0.1f, depth),
+                    new Vector3(width, 0.08f, 2.04f),
+                    segment % 2 == 0 ? materials.Stone : materials.Cloth,
+                    Quaternion.Euler(0f, segment % 2 == 0 ? 1.2f : -1.2f, 0f));
+            }
+
+            BuildParkBench(backdrop, new Vector3(3.18f, 0.17f, 6.4f), 88f, materials);
+            BuildParkBench(backdrop, new Vector3(7.18f, 0.17f, 9.6f), -88f, materials);
+            BuildParkBench(backdrop, new Vector3(3.45f, 0.17f, 14.2f), 88f, materials, 0.82f);
+            BuildParkTree(backdrop, new Vector3(-6.2f, 0f, 5.4f), 1.05f, materials);
+            BuildParkTree(backdrop, new Vector3(8.25f, 0f, 7.4f), 0.86f, materials);
+            BuildParkTree(backdrop, new Vector3(-5.1f, 0f, 12.6f), 0.78f, materials);
+            BuildParkTree(backdrop, new Vector3(5.2f, 0f, 15.2f), 0.7f, materials);
+
+            for (var flower = 0; flower < 18; flower++)
+            {
+                var side = flower % 2 == 0 ? -1f : 1f;
+                var z = 4.2f + flower * 0.72f;
+                var x = 5.2f + side * (1.72f + (flower % 3) * 0.25f);
+                var colour = flower % 3 == 0 ? materials.Cherry : flower % 3 == 1 ? materials.Glow : materials.Flour;
+                CreatePrimitive(PrimitiveType.Sphere, $"Park Flower {flower:00}", backdrop, new Vector3(x, 0.23f, z), Vector3.one * 0.16f, colour);
+            }
+
+            CreatePrimitive(PrimitiveType.Cube, "Distant Sidewalk Near", backdrop, new Vector3(0f, 0.08f, 18.55f), new Vector3(22f, 0.12f, 1.1f), materials.Stone);
+            CreatePrimitive(PrimitiveType.Cube, "Distant Road", backdrop, new Vector3(0f, 0.04f, 20.55f), new Vector3(25f, 0.12f, 3.1f), materials.Road);
+            CreatePrimitive(PrimitiveType.Cube, "Distant Sidewalk Far", backdrop, new Vector3(0f, 0.09f, 22.45f), new Vector3(22f, 0.14f, 0.9f), materials.Stone);
+            for (var mark = -5; mark <= 5; mark++)
+            {
+                CreatePrimitive(PrimitiveType.Cube, "Road Centre Mark", backdrop, new Vector3(mark * 2.3f, 0.12f, 20.55f), new Vector3(1.25f, 0.025f, 0.12f), materials.Flour);
+            }
+
+            CreateParkPedestrian(backdrop, "Park Walker - Red Scarf", new Vector3(4.78f, 0.17f, 4.5f), new Vector3(5.32f, 0.17f, 17.2f), 0.82f, 0.4f, materials.Cherry, materials, true);
+            CreateParkPedestrian(backdrop, "Park Walker - Blue Coat", new Vector3(5.72f, 0.17f, 16.8f), new Vector3(5.18f, 0.17f, 5.2f), 0.64f, 2.1f, materials.EveningBlue, materials, false);
+            CreateParkPedestrian(backdrop, "Park Walker - Little Hat", new Vector3(4.55f, 0.17f, 15.3f), new Vector3(4.72f, 0.17f, 7.1f), 0.72f, 5.2f, materials.Sage, materials, true, 0.82f);
+            CreateParkVehicle(backdrop, "Traffic Car - Cherry", new Vector3(-13f, 0.24f, 20.08f), new Vector3(13f, 0.24f, 20.08f), 4.1f, 0.8f, materials.Cherry, materials, false);
+            CreateParkVehicle(backdrop, "Traffic Car - Cream", new Vector3(13f, 0.24f, 21.12f), new Vector3(-13f, 0.24f, 21.12f), 3.45f, 4.4f, materials.Flour, materials, true);
+
+            CreateFacade(backdrop, new Vector3(-8.4f, 2.75f, 25.2f), new Vector3(4.2f, 5.5f, 1.35f), materials.Cherry, materials.Glow, materials.White);
+            CreateFacade(backdrop, new Vector3(-3.25f, 3.05f, 25.55f), new Vector3(4.35f, 6.1f, 1.35f), materials.Flour, materials.Glow, materials.White);
+            CreateFacade(backdrop, new Vector3(2.1f, 2.65f, 25.35f), new Vector3(4.1f, 5.3f, 1.35f), materials.Sage, materials.Glow, materials.White);
+            CreateFacade(backdrop, new Vector3(7.2f, 2.95f, 25.65f), new Vector3(4.45f, 5.9f, 1.35f), materials.Crust, materials.Glow, materials.White);
+        }
+
+        private static void BuildParkBench(Transform parent, Vector3 position, float yaw, Materials materials, float scale = 1f)
+        {
+            var bench = new GameObject("Park Bench Sideways").transform;
+            bench.SetParent(parent, false);
+            bench.localPosition = position;
+            bench.localRotation = Quaternion.Euler(0f, yaw, 0f);
+            bench.localScale = Vector3.one * scale;
+            CreatePrimitive(PrimitiveType.Cube, "Bench Seat", bench, new Vector3(0f, 0.62f, 0f), new Vector3(2.1f, 0.18f, 0.58f), materials.Wood);
+            CreatePrimitive(PrimitiveType.Cube, "Bench Back", bench, new Vector3(0f, 1.05f, 0.24f), new Vector3(2.1f, 0.7f, 0.14f), materials.Wood, Quaternion.Euler(-8f, 0f, 0f));
+            for (var leg = -1; leg <= 1; leg += 2)
+            {
+                CreatePrimitive(PrimitiveType.Cube, "Bench Leg", bench, new Vector3(leg * 0.72f, 0.28f, 0f), new Vector3(0.16f, 0.58f, 0.42f), materials.Metal);
+            }
+        }
+
+        private static void BuildParkTree(Transform parent, Vector3 position, float scale, Materials materials)
+        {
+            var tree = new GameObject("Park Tree").transform;
+            tree.SetParent(parent, false);
+            tree.localPosition = position;
+            tree.localScale = Vector3.one * scale;
+            CreatePrimitive(PrimitiveType.Cylinder, "Park Trunk", tree, new Vector3(0f, 1.45f, 0f), new Vector3(0.38f, 1.45f, 0.38f), materials.Wood);
+            CreatePrimitive(PrimitiveType.Sphere, "Park Crown A", tree, new Vector3(-0.45f, 3.25f, 0f), new Vector3(1.65f, 1.45f, 1.5f), materials.Sage);
+            CreatePrimitive(PrimitiveType.Sphere, "Park Crown B", tree, new Vector3(0.52f, 3.3f, 0.1f), new Vector3(1.5f, 1.35f, 1.4f), materials.Grass);
+            CreatePrimitive(PrimitiveType.Sphere, "Park Crown C", tree, new Vector3(0f, 3.9f, 0f), new Vector3(1.55f, 1.25f, 1.35f), materials.Sage);
+        }
+
+        private static void CreateParkPedestrian(
+            Transform parent,
+            string name,
+            Vector3 start,
+            Vector3 end,
+            float speed,
+            float delay,
+            Material coat,
+            Materials materials,
+            bool hasHat,
+            float scale = 1f)
+        {
+            var startStation = CreateStation(parent, name + " Start", start);
+            var endStation = CreateStation(parent, name + " End", end);
+            var actorRoot = new GameObject(name).transform;
+            actorRoot.SetParent(parent, false);
+            actorRoot.localPosition = start;
+            var visual = new GameObject(name + " Visual").transform;
+            visual.SetParent(actorRoot, false);
+            visual.localScale = Vector3.one * scale;
+            CreatePrimitive(PrimitiveType.Capsule, "Body", visual, new Vector3(0f, 0.72f, 0f), new Vector3(0.58f, 0.66f, 0.52f), coat);
+            var leftLeg = CreateLimb(visual, "Leg Left", new Vector3(-0.15f, 0.43f, 0f), new Vector3(-0.15f, 0.04f, 0f), 0.14f, materials.Cocoa);
+            var rightLeg = CreateLimb(visual, "Leg Right", new Vector3(0.15f, 0.43f, 0f), new Vector3(0.15f, 0.04f, 0f), 0.14f, materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Head", visual, new Vector3(0f, 1.62f, 0f), new Vector3(0.58f, 0.6f, 0.54f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Hair", visual, new Vector3(0f, 1.83f, 0.1f), new Vector3(0.61f, 0.38f, 0.56f), materials.Hair);
+            if (hasHat)
+            {
+                CreatePrimitive(PrimitiveType.Cylinder, "Little Hat", visual, new Vector3(0f, 1.98f, 0f), new Vector3(0.62f, 0.1f, 0.62f), materials.Crust);
+            }
+            CreatePrimitive(PrimitiveType.Sphere, "Eye Left", visual, new Vector3(-0.13f, 1.66f, -0.28f), new Vector3(0.06f, 0.07f, 0.05f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Sphere, "Eye Right", visual, new Vector3(0.13f, 1.66f, -0.28f), new Vector3(0.06f, 0.07f, 0.05f), materials.Cocoa);
+            var leftArm = CreateLimb(visual, "Arm Left", new Vector3(-0.27f, 1.08f, 0f), new Vector3(-0.42f, 0.72f, -0.24f), 0.15f, coat);
+            var rightArm = CreateLimb(visual, "Arm Right", new Vector3(0.27f, 1.08f, 0f), new Vector3(0.42f, 0.72f, -0.24f), 0.15f, coat);
+            var actor = actorRoot.gameObject.AddComponent<BakeryParkActor>();
+            var serialized = new SerializedObject(actor);
+            serialized.FindProperty("kind").enumValueIndex = (int)BakeryParkActorKind.Pedestrian;
+            SetReference(serialized, "visualRoot", visual);
+            SetReference(serialized, "startStation", startStation);
+            SetReference(serialized, "endStation", endStation);
+            SetReference(serialized, "leftLeg", leftLeg);
+            SetReference(serialized, "rightLeg", rightLeg);
+            SetReference(serialized, "leftArm", leftArm);
+            SetReference(serialized, "rightArm", rightArm);
+            serialized.FindProperty("speed").floatValue = speed;
+            serialized.FindProperty("initialDelay").floatValue = delay;
+            serialized.FindProperty("loopDelay").floatValue = 1.4f + delay * 0.18f;
+            serialized.FindProperty("reverseAtEnd").boolValue = true;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void CreateParkVehicle(
+            Transform parent,
+            string name,
+            Vector3 start,
+            Vector3 end,
+            float speed,
+            float delay,
+            Material bodyMaterial,
+            Materials materials,
+            bool reversed)
+        {
+            var startStation = CreateStation(parent, name + " Start", start);
+            var endStation = CreateStation(parent, name + " End", end);
+            var actorRoot = new GameObject(name).transform;
+            actorRoot.SetParent(parent, false);
+            actorRoot.localPosition = start;
+            var visual = new GameObject(name + " Visual").transform;
+            visual.SetParent(actorRoot, false);
+            visual.localRotation = Quaternion.Euler(0f, reversed ? 180f : 0f, 0f);
+            CreatePrimitive(PrimitiveType.Cube, "Car Lower Body", visual, new Vector3(0f, 0.45f, 0f), new Vector3(2.45f, 0.62f, 1.02f), bodyMaterial);
+            CreatePrimitive(PrimitiveType.Cube, "Car Cabin", visual, new Vector3(-0.18f, 0.94f, 0f), new Vector3(1.35f, 0.58f, 0.88f), materials.EveningBlue);
+            CreatePrimitive(PrimitiveType.Cube, "Car Window", visual, new Vector3(-0.18f, 0.98f, -0.46f), new Vector3(0.92f, 0.32f, 0.04f), materials.Glow);
+            CreatePrimitive(PrimitiveType.Sphere, "Car Lamp A", visual, new Vector3(1.23f, 0.48f, -0.32f), Vector3.one * 0.14f, materials.Glow);
+            CreatePrimitive(PrimitiveType.Sphere, "Car Lamp B", visual, new Vector3(1.23f, 0.48f, 0.32f), Vector3.one * 0.14f, materials.Glow);
+            var wheels = new Transform[4];
+            var cursor = 0;
+            for (var x = -1; x <= 1; x += 2)
+            {
+                for (var z = -1; z <= 1; z += 2)
+                {
+                    wheels[cursor++] = CreatePrimitive(
+                        PrimitiveType.Cylinder,
+                        "Traffic Wheel",
+                        visual,
+                        new Vector3(x * 0.76f, 0.2f, z * 0.54f),
+                        new Vector3(0.36f, 0.1f, 0.36f),
+                        materials.Cocoa,
+                        Quaternion.Euler(90f, 0f, 0f)).transform;
+                }
+            }
+            var actor = actorRoot.gameObject.AddComponent<BakeryParkActor>();
+            var serialized = new SerializedObject(actor);
+            serialized.FindProperty("kind").enumValueIndex = (int)BakeryParkActorKind.Vehicle;
+            SetReference(serialized, "visualRoot", visual);
+            SetReference(serialized, "startStation", startStation);
+            SetReference(serialized, "endStation", endStation);
+            SetReferenceArray(serialized, "wheels", wheels);
+            serialized.FindProperty("speed").floatValue = speed;
+            serialized.FindProperty("initialDelay").floatValue = delay;
+            serialized.FindProperty("loopDelay").floatValue = 3.2f + delay * 0.2f;
+            serialized.FindProperty("reverseAtEnd").boolValue = false;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void CreateFacade(Transform parent, Vector3 position, Vector3 scale, Material wall, Material window, Material smoke)
@@ -530,14 +712,20 @@ namespace BakaBakeBakery.Editor
             facade.SetParent(parent, false);
             facade.localPosition = position;
             CreatePrimitive(PrimitiveType.Cube, "Wall", facade, Vector3.zero, scale, wall);
-            CreatePrimitive(PrimitiveType.Cube, "Window Light A", facade, new Vector3(-0.9f, 0.4f, -0.43f), new Vector3(0.7f, 1.15f, 0.08f), window);
-            CreatePrimitive(PrimitiveType.Cube, "Window Light B", facade, new Vector3(0.9f, 0.4f, -0.43f), new Vector3(0.7f, 1.15f, 0.08f), window);
-            for (var side = -1; side <= 1; side += 2)
+            var front = -scale.z * 0.5f - 0.055f;
+            foreach (var floor in new[] { 0.25f, 1.58f })
             {
-                var x = side * 0.9f;
-                CreatePrimitive(PrimitiveType.Cube, "Window Crossbar", facade, new Vector3(x, 0.4f, -0.49f), new Vector3(0.06f, 1.16f, 0.04f), wall);
-                CreatePrimitive(PrimitiveType.Cube, "Window Sill", facade, new Vector3(x, -0.2f, -0.5f), new Vector3(0.88f, 0.12f, 0.2f), wall);
-                CreatePrimitive(PrimitiveType.Cube, "Flower Box", facade, new Vector3(x, -0.35f, -0.57f), new Vector3(0.72f, 0.22f, 0.28f), wall);
+                for (var side = -1; side <= 1; side += 2)
+                {
+                    var x = side * 0.9f;
+                    CreatePrimitive(PrimitiveType.Cube, "Window Light", facade, new Vector3(x, floor, front), new Vector3(0.7f, 0.9f, 0.08f), window);
+                    CreatePrimitive(PrimitiveType.Cube, "Window Crossbar", facade, new Vector3(x, floor, front - 0.05f), new Vector3(0.06f, 0.92f, 0.04f), wall);
+                    CreatePrimitive(PrimitiveType.Cube, "Window Sill", facade, new Vector3(x, floor - 0.51f, front - 0.05f), new Vector3(0.88f, 0.12f, 0.2f), wall);
+                    if (floor < 1f)
+                    {
+                        CreatePrimitive(PrimitiveType.Cube, "Flower Box", facade, new Vector3(x, floor - 0.66f, front - 0.12f), new Vector3(0.72f, 0.22f, 0.28f), wall);
+                    }
+                }
             }
             CreatePrimitive(PrimitiveType.Cube, "Cornice", facade, new Vector3(0f, scale.y * 0.5f, -0.05f), new Vector3(scale.x + 0.25f, 0.18f, scale.z + 0.12f), wall);
             CreatePrimitive(PrimitiveType.Cube, "Roof Left", facade, new Vector3(-scale.x * 0.22f, scale.y * 0.5f + 0.48f, 0f), new Vector3(scale.x * 0.58f, 0.16f, scale.z + 0.5f), wall, Quaternion.Euler(0f, 0f, 22f));
@@ -684,8 +872,11 @@ namespace BakaBakeBakery.Editor
             var doorPivot = new GameObject("Oven Door Hinge").transform;
             doorPivot.SetParent(oven, false);
             doorPivot.localPosition = new Vector3(0f, 0.45f, -0.68f);
-            CreatePrimitive(PrimitiveType.Cube, "Oven Door", doorPivot, new Vector3(0f, 0.58f, 0f), new Vector3(1.3f, 1.15f, 0.08f), materials.Cocoa);
-            CreatePrimitive(PrimitiveType.Cube, "Oven Window", doorPivot, new Vector3(0f, 0.59f, -0.06f), new Vector3(1.05f, 0.82f, 0.04f), materials.Glow);
+            CreatePrimitive(PrimitiveType.Cube, "Oven Door", doorPivot, new Vector3(0f, 0.58f, 0f), new Vector3(1.3f, 1.15f, 0.11f), materials.Cocoa);
+            CreatePrimitive(PrimitiveType.Cube, "Oven Window", doorPivot, new Vector3(0f, 0.59f, -0.075f), new Vector3(1.05f, 0.82f, 0.045f), materials.Glow);
+            CreatePrimitive(PrimitiveType.Cube, "Oven Handle Rail", doorPivot, new Vector3(0f, 1.11f, -0.18f), new Vector3(1.08f, 0.12f, 0.14f), materials.Wood);
+            CreatePrimitive(PrimitiveType.Cylinder, "Oven Handle Left Mount", doorPivot, new Vector3(-0.45f, 1.04f, -0.12f), new Vector3(0.08f, 0.11f, 0.08f), materials.Metal);
+            CreatePrimitive(PrimitiveType.Cylinder, "Oven Handle Right Mount", doorPivot, new Vector3(0.45f, 1.04f, -0.12f), new Vector3(0.08f, 0.11f, 0.08f), materials.Metal);
             references.OvenDoor = doorPivot;
             CreatePrimitive(PrimitiveType.Cylinder, "Oven Dial A", oven, new Vector3(-0.42f, 1.82f, -0.68f), new Vector3(0.18f, 0.06f, 0.18f), materials.Cherry, Quaternion.Euler(90f, 0f, 0f));
             CreatePrimitive(PrimitiveType.Cylinder, "Oven Dial B", oven, new Vector3(0.42f, 1.82f, -0.68f), new Vector3(0.18f, 0.06f, 0.18f), materials.Flour, Quaternion.Euler(90f, 0f, 0f));
@@ -1293,6 +1484,8 @@ namespace BakaBakeBakery.Editor
             var grandmotherExit = CreateStation(characters, "Mrs Rose - Exit", new Vector3(7.45f, 0.5f, -3.15f));
             var neighbourEntrance = CreateStation(characters, "Neighbour - Entrance", new Vector3(-7.1f, 0.5f, -2.62f));
             var neighbourExit = CreateStation(characters, "Neighbour - Exit", new Vector3(-7.4f, 0.5f, -3.05f));
+            var neighbourSnackWalk = CreateStation(characters, "Neighbour - Park Snack", new Vector3(5.7f, 0.5f, 5.6f));
+            var neighbourParkExit = CreateStation(characters, "Neighbour - Park Exit", new Vector3(5.45f, 0.5f, 16.4f));
             references.Customers = new[]
             {
                 CreateGrandmother(
@@ -1308,6 +1501,8 @@ namespace BakaBakeBakery.Editor
                     serviceStation,
                     queueStation,
                     neighbourExit,
+                    neighbourSnackWalk,
+                    neighbourParkExit,
                     materials)
             };
             CreateFriend(characters, materials);
@@ -1400,15 +1595,35 @@ namespace BakaBakeBakery.Editor
             CreatePrimitive(PrimitiveType.Sphere, "Cheek Left", visual, new Vector3(-0.27f, 1.9f, -0.32f), new Vector3(0.12f, 0.08f, 0.04f), materials.Cherry);
             CreatePrimitive(PrimitiveType.Sphere, "Cheek Right", visual, new Vector3(0.27f, 1.9f, -0.32f), new Vector3(0.12f, 0.08f, 0.04f), materials.Cherry);
             CreatePrimitive(PrimitiveType.Cube, "Smile", visual, new Vector3(0f, 1.82f, -0.37f), new Vector3(0.2f, 0.035f, 0.035f), materials.Cocoa);
-            var leftArm = CreateLimb(visual, "Arm Left", new Vector3(-0.34f, 1.38f, -0.02f), new Vector3(-0.72f, 1.0f, -0.42f), 0.22f, materials.Cloth);
-            var rightArm = CreateLimb(visual, "Arm Right", new Vector3(0.34f, 1.38f, -0.02f), new Vector3(0.78f, 1.13f, -0.44f), 0.22f, materials.Cloth);
-            CreatePrimitive(PrimitiveType.Sphere, "Hand Left", visual, new Vector3(-0.72f, 1.0f, -0.42f), new Vector3(0.2f, 0.2f, 0.2f), materials.Skin);
-            CreatePrimitive(PrimitiveType.Sphere, "Hand Right", visual, new Vector3(0.78f, 1.13f, -0.44f), new Vector3(0.2f, 0.2f, 0.2f), materials.Skin);
+            var leftShoulder = CreateStation(visual, "Shoulder Left", new Vector3(-0.34f, 1.38f, -0.02f));
+            var rightShoulder = CreateStation(visual, "Shoulder Right", new Vector3(0.34f, 1.38f, -0.02f));
+            var leftElbow = new Vector3(-0.56f, 1.18f, -0.24f);
+            var rightElbow = new Vector3(0.58f, 1.2f, -0.25f);
+            var leftHandPosition = new Vector3(-0.66f, 1.02f, -0.4f);
+            var rightHandPosition = new Vector3(0.69f, 1.08f, -0.42f);
+            var leftUpperArm = CreateLimb(visual, "Upper Arm Left", leftShoulder.localPosition, leftElbow, 0.22f, materials.Cloth);
+            var rightUpperArm = CreateLimb(visual, "Upper Arm Right", rightShoulder.localPosition, rightElbow, 0.22f, materials.Cloth);
+            var leftForearm = CreateLimb(visual, "Forearm Left", leftElbow, leftHandPosition, 0.2f, materials.Skin);
+            var rightForearm = CreateLimb(visual, "Forearm Right", rightElbow, rightHandPosition, 0.2f, materials.Skin);
+            var leftHand = CreateStation(visual, "Hand Left Rig", leftHandPosition);
+            var rightHand = CreateStation(visual, "Hand Right Rig", rightHandPosition);
+            CreatePrimitive(PrimitiveType.Sphere, "Palm Left", leftHand, Vector3.zero, new Vector3(0.2f, 0.18f, 0.2f), materials.Skin);
+            CreatePrimitive(PrimitiveType.Sphere, "Palm Right", rightHand, Vector3.zero, new Vector3(0.2f, 0.18f, 0.2f), materials.Skin);
             for (var finger = -1; finger <= 1; finger++)
             {
-                CreatePrimitive(PrimitiveType.Capsule, "Finger Left", visual, new Vector3(-0.72f + finger * 0.06f, 0.89f, -0.46f), new Vector3(0.035f, 0.1f, 0.035f), materials.Skin);
-                CreatePrimitive(PrimitiveType.Capsule, "Finger Right", visual, new Vector3(0.78f + finger * 0.06f, 1.02f, -0.48f), new Vector3(0.035f, 0.1f, 0.035f), materials.Skin);
+                CreatePrimitive(PrimitiveType.Capsule, "Finger Left", leftHand, new Vector3(finger * 0.055f, -0.1f, -0.04f), new Vector3(0.032f, 0.09f, 0.032f), materials.Skin);
+                CreatePrimitive(PrimitiveType.Capsule, "Finger Right", rightHand, new Vector3(finger * 0.055f, -0.1f, -0.04f), new Vector3(0.032f, 0.09f, 0.032f), materials.Skin);
             }
+
+            var carryAnchor = CreateStation(visual, "Two Hand Carry Anchor", new Vector3(0f, 1.42f, -0.68f));
+            var carryTray = CreatePrimitive(
+                PrimitiveType.Cube,
+                "Two Hand Carry Tray",
+                carryAnchor,
+                new Vector3(0f, -0.1f, 0.04f),
+                new Vector3(1.08f, 0.07f, 0.72f),
+                materials.Wood);
+            carryTray.SetActive(false);
 
             var recipeCount = Enum.GetValues(typeof(RecipeId)).Length;
             var rawCarryDisplays = new GameObject[recipeCount];
@@ -1417,21 +1632,21 @@ namespace BakaBakeBakery.Editor
             {
                 var recipeId = (RecipeId)index;
                 rawCarryDisplays[index] = CreateRecipeVisual(
-                    visual,
+                    carryAnchor,
                     $"Carried Raw - {recipeId}",
                     recipeId,
                     materials,
                     true,
-                    new Vector3(0.5f, 1.28f, -0.58f),
-                    0.46f).gameObject;
+                    new Vector3(0f, 0.05f, -0.04f),
+                    0.72f).gameObject;
                 bakedCarryDisplays[index] = CreateRecipeVisual(
-                    visual,
+                    carryAnchor,
                     $"Carried Baked - {recipeId}",
                     recipeId,
                     materials,
                     false,
-                    new Vector3(0.5f, 1.28f, -0.58f),
-                    0.46f).gameObject;
+                    new Vector3(0f, 0.05f, -0.04f),
+                    0.72f).gameObject;
                 rawCarryDisplays[index].SetActive(false);
                 bakedCarryDisplays[index].SetActive(false);
             }
@@ -1450,8 +1665,16 @@ namespace BakaBakeBakery.Editor
             serializedWorker.FindProperty("counterStation").objectReferenceValue = counterStation;
             serializedWorker.FindProperty("leftLeg").objectReferenceValue = leftLeg;
             serializedWorker.FindProperty("rightLeg").objectReferenceValue = rightLeg;
-            serializedWorker.FindProperty("leftArm").objectReferenceValue = leftArm;
-            serializedWorker.FindProperty("rightArm").objectReferenceValue = rightArm;
+            serializedWorker.FindProperty("leftShoulder").objectReferenceValue = leftShoulder;
+            serializedWorker.FindProperty("rightShoulder").objectReferenceValue = rightShoulder;
+            serializedWorker.FindProperty("leftUpperArm").objectReferenceValue = leftUpperArm;
+            serializedWorker.FindProperty("rightUpperArm").objectReferenceValue = rightUpperArm;
+            serializedWorker.FindProperty("leftForearm").objectReferenceValue = leftForearm;
+            serializedWorker.FindProperty("rightForearm").objectReferenceValue = rightForearm;
+            serializedWorker.FindProperty("leftHand").objectReferenceValue = leftHand;
+            serializedWorker.FindProperty("rightHand").objectReferenceValue = rightHand;
+            serializedWorker.FindProperty("carryAnchor").objectReferenceValue = carryAnchor;
+            serializedWorker.FindProperty("carryTray").objectReferenceValue = carryTray;
             SetReferenceArray(serializedWorker, "rawCarryDisplays", rawCarryDisplays);
             SetReferenceArray(serializedWorker, "bakedCarryDisplays", bakedCarryDisplays);
             serializedWorker.ApplyModifiedPropertiesWithoutUndo();
@@ -1520,6 +1743,8 @@ namespace BakaBakeBakery.Editor
             Transform serviceStation,
             Transform queueStation,
             Transform exitStation,
+            Transform postPurchaseStation,
+            Transform farExitStation,
             Materials materials)
         {
             var neighbour = new GameObject("Customer - Neighbour").transform;
@@ -1562,7 +1787,10 @@ namespace BakaBakeBakery.Editor
                 rightLeg,
                 leftArm,
                 rightArm,
-                parcel);
+                parcel,
+                postPurchaseStation,
+                farExitStation,
+                true);
         }
 
         private static GameObject CreatePurchaseParcel(Transform visual, Materials materials)
@@ -1587,7 +1815,10 @@ namespace BakaBakeBakery.Editor
             Transform rightLeg,
             Transform leftArm,
             Transform rightArm,
-            GameObject parcel)
+            GameObject parcel,
+            Transform postPurchaseStation = null,
+            Transform farExitStation = null,
+            bool eatsPurchase = false)
         {
             var actor = actorRoot.gameObject.AddComponent<BakeryCustomerActor>();
             var serializedActor = new SerializedObject(actor);
@@ -1601,6 +1832,9 @@ namespace BakaBakeBakery.Editor
             SetReference(serializedActor, "leftArm", leftArm);
             SetReference(serializedActor, "rightArm", rightArm);
             SetReference(serializedActor, "purchaseParcel", parcel);
+            if (postPurchaseStation != null) SetReference(serializedActor, "postPurchaseStation", postPurchaseStation);
+            if (farExitStation != null) SetReference(serializedActor, "farExitStation", farExitStation);
+            serializedActor.FindProperty("eatsPurchase").boolValue = eatsPurchase;
             serializedActor.ApplyModifiedPropertiesWithoutUndo();
             return actor;
         }

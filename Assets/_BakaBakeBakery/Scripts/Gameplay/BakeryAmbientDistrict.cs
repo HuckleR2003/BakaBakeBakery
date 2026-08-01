@@ -10,6 +10,8 @@ namespace BakaBakeBakery.Gameplay
         private readonly List<Transform> chimneyPuffs = new();
         private readonly List<Transform> flourMotes = new();
         private readonly List<Transform> shutterSlats = new();
+        private readonly List<Transform> parkCrowns = new();
+        private readonly List<Quaternion> parkCrownBases = new();
         private BakeryGameController game;
         private Transform shutter;
         private Transform bicycle;
@@ -35,6 +37,7 @@ namespace BakaBakeBakery.Gameplay
                 else if (item.name.StartsWith("Backdrop Smoke")) chimneyPuffs.Add(item);
                 else if (item.name.StartsWith("Flour Mote")) flourMotes.Add(item);
                 else if (item.name.StartsWith("Wooden Shutter Slat")) shutterSlats.Add(item);
+                else if (item.name.StartsWith("Park Crown")) parkCrowns.Add(item);
                 else if (item.name == "Service Shutter") shutter = item;
                 else if (item.name == "Morning Bicycle") bicycle = item;
                 else if (item.name == "Old Delivery Car") deliveryCar = item;
@@ -44,6 +47,7 @@ namespace BakaBakeBakery.Gameplay
             }
 
             if (friend != null) friendBase = friend.localPosition;
+            foreach (var crown in parkCrowns) parkCrownBases.Add(crown.localRotation);
             if (friendLeftArm != null) friendLeftArmBase = friendLeftArm.localRotation;
             if (friendRightArm != null) friendRightArmBase = friendRightArm.localRotation;
         }
@@ -54,6 +58,7 @@ namespace BakaBakeBakery.Gameplay
             AnimateWindows(time);
             AnimateSmoke(time);
             AnimateFlour(time);
+            AnimatePark(time);
             AnimateBakeryState(time);
         }
 
@@ -98,6 +103,20 @@ namespace BakaBakeBakery.Gameplay
                     1.34f + phase * 0.75f,
                     -0.28f + Mathf.Sin(time * 1.4f + index) * 0.12f);
                 mote.localScale = Vector3.one * Mathf.Lerp(0.055f, 0.018f, phase);
+            }
+        }
+
+        private void AnimatePark(float time)
+        {
+            var motionScale = BakaBakeBakery.Core.GameSettings.ReduceMotion ? 0.3f : 1f;
+            for (var index = 0; index < parkCrowns.Count; index++)
+            {
+                var crown = parkCrowns[index];
+                crown.localRotation = parkCrownBases[index]
+                    * Quaternion.Euler(
+                        Mathf.Sin(time * 0.42f + index * 0.7f) * 1.1f * motionScale,
+                        0f,
+                        Mathf.Sin(time * 0.36f + index * 0.43f) * 1.8f * motionScale);
             }
         }
 
