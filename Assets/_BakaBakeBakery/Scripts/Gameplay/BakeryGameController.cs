@@ -421,6 +421,7 @@ namespace BakaBakeBakery.Gameplay
             }
 
             loop.UnlockCraftedRecipe(result.Result);
+            BakeryAudio.Play(BakerySound.Discovery);
             AdvanceTutorial(BakeryTutorialStep.CloseFirstDay);
             saveDirty = true;
             HandleLoopEvents();
@@ -482,18 +483,27 @@ namespace BakaBakeBakery.Gameplay
             {
                 switch (loopEvent.Type)
                 {
+                    case BakeryLoopEventType.WorkStarted:
+                        BakeryAudio.Play(
+                            loop.Snapshot.Phase == BakeryWorkPhase.LoadingOven
+                                ? BakerySound.OvenDoor
+                                : BakerySound.Knead);
+                        break;
                     case BakeryLoopEventType.BatchCompleted:
                         worker?.Pulse();
+                        BakeryAudio.Play(BakerySound.BakeReady);
                         AdvanceTutorial(BakeryTutorialStep.DiscoverRecipe);
                         hud?.ShowDialogue(BakerySpeaker.Baker, "Fresh from the oven — easy now.", 2.6f);
                         break;
                     case BakeryLoopEventType.SaleCompleted:
                         saveDirty = true;
+                        BakeryAudio.Play(BakerySound.Coin);
                         dayCycle.RecordRevenue(loopEvent.Amount);
                         worldView?.CelebrateSale();
                         OnSaleCompleted(loopEvent);
                         break;
                     case BakeryLoopEventType.CustomerArrived:
+                        BakeryAudio.Play(BakerySound.ShopBell, 0.7f);
                         if (loop.TotalItemsSold % 3 == 1)
                         {
                             hud?.ShowDialogue(BakerySpeaker.Neighbour, "Morning! Is that loaf spoken for?", 3f);
@@ -502,23 +512,28 @@ namespace BakaBakeBakery.Gameplay
                         break;
                     case BakeryLoopEventType.ManagerUnlocked:
                         saveDirty = true;
+                        BakeryAudio.Play(BakerySound.Discovery);
                         hud?.ShowToast("MANAGER UNLOCKED", "Mila now keeps the baker moving between your clicks.");
                         hud?.ShowDialogue(BakerySpeaker.Baker, "Mila wrote the whole rhythm down. We can breathe now.", 4f);
                         break;
                     case BakeryLoopEventType.RecipeUnlocked:
                         saveDirty = true;
+                        BakeryAudio.Play(BakerySound.Discovery);
                         var recipe = loop.GetRecipe(loopEvent.RecipeId);
                         hud?.ShowToast("NEW RECIPE", recipe.DisplayName);
                         break;
                     case BakeryLoopEventType.SecondOvenPurchased:
+                        BakeryAudio.Play(BakerySound.Discovery);
                         hud?.ShowToast("SECOND OVEN READY", "Bakes are now 40% quicker and the counter holds more.");
                         hud?.ShowDialogue(BakerySpeaker.Grandmother, "Two ovens? This little place is growing up.", 4f);
                         break;
                     case BakeryLoopEventType.BakeryUpgraded:
+                        BakeryAudio.Play(BakerySound.DayBell);
                         hud?.ShowToast("BAKA-BAKE-BAKERY", "The neighbourhood helped raise a warm wooden home.");
                         hud?.ShowDialogue(BakerySpeaker.Neighbour, "That glowing sign belongs on this street.", 4f);
                         break;
                     case BakeryLoopEventType.GoldenMinuteStarted:
+                        BakeryAudio.Play(BakerySound.Discovery);
                         hud?.ShowToast("GOLDEN MINUTE", "Neighbourhood warmth doubles every sale for 18 seconds.");
                         break;
                     case BakeryLoopEventType.GoldenMinuteEnded:
@@ -656,6 +671,12 @@ namespace BakaBakeBakery.Gameplay
             var prior = previousDayPhase;
             previousDayPhase = dayCycle.Phase;
             saveDirty = true;
+            BakeryAudio.SetShiftOpen(dayCycle.Phase == BakeryDayPhase.Open);
+            if (dayCycle.Phase == BakeryDayPhase.Open || dayCycle.Phase == BakeryDayPhase.DaySummary)
+            {
+                BakeryAudio.Play(BakerySound.DayBell, 0.8f);
+            }
+
             if (prior == BakeryDayPhase.TravellingToMarket && dayCycle.Phase == BakeryDayPhase.ReadyToOpen)
             {
                 hud?.ShowToast("PANTRY RESTOCKED", "Flour, milk, pastry, jam and chocolate are safely home.");
