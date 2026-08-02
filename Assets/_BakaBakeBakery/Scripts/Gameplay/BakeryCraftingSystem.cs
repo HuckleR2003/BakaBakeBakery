@@ -61,13 +61,17 @@ namespace BakaBakeBakery.Gameplay
 
         public int Count(IngredientId ingredient) => stock[(int)ingredient];
 
+        /// <summary>
+        /// A morning basket worth experimenting with. The test kitchen is meant to be played with,
+        /// and a failed formula costs nothing, so a thin pantry only ever made the panel feel dead.
+        /// </summary>
         public void AddMorningBasket()
         {
-            Add(IngredientId.Flour, 6);
-            Add(IngredientId.Milk, 4);
-            Add(IngredientId.PuffPastry, 3);
-            Add(IngredientId.Jam, 3);
-            Add(IngredientId.Chocolate, 4);
+            Add(IngredientId.Flour, 24);
+            Add(IngredientId.Milk, 18);
+            Add(IngredientId.PuffPastry, 14);
+            Add(IngredientId.Jam, 14);
+            Add(IngredientId.Chocolate, 16);
         }
 
         public void Add(IngredientId ingredient, int amount)

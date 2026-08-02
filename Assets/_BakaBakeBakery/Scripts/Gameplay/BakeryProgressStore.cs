@@ -10,10 +10,21 @@ namespace BakaBakeBakery.Gameplay
 
         public static bool HasProgress => PlayerPrefs.HasKey(ProgressKey);
 
-        /// <summary>A fresh bakery: the opening float in the cash tin, nothing else.</summary>
+        /// <summary>
+        /// A fresh bakery: the opening float in the cash tin and a small pantry, so the test kitchen
+        /// has something to hold on the very first morning.
+        /// </summary>
         public static BakeryProgressData CreateNewGame()
         {
-            return Sanitize(new BakeryProgressData { coins = BakeryProgressData.NewGameCoins });
+            return Sanitize(new BakeryProgressData
+            {
+                coins = BakeryProgressData.NewGameCoins,
+                flour = 8,
+                milk = 6,
+                puffPastry = 5,
+                jam = 5,
+                chocolate = 6
+            });
         }
 
         public static BakeryProgressData Load()
