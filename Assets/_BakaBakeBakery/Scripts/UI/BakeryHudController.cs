@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BakaBakeBakery.Core;
 using BakaBakeBakery.Data;
 using BakaBakeBakery.Gameplay;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace BakaBakeBakery.UI
 
         private readonly Dictionary<Button, RecipeId> recipeCards = new();
         private readonly Dictionary<VisualElement, IngredientId> ingredientCards = new();
+        private readonly Dictionary<IngredientId, Texture2D> ingredientTextures = new();
         private readonly Dictionary<VisualElement, IVisualElementScheduledItem> bubbleSchedules = new();
         private readonly List<IngredientId> craftingSlots = new();
         private readonly List<Button> recipeSlotButtons = new();
@@ -75,9 +77,12 @@ namespace BakaBakeBakery.UI
         private Button tutorialPrimaryButton;
         private Button tutorialSecondaryButton;
         private Button tutorialRibbon;
+        private const float ClickTravelThreshold = 6f;
+
         private BakeryGameController game;
         private IVisualElementScheduledItem toastSchedule;
         private IngredientId? draggedIngredient;
+        private Vector3 dragStartPosition;
         private bool diagnosticsMapVisible;
 
         private void OnEnable()
@@ -92,6 +97,7 @@ namespace BakaBakeBakery.UI
             QueryElements();
             MakeDecorationTransparentToClicks();
             ApplyPortraits();
+            ApplyIngredientArt();
             RegisterCallbacks();
         }
 
@@ -482,6 +488,75 @@ namespace BakaBakeBakery.UI
             ApplyPortrait("shop-seller-portrait", "Portraits/shop_seller");
         }
 
+        /// <summary>
+        /// Owner-supplied pantry artwork, shown on the pantry cards, on a filled equation slot and
+        /// on the drag ghost, so an ingredient keeps the same face wherever the player moves it.
+        /// </summary>
+        private void ApplyIngredientArt()
+        {
+            foreach (var pair in ingredientCards)
+            {
+                ApplyIngredientIcon(pair.Key, pair.Value);
+            }
+        }
+
+        private void ApplyIngredientIcon(VisualElement host, IngredientId ingredient)
+        {
+            if (host == null)
+            {
+                return;
+            }
+
+            var icon = host.Q<VisualElement>("ingredient-icon");
+            if (icon == null)
+            {
+                icon = new VisualElement { name = "ingredient-icon", pickingMode = PickingMode.Ignore };
+                icon.AddToClassList("ingredient-icon");
+                host.Insert(0, icon);
+            }
+
+            var texture = IngredientTexture(ingredient);
+            if (texture != null)
+            {
+                icon.style.backgroundImage = new StyleBackground(texture);
+            }
+
+            icon.style.display = texture != null ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        private void ClearIngredientIcon(VisualElement host)
+        {
+            var icon = host?.Q<VisualElement>("ingredient-icon");
+            if (icon != null)
+            {
+                icon.style.display = DisplayStyle.None;
+            }
+        }
+
+        private Texture2D IngredientTexture(IngredientId ingredient)
+        {
+            if (ingredientTextures.TryGetValue(ingredient, out var cached))
+            {
+                return cached;
+            }
+
+            var fileName = ingredient switch
+            {
+                IngredientId.Flour => "flour",
+                IngredientId.Milk => "milk",
+                IngredientId.PuffPastry => "pastry",
+                IngredientId.Jam => "jam",
+                IngredientId.Chocolate => "chocolate",
+                _ => string.Empty
+            };
+
+            var texture = string.IsNullOrEmpty(fileName)
+                ? null
+                : Resources.Load<Texture2D>($"Ingredients/{fileName}");
+            ingredientTextures[ingredient] = texture;
+            return texture;
+        }
+
         private void ApplyPortrait(string elementName, string resourcePath)
         {
             var element = root?.Q<VisualElement>(elementName);
@@ -512,6 +587,7 @@ namespace BakaBakeBakery.UI
                 card.RegisterCallback<PointerCaptureOutEvent>(OnIngredientPointerCaptureOut);
             }
 
+            root.RegisterCallback<ClickEvent>(OnAnyButtonClicked, TrickleDown.TrickleDown);
             if (ledgerButton != null) ledgerButton.clicked += ToggleLedger;
             if (dayButton != null) dayButton.clicked += OnDayButtonClicked;
             if (actionButton != null) actionButton.clicked += OnActionClicked;
@@ -547,6 +623,7 @@ namespace BakaBakeBakery.UI
                 card.UnregisterCallback<PointerCaptureOutEvent>(OnIngredientPointerCaptureOut);
             }
 
+            root?.UnregisterCallback<ClickEvent>(OnAnyButtonClicked, TrickleDown.TrickleDown);
             if (ledgerButton != null) ledgerButton.clicked -= ToggleLedger;
             if (dayButton != null) dayButton.clicked -= OnDayButtonClicked;
             if (actionButton != null) actionButton.clicked -= OnActionClicked;
@@ -852,19 +929,36 @@ namespace BakaBakeBakery.UI
 
             for (var index = 0; index < craftSlotButtons.Count; index++)
             {
+                var slot = craftSlotButtons[index];
                 var filled = index < craftingSlots.Count;
-                craftSlotButtons[index].text = filled ? BakeryCraftingSystem.IngredientName(craftingSlots[index]).ToUpperInvariant() : "DROP";
-                craftSlotButtons[index].EnableInClassList("craft-slot--filled", filled);
+                slot.text = filled ? BakeryCraftingSystem.IngredientName(craftingSlots[index]).ToUpperInvariant() : "DROP";
+                slot.EnableInClassList("craft-slot--filled", filled);
+                if (filled)
+                {
+                    ApplyIngredientIcon(slot, craftingSlots[index]);
+                }
+                else
+                {
+                    ClearIngredientIcon(slot);
+                }
             }
 
             foreach (var pair in ingredientCards)
             {
                 var count = game.IngredientCount(pair.Value);
-                if (pair.Key is Button button)
+                var available = count - ReservedCount(pair.Value);
+                if (pair.Key is not Button button)
                 {
-                    button.text = $"{BakeryCraftingSystem.IngredientName(pair.Value).ToUpperInvariant()}\n{count}";
-                    button.SetEnabled(count > ReservedCount(pair.Value));
+                    continue;
                 }
+
+                button.text = $"{BakeryCraftingSystem.IngredientName(pair.Value).ToUpperInvariant()}\n{available} / {count}";
+
+                // A disabled element receives no pointer events at all, which used to make an empty
+                // pantry look like broken crafting: neither a click nor a drag did anything. The card
+                // stays live and explains itself instead.
+                button.SetEnabled(true);
+                button.EnableInClassList("ingredient-card--empty", available <= 0);
             }
 
             var hasRecipe = BakeryCraftingSystem.TryFindRecipe(craftingSlots, out var preview);
@@ -929,6 +1023,14 @@ namespace BakaBakeBakery.UI
             }
         }
 
+        private static void OnAnyButtonClicked(ClickEvent evt)
+        {
+            if (evt.target is Button)
+            {
+                BakeryAudio.Play(BakerySound.UiTap, 0.5f);
+            }
+        }
+
         private void OnCraftSlotClicked(ClickEvent evt)
         {
             if (evt.currentTarget is not Button button)
@@ -951,17 +1053,47 @@ namespace BakaBakeBakery.UI
                 return;
             }
 
-            if (game == null || game.IngredientCount(ingredient) <= ReservedCount(ingredient) || craftingSlots.Count >= BakeryCraftingSystem.MaximumIngredients)
+            if (!CanTakeIngredient(ingredient))
             {
+                evt.StopPropagation();
                 return;
             }
 
             draggedIngredient = ingredient;
+            dragStartPosition = evt.position;
             source.CapturePointer(evt.pointerId);
             dragGhost.AddToClassList("drag-ghost--visible");
             SetText(dragGhostLabel, BakeryCraftingSystem.IngredientName(ingredient).ToUpperInvariant());
+            ApplyIngredientIcon(dragGhost, ingredient);
             MoveDragGhost(evt.position);
             evt.StopPropagation();
+        }
+
+        /// <summary>
+        /// Explains a refusal instead of going quiet, which is what an empty pantry used to do.
+        /// </summary>
+        private bool CanTakeIngredient(IngredientId ingredient)
+        {
+            if (game == null)
+            {
+                return false;
+            }
+
+            if (craftingSlots.Count >= BakeryCraftingSystem.MaximumIngredients)
+            {
+                ShowToast("THE BOWL IS FULL", "Four ingredients is the most one experiment can take. Clear a slot first.");
+                return false;
+            }
+
+            if (game.IngredientCount(ingredient) <= ReservedCount(ingredient))
+            {
+                ShowToast(
+                    "PANTRY IS OUT",
+                    $"No {BakeryCraftingSystem.IngredientName(ingredient).ToLowerInvariant()} left. The morning market restocks it, and the trip is free.");
+                return false;
+            }
+
+            return true;
         }
 
         private void OnIngredientPointerMove(PointerMoveEvent evt)
@@ -981,6 +1113,7 @@ namespace BakaBakeBakery.UI
             }
 
             var pointer = new Vector2(evt.position.x, evt.position.y);
+            var travelled = Vector2.Distance(pointer, new Vector2(dragStartPosition.x, dragStartPosition.y));
             var targetIndex = -1;
             for (var index = 0; index < craftSlotButtons.Count; index++)
             {
@@ -991,7 +1124,10 @@ namespace BakaBakeBakery.UI
                 }
             }
 
-            if (targetIndex < 0 && craftPanel.worldBound.Contains(pointer))
+            // A tap that never really moved is the accessible shortcut: it drops into the next empty
+            // slot. Releasing anywhere over the workbench does the same, so an imprecise drag still
+            // lands rather than silently vanishing.
+            if (targetIndex < 0 && (travelled < ClickTravelThreshold || craftPanel.worldBound.Contains(pointer)))
             {
                 targetIndex = craftingSlots.Count;
             }
@@ -999,6 +1135,7 @@ namespace BakaBakeBakery.UI
             if (targetIndex >= 0 && targetIndex <= craftingSlots.Count && craftingSlots.Count < BakeryCraftingSystem.MaximumIngredients)
             {
                 craftingSlots.Insert(targetIndex, draggedIngredient.Value);
+                BakeryAudio.Play(BakerySound.Knead, 0.55f);
             }
 
             if (evt.currentTarget is VisualElement source && source.HasPointerCapture(evt.pointerId))
